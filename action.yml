@@ -1,11 +1,41 @@
 # https://help.github.com/ja/articles/metadata-syntax-for-github-actions
-name: GitHub Actions Template
-description: Template for GitHub actions.
+name: Get Diff Action
+description: GitHub actions to get git diff.
 author: technote-space
 inputs:
-  GITHUB_TOKEN:
-    description: Secret GitHub API token to use for making API requests.
+  FROM:
+    description: Commit A.
+    default: 'origin/${GITHUB_BASE_REF}'
     required: true
+  TO:
+    description: Commit B.
+    default: '${GITHUB_REF#refs/}'
+    required: true
+  DOT:
+    description: Dot.
+    default: '...'
+    required: true
+  DIFF_FILTER:
+    description: Diff filter.
+    default: 'AM'
+    required: true
+  SEPARATOR:
+    description: Separator of diffs.
+    default: ' '
+    required: true
+  PREFIX_FILTER:
+    description: Prefix filter.
+    required: false
+  SUFFIX_FILTER:
+    description: Suffix filter.
+    required: false
+  ABSOLUTE:
+    description: Get as absolute path.
+    default: 'true'
+    required: false
+outputs:
+  diff:
+    description: 'git diff results'
 branding:
   # https://feathericons.com/
   icon: 'package'

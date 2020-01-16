@@ -1,33 +1,25 @@
 import path from 'path';
-import { setFailed, getInput } from '@actions/core';
-import { context, GitHub } from '@actions/github';
+import { setFailed, setOutput } from '@actions/core';
+import { context } from '@actions/github';
 import { isTargetEvent } from '@technote-space/filter-github-action';
-import { Logger, Utils } from '@technote-space/github-action-helper';
-import { getPayload } from './utils/misc';
+import { Logger, ContextHelper } from '@technote-space/github-action-helper';
+import { getGitDiff, getGitDiffOutput } from './utils/command';
 import { TARGET_EVENTS } from './constant';
-
-const {showActionInfo} = Utils;
 
 /**
  * run
  */
 async function run(): Promise<void> {
-	try {
-		const logger = new Logger();
-		showActionInfo(path.resolve(__dirname, '..'), logger, context);
+	const logger = new Logger();
+	ContextHelper.showActionInfo(path.resolve(__dirname, '..'), logger, context);
 
-		if (!isTargetEvent(TARGET_EVENTS, context)) {
-			logger.info('This is not target event.');
-			return;
-		}
-
-		const octokit = new GitHub(getInput('GITHUB_TOKEN', {required: true}));
-		console.log(octokit);
-		console.log(getPayload(context));
-
-	} catch (error) {
-		setFailed(error.message);
+	if (!isTargetEvent(TARGET_EVENTS, context)) {
+		logger.info('This is not target event.');
+		setOutput('diff', '');
+		return;
 	}
+
+	setOutput('diff', getGitDiffOutput(await getGitDiff()));
 }
 
-run();
+run().catch(error => setFailed(error.message));

@@ -1,6 +1,5 @@
 import { isTargetEvent } from '@technote-space/filter-github-action';
 import { getContext } from '@technote-space/github-action-test-helper';
-import { getPayload } from '../../src/utils/misc';
 import { TARGET_EVENTS } from '../../src/constant';
 
 describe('isTargetEvent', () => {
@@ -10,16 +9,14 @@ describe('isTargetEvent', () => {
 				action: 'opened',
 			},
 			eventName: 'pull_request',
-		}))).toBeTruthy();
+		}))).toBe(true);
 	});
 
 	it('should return false 1', () => {
 		expect(isTargetEvent(TARGET_EVENTS, getContext({
-			payload: {
-				action: 'opened',
-			},
+			payload: {},
 			eventName: 'push',
-		}))).toBeFalsy();
+		}))).toBe(false);
 	});
 
 	it('should return false 2', () => {
@@ -28,18 +25,6 @@ describe('isTargetEvent', () => {
 				action: 'closed',
 			},
 			eventName: 'pull_request',
-		}))).toBeFalsy();
-	});
-});
-
-describe('getPayload', () => {
-	it('should get payload', () => {
-		expect(getPayload(getContext({
-			payload: {
-				'test': 123,
-			},
-		}))).toEqual({
-			'test': 123,
-		});
+		}))).toBe(false);
 	});
 });
