@@ -11,7 +11,12 @@ describe('getGitDiff', () => {
 
 	it('should get git diff 1', async() => {
 		process.env.GITHUB_WORKSPACE = '/home/runner/work/my-repo-name/my-repo-name';
-		const mockExec               = spyOnExec();
+		process.env.GITHUB_REF       = 'refs/pull/123/merge';
+		process.env.GITHUB_SHA       = 'f01e53bb1f41af4e132326dad21e82c77ee1ff48';
+		process.env.GITHUB_HEAD_REF  = 'release/v0.3.13';
+		process.env.GITHUB_BASE_REF  = 'master';
+
+		const mockExec = spyOnExec();
 		setChildProcessParams({
 			stdout: (command: string): string => {
 				if (command.startsWith('git diff')) {
@@ -25,11 +30,20 @@ describe('getGitDiff', () => {
 			'/home/runner/work/my-repo-name/my-repo-name/README.md',
 			'/home/runner/work/my-repo-name/my-repo-name/src/main.ts',
 		]);
-		execCalledWith(mockExec, ['git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" -C /home/runner/work/my-repo-name/my-repo-name \'--diff-filter=AM\' --name-only']);
+		execCalledWith(mockExec, [
+			'git fetch origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
+			'git fetch origin \'+refs/heads/master:refs/remotes/origin/master\'',
+			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" \'--diff-filter=AM\' --name-only',
+		]);
 	});
 
 	it('should get git diff 2', async() => {
-		process.env.GITHUB_WORKSPACE    = '/home/runner/work/my-repo-name/my-repo-name';
+		process.env.GITHUB_WORKSPACE = '/home/runner/work/my-repo-name/my-repo-name';
+		process.env.GITHUB_REF       = 'refs/pull/123/merge';
+		process.env.GITHUB_SHA       = 'f01e53bb1f41af4e132326dad21e82c77ee1ff48';
+		process.env.GITHUB_HEAD_REF  = 'release/v0.3.13';
+		process.env.GITHUB_BASE_REF  = 'master';
+
 		process.env.INPUT_FROM          = '!"#$%&\'()-=~^|\\[];+*,./';
 		process.env.INPUT_TO            = 'test';
 		process.env.INPUT_DOT           = '..';
@@ -52,7 +66,11 @@ describe('getGitDiff', () => {
 			'src/test/test2.txt',
 			'__tests__/main.test.ts',
 		]);
-		execCalledWith(mockExec, ['git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" -C /home/runner/work/my-repo-name/my-repo-name \'--diff-filter=AMD\' --name-only']);
+		execCalledWith(mockExec, [
+			'git fetch origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
+			'git fetch origin \'+refs/heads/master:refs/remotes/origin/master\'',
+			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" \'--diff-filter=AMD\' --name-only',
+		]);
 	});
 });
 
