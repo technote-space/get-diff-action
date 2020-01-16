@@ -31,6 +31,8 @@ export const getGitDiff = async(): Promise<string[]> => {
 	return Utils.split((await (new Command(new Logger())).execAsync({
 		command: `git diff "${Utils.replaceAll(getFrom(), /[^\\]"/g, '\\"')}"${getDot()}"${Utils.replaceAll(getTo(), /[^\\]"/g, '\\"')}"`,
 		args: [
+			'-C',
+			Utils.getWorkspace(),
 			'--diff-filter=' + getFilter(),
 			'--name-only',
 		],

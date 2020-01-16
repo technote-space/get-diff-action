@@ -25,7 +25,7 @@ describe('getGitDiff', () => {
 			'/home/runner/work/my-repo-name/my-repo-name/README.md',
 			'/home/runner/work/my-repo-name/my-repo-name/src/main.ts',
 		]);
-		execCalledWith(mockExec, ['git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" \'--diff-filter=AM\' --name-only']);
+		execCalledWith(mockExec, ['git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" -C /home/runner/work/my-repo-name/my-repo-name \'--diff-filter=AM\' --name-only']);
 	});
 
 	it('should get git diff 2', async() => {
@@ -52,7 +52,7 @@ describe('getGitDiff', () => {
 			'src/test/test2.txt',
 			'__tests__/main.test.ts',
 		]);
-		execCalledWith(mockExec, ['git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" \'--diff-filter=AMD\' --name-only']);
+		execCalledWith(mockExec, ['git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" -C /home/runner/work/my-repo-name/my-repo-name \'--diff-filter=AMD\' --name-only']);
 	});
 });
 
