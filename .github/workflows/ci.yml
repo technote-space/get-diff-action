@@ -20,8 +20,8 @@ jobs:
         id: git-diff
         with:
           PREFIX_FILTER: |
-            src
-            __tests__
+            src/
+            __tests__/
           SUFFIX_FILTER: .ts
       - name: Get Yarn Cache Directory
         id: yarn-cache
@@ -64,8 +64,8 @@ jobs:
         id: git-diff
         with:
           PREFIX_FILTER: |
-            src
-            __tests__
+            src/
+            __tests__/
           SUFFIX_FILTER: .ts
       - name: Setup node
         uses: actions/setup-node@v1
