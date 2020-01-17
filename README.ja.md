@@ -7,28 +7,28 @@
 
 *Read this in other languages: [English](README.md), [日本語](README.ja.md).*
 
-GitHub actions to get git diff.
+これは `git diff` を取得するための GitHub Actions です。
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Screenshots](#screenshots)
-- [Usage](#usage)
-- [Behavior](#behavior)
-- [Action event details](#action-event-details)
-  - [Target events](#target-events)
+- [スクリーンショット](#%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88)
+- [使用方法](#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95)
+- [動作](#%E5%8B%95%E4%BD%9C)
+- [Action イベント詳細](#action-%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E8%A9%B3%E7%B4%B0)
+  - [対象イベント](#%E5%AF%BE%E8%B1%A1%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88)
 - [Author](#author)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Screenshots
-1. Example workflow  
+## スクリーンショット
+1. Workflow の例  
    ![Example workflow](https://raw.githubusercontent.com/technote-space/get-diff-action/images/workflow.png)
-1. Skip  
+1. スキップ  
    ![Skip](https://raw.githubusercontent.com/technote-space/get-diff-action/images/skip.png)
 
-## Usage
+## 使用方法
 ```yaml
 on: pull_request
 name: CI
@@ -51,23 +51,23 @@ jobs:
         run: yarn install
         if: steps.git-diff.outputs.diff
       - name: Check code style
-        # Check only the source codes that have differences
+        # 差分があるソースコードだけチェック
         run: yarn eslint ${{ steps.git-diff.outputs.diff }}
         if: steps.git-diff.outputs.diff
 ```
 
-If there is no difference in the source code below, this workflow will skip the code style check
+以下のソースコードに差分がない場合、この Workflow はコードのスタイルチェックをスキップします。
 - `src/**/*.ts`
 - `__tests__/**/*.ts`
 
-## Behavior
-1. Get git diff
+## 動作
+1. `git diff` を取得
 
    ```shell script
    git diff "${FROM}"${DOT}"${TO}" '--diff-filter=${DIFF_FILTER}' --name-only
    ```
 
-   e.g. (default)
+   例：(default)
    ```yaml
    FROM: 'origin/${GITHUB_BASE_REF}'
    TO: '${GITHUB_REF#refs/}'
@@ -88,9 +88,9 @@ If there is no difference in the source code below, this workflow will skip the 
    yarn.lock
    ```
 
-1. Filtered by `PREFIX_FILTER` or `SUFFIX_FILTER` option
+1. `PREFIX_FILTER` や `SUFFIX_FILTER` オプションによるフィルタ
 
-   e.g.
+   例：
    ```yaml
    SUFFIX_FILTER: .ts
    PREFIX_FILTER: src/
@@ -101,17 +101,17 @@ If there is no difference in the source code below, this workflow will skip the 
    src/utils/command.ts
    ```
 
-1. Mapped to absolute if `ABSOLUTE` option is true(default)
+1. `ABSOLUTE` オプションがtrue(default)の場合に絶対パスに変換
 
-   e.g. (default)
+   例：(default)
    ```
    /home/runner/work/my-repo-name/my-repo-name/src/main.ts
    /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
    ```
 
-1. Combined by `SEPARATOR` option
+1. `SEPARATOR` オプションの値で結合
 
-   e.g.
+   例：
    ```yaml
    SEPARATOR: ' '
    ```
@@ -120,13 +120,13 @@ If there is no difference in the source code below, this workflow will skip the 
    /home/runner/work/my-repo-name/my-repo-name/src/main.ts /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
    ```
 
-## Action event details
-### Target events
+## Action イベント詳細
+### 対象イベント
 | eventName | action |
 |:---:|:---:|
 |pull_request|opened, reopened, rerequested, synchronize|
 
-If called on any other event, the result will be empty.
+もしこれ以外のイベントで呼ばれた場合、結果は空になります。
 
 ## Author
 [GitHub (Technote)](https://github.com/technote-space)  
