@@ -15,7 +15,7 @@ async function run(): Promise<void> {
 
 	if (!isTargetEvent(TARGET_EVENTS, context)) {
 		logger.info('This is not target event.');
-		setOutput('diff', '*');
+		setOutput('diff', '');
 		return;
 	}
 
