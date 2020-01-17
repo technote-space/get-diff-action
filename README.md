@@ -122,10 +122,7 @@ If there is no difference in the source code below, this workflow will skip the 
 ### Target events
 | eventName | action |
 |:---:|:---:|
-|release|opened|
-|release|reopened|
-|release|rerequested|
-|release|synchronize|
+|pull_request|opened, reopened, rerequested, synchronize|
 
 If called on any other event, the result will be empty.
 
