@@ -19,7 +19,12 @@ async function run(): Promise<void> {
 		return;
 	}
 
-	setOutput('diff', getGitDiffOutput(await getGitDiff()));
+	const diff = await getGitDiff();
+	logger.startProcess('Dump output');
+	console.log(diff);
+	logger.endProcess();
+
+	setOutput('diff', getGitDiffOutput(diff));
 }
 
 run().catch(error => setFailed(error.message));

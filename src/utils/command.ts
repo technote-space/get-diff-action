@@ -28,12 +28,27 @@ export const getGitDiff = async(): Promise<string[]> => {
 	const prefix    = getPrefix();
 	const suffix    = getSuffix();
 	const workspace = getWorkspace();
-	return Utils.split((await (new Command(new Logger())).execAsync({
+	const command   = new Command(new Logger());
+
+	await command.execAsync({
+		command: 'git fetch',
+		args: ['--no-tags', 'origin', '+refs/pull/*/merge:refs/remotes/pull/*/merge'],
+		stderrToStdout: true,
+		cwd: Utils.getWorkspace(),
+	});
+	await command.execAsync({
+		command: 'git fetch',
+		args: ['--no-tags', 'origin', `+refs/heads/${process.env.GITHUB_BASE_REF}:refs/remotes/origin/${process.env.GITHUB_BASE_REF}`],
+		stderrToStdout: true,
+		cwd: Utils.getWorkspace(),
+	});
+	return Utils.split((await command.execAsync({
 		command: `git diff "${Utils.replaceAll(getFrom(), /[^\\]"/g, '\\"')}"${getDot()}"${Utils.replaceAll(getTo(), /[^\\]"/g, '\\"')}"`,
 		args: [
 			'--diff-filter=' + getFilter(),
 			'--name-only',
 		],
+		cwd: Utils.getWorkspace(),
 	})).stdout)
 		.filter(item => prefixFilter(item, prefix) && suffixFilter(item, suffix))
 		.map(item => toAbsolute(item, workspace));

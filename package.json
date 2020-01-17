@@ -1,6 +1,6 @@
 {
   "name": "@technote-space/get-diff-action",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "GitHub actions to get git diff.",
   "author": "Technote <technote.space@gmail.com> (https://technote.space)",
   "license": "MIT",
@@ -21,7 +21,7 @@
     "@actions/core": "^1.2.1",
     "@actions/github": "^2.0.1",
     "@technote-space/filter-github-action": "^0.1.13",
-    "@technote-space/github-action-helper": "^0.7.0"
+    "@technote-space/github-action-helper": "^0.7.1"
   },
   "devDependencies": {
     "@technote-space/github-action-test-helper": "^0.0.28",
@@ -34,7 +34,7 @@
     "jest-circus": "^24.9.0",
     "nock": "^11.7.2",
     "ts-jest": "^24.3.0",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.5"
   },
   "publishConfig": {
     "access": "public"
