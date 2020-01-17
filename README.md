@@ -11,9 +11,8 @@ GitHub actions to get git diff.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Setup](#setup)
-  - [yarn](#yarn)
-  - [npm](#npm)
+- [Usage](#usage)
+- [Behavior](#behavior)
 - [Author](#author)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
