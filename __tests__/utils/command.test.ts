@@ -31,8 +31,8 @@ describe('getGitDiff', () => {
 			'/home/runner/work/my-repo-name/my-repo-name/src/main.ts',
 		]);
 		execCalledWith(mockExec, [
-			'git fetch origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
-			'git fetch origin \'+refs/heads/master:refs/remotes/origin/master\'',
+			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
+			'git fetch --no-tags origin \'+refs/heads/master:refs/remotes/origin/master\'',
 			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" \'--diff-filter=AM\' --name-only',
 		]);
 	});
@@ -67,8 +67,8 @@ describe('getGitDiff', () => {
 			'__tests__/main.test.ts',
 		]);
 		execCalledWith(mockExec, [
-			'git fetch origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
-			'git fetch origin \'+refs/heads/master:refs/remotes/origin/master\'',
+			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
+			'git fetch --no-tags origin \'+refs/heads/master:refs/remotes/origin/master\'',
 			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" \'--diff-filter=AMD\' --name-only',
 		]);
 	});
