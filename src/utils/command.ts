@@ -32,13 +32,13 @@ export const getGitDiff = async(): Promise<string[]> => {
 
 	await command.execAsync({
 		command: 'git fetch',
-		args: ['origin', '+refs/pull/*/merge:refs/remotes/pull/*/merge'],
+		args: ['--no-tags', 'origin', '+refs/pull/*/merge:refs/remotes/pull/*/merge'],
 		stderrToStdout: true,
 		cwd: Utils.getWorkspace(),
 	});
 	await command.execAsync({
 		command: 'git fetch',
-		args: ['origin', `+refs/heads/${process.env.GITHUB_BASE_REF}:refs/remotes/origin/${process.env.GITHUB_BASE_REF}`],
+		args: ['--no-tags', 'origin', `+refs/heads/${process.env.GITHUB_BASE_REF}:refs/remotes/origin/${process.env.GITHUB_BASE_REF}`],
 		stderrToStdout: true,
 		cwd: Utils.getWorkspace(),
 	});
