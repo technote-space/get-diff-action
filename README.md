@@ -12,6 +12,7 @@ GitHub actions to get git diff.
 **Table of Contents**
 
 - [Usage](#usage)
+- [Behavior](#behavior)
 - [Author](#author)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
