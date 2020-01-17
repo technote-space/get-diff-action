@@ -13,11 +13,11 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Screenshots](#screenshots)
-- [Usage](#usage)
-- [Behavior](#behavior)
-- [Action event details](#action-event-details)
-  - [Target events](#target-events)
+- [スクリーンショット](#%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88)
+- [使用方法](#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95)
+- [動作](#%E5%8B%95%E4%BD%9C)
+- [Action イベント詳細](#action-%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E8%A9%B3%E7%B4%B0)
+  - [対象イベント](#%E5%AF%BE%E8%B1%A1%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88)
 - [Author](#author)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
