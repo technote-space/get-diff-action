@@ -11,11 +11,20 @@ GitHub actions to get git diff.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
+- [Screenshots](#screenshots)
 - [Usage](#usage)
 - [Behavior](#behavior)
+- [Action event details](#action-event-details)
+  - [Target events](#target-events)
 - [Author](#author)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Screenshots
+1. Example workflow  
+   ![Example workflow  ](https://raw.githubusercontent.com/technote-space/get-diff-action/images/workflow.png)
+1. Skip  
+   ![Skip](https://raw.githubusercontent.com/technote-space/get-diff-action/images/skip.png)
 
 ## Usage
 ```yaml
@@ -108,6 +117,14 @@ If there is no difference in the source code below, this workflow will skip the 
    ```
    /home/runner/work/my-repo-name/my-repo-name/src/main.ts /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
    ```
+
+## Action event details
+### Target events
+| eventName | action |
+|:---:|:---:|
+|pull_request|opened, reopened, rerequested, synchronize|
+
+If called on any other event, the result will be empty.
 
 ## Author
 [GitHub (Technote)](https://github.com/technote-space)  
