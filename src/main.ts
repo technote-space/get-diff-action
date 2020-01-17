@@ -15,11 +15,16 @@ async function run(): Promise<void> {
 
 	if (!isTargetEvent(TARGET_EVENTS, context)) {
 		logger.info('This is not target event.');
-		setOutput('diff', '');
+		setOutput('diff', '*');
 		return;
 	}
 
-	setOutput('diff', getGitDiffOutput(await getGitDiff()));
+	const output = getGitDiffOutput(await getGitDiff());
+	logger.startProcess('Dump output');
+	console.log(output);
+	logger.endProcess();
+
+	setOutput('diff', output);
 }
 
 run().catch(error => setFailed(error.message));
