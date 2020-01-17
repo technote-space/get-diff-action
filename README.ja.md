@@ -7,7 +7,7 @@
 
 *Read this in other languages: [English](README.md), [日本語](README.ja.md).*
 
-GitHub actions to get git diff.
+これは `git diff` を取得するための GitHub Actions です。
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -22,13 +22,13 @@ GitHub actions to get git diff.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Screenshots
-1. Example workflow  
+## スクリーンショット
+1. Workflow の例  
    ![Example workflow](https://raw.githubusercontent.com/technote-space/get-diff-action/images/workflow.png)
-1. Skip  
+1. スキップ  
    ![Skip](https://raw.githubusercontent.com/technote-space/get-diff-action/images/skip.png)
 
-## Usage
+## 使用方法
 ```yaml
 on: pull_request
 name: CI
@@ -51,23 +51,23 @@ jobs:
         run: yarn install
         if: steps.git-diff.outputs.diff
       - name: Check code style
-        # Check only the source codes that have differences
+        # 差分があるソースコードだけチェック
         run: yarn eslint ${{ steps.git-diff.outputs.diff }}
         if: steps.git-diff.outputs.diff
 ```
 
-If there is no difference in the source code below, this workflow will skip the code style check
+以下のソースコードに差分がない場合、この Workflow はコードのスタイルチェックをスキップします。
 - `src/**/*.ts`
 - `__tests__/**/*.ts`
 
-## Behavior
-1. Get git diff
+## 動作
+1. `git diff` を取得
 
    ```shell script
    git diff "${FROM}"${DOT}"${TO}" '--diff-filter=${DIFF_FILTER}' --name-only
    ```
 
-   e.g. (default)
+   例：(default)
    ```yaml
    FROM: 'origin/${GITHUB_BASE_REF}'
    TO: '${GITHUB_REF#refs/}'
@@ -88,9 +88,9 @@ If there is no difference in the source code below, this workflow will skip the 
    yarn.lock
    ```
 
-1. Filtered by `PREFIX_FILTER` or `SUFFIX_FILTER` option
+1. `PREFIX_FILTER` や `SUFFIX_FILTER` オプションによるフィルタ
 
-   e.g.
+   例：
    ```yaml
    SUFFIX_FILTER: .ts
    PREFIX_FILTER: src/
@@ -101,17 +101,17 @@ If there is no difference in the source code below, this workflow will skip the 
    src/utils/command.ts
    ```
 
-1. Mapped to absolute if `ABSOLUTE` option is true(default)
+1. `ABSOLUTE` オプションがtrue(default)の場合に絶対パスに変換
 
-   e.g. (default)
+   例：(default)
    ```
    /home/runner/work/my-repo-name/my-repo-name/src/main.ts
    /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
    ```
 
-1. Combined by `SEPARATOR` option
+1. `SEPARATOR` オプションの値で結合
 
-   e.g.
+   例：
    ```yaml
    SEPARATOR: ' '
    ```
@@ -120,13 +120,13 @@ If there is no difference in the source code below, this workflow will skip the 
    /home/runner/work/my-repo-name/my-repo-name/src/main.ts /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
    ```
 
-## Action event details
-### Target events
+## Action イベント詳細
+### 対象イベント
 | eventName | action |
 |:---:|:---:|
 |pull_request|opened, reopened, rerequested, synchronize|
 
-If called on any other event, the result will be empty.
+もしこれ以外のイベントで呼ばれた場合、結果は空になります。
 
 ## Author
 [GitHub (Technote)](https://github.com/technote-space)  
