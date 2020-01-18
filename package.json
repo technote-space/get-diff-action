@@ -1,6 +1,6 @@
 {
   "name": "@technote-space/get-diff-action",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "GitHub actions to get git diff.",
   "author": "Technote <technote.space@gmail.com> (https://technote.space)",
   "license": "MIT",
@@ -20,13 +20,13 @@
   "dependencies": {
     "@actions/core": "^1.2.1",
     "@actions/github": "^2.0.1",
-    "@technote-space/filter-github-action": "^0.1.13",
-    "@technote-space/github-action-helper": "^0.7.1"
+    "@technote-space/filter-github-action": "^0.1.14",
+    "@technote-space/github-action-helper": "^0.7.2"
   },
   "devDependencies": {
-    "@technote-space/github-action-test-helper": "^0.0.28",
+    "@technote-space/github-action-test-helper": "^0.1.0",
     "@types/jest": "^24.9.0",
-    "@types/node": "^13.1.7",
+    "@types/node": "^13.1.8",
     "@typescript-eslint/eslint-plugin": "^2.16.0",
     "@typescript-eslint/parser": "^2.16.0",
     "eslint": "^6.8.0",
