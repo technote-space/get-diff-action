@@ -41,7 +41,7 @@ outputs:
     description: 'git diff results'
 branding:
   # https://feathericons.com/
-  icon: 'package'
+  icon: 'file'
   color: 'orange'
 runs:
   using: node12
