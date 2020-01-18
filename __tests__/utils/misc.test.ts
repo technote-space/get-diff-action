@@ -1,6 +1,12 @@
+/* eslint-disable no-magic-numbers */
+import path from 'path';
 import { isTargetEvent } from '@technote-space/filter-github-action';
-import { getContext } from '@technote-space/github-action-test-helper';
+import { testEnv, getContext, spyOnStdout, stdoutCalledWith } from '@technote-space/github-action-test-helper';
+import { Logger } from '@technote-space/github-action-helper';
+import { dumpOutput, setResult } from '../../src/utils/misc';
 import { TARGET_EVENTS } from '../../src/constant';
+
+const rootDir = path.resolve(__dirname, '..', '..');
 
 describe('isTargetEvent', () => {
 	it('should return true', () => {
@@ -26,5 +32,50 @@ describe('isTargetEvent', () => {
 			},
 			eventName: 'pull_request',
 		}))).toBe(false);
+	});
+});
+
+describe('dumpOutput', () => {
+	testEnv(rootDir);
+
+	it('should dump output', () => {
+		const mockStdout = spyOnStdout();
+
+		dumpOutput(['test1', 'test2'], new Logger());
+
+		stdoutCalledWith(mockStdout, [
+			'::group::Dump output',
+			'[\n' +
+			'\t"test1",\n' +
+			'\t"test2"\n' +
+			']',
+			'::endgroup::',
+		]);
+	});
+});
+
+describe('setResult', () => {
+	testEnv(rootDir);
+
+	it('should set result', () => {
+		const mockStdout = spyOnStdout();
+
+		setResult(['test1', 'test2']);
+
+		stdoutCalledWith(mockStdout, [
+			'::set-output name=diff::test1 test2',
+		]);
+	});
+
+	it('should set result with env', () => {
+		process.env.INPUT_SET_ENV_NAME = 'DIFF';
+		const mockStdout               = spyOnStdout();
+
+		setResult(['test1', 'test2']);
+
+		stdoutCalledWith(mockStdout, [
+			'::set-output name=diff::test1 test2',
+			'::set-env name=DIFF::test1 test2',
+		]);
 	});
 });

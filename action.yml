@@ -36,12 +36,15 @@ inputs:
     description: Get as absolute path.
     default: 'true'
     required: false
+  SET_ENV_NAME:
+    description: Env name.
+    required: false
 outputs:
   diff:
     description: 'git diff results'
 branding:
   # https://feathericons.com/
-  icon: 'package'
+  icon: 'file'
   color: 'orange'
 runs:
   using: node12
