@@ -20,13 +20,15 @@ describe('getGitDiff', () => {
 		setChildProcessParams({
 			stdout: (command: string): string => {
 				if (command.startsWith('git diff')) {
-					return 'README.md\nsrc/main.ts';
+					return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
 				}
 				return '';
 			},
 		});
 
 		expect(await getGitDiff()).toEqual([
+			'/home/runner/work/my-repo-name/my-repo-name/package.json',
+			'/home/runner/work/my-repo-name/my-repo-name/abc/composer.json',
 			'/home/runner/work/my-repo-name/my-repo-name/README.md',
 			'/home/runner/work/my-repo-name/my-repo-name/src/main.ts',
 		]);
@@ -48,6 +50,7 @@ describe('getGitDiff', () => {
 		process.env.INPUT_TO            = 'test';
 		process.env.INPUT_DOT           = '..';
 		process.env.INPUT_DIFF_FILTER   = 'AMD';
+		process.env.INPUT_FILES         = 'package.json\ncomposer.json\nREADME2.md';
 		process.env.INPUT_PREFIX_FILTER = 'src/\n__tests__';
 		process.env.INPUT_SUFFIX_FILTER = '.ts\n.txt';
 		process.env.INPUT_ABSOLUTE      = 'false';
@@ -55,13 +58,15 @@ describe('getGitDiff', () => {
 		setChildProcessParams({
 			stdout: (command: string): string => {
 				if (command.startsWith('git diff')) {
-					return 'README.md\nsrc/main.ts\nsrc/test1.tts\nsrc/test/test2.txt\n__tests__/main.test.ts';
+					return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts\nsrc/test1.tts\nsrc/test/test2.txt\n__tests__/main.test.ts';
 				}
 				return '';
 			},
 		});
 
 		expect(await getGitDiff()).toEqual([
+			'package.json',
+			'abc/composer.json',
 			'src/main.ts',
 			'src/test/test2.txt',
 			'__tests__/main.test.ts',
