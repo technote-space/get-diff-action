@@ -29,6 +29,9 @@ inputs:
   SUFFIX_FILTER:
     description: Suffix filter.
     required: false
+  FILES:
+    description: Specific files.
+    required: false
   ABSOLUTE:
     description: Get as absolute path.
     default: 'true'
