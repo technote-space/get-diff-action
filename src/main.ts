@@ -1,9 +1,10 @@
 import path from 'path';
-import { setFailed, setOutput } from '@actions/core';
+import { setFailed } from '@actions/core';
 import { context } from '@actions/github';
 import { isTargetEvent } from '@technote-space/filter-github-action';
 import { Logger, ContextHelper } from '@technote-space/github-action-helper';
-import { getGitDiff, getGitDiffOutput } from './utils/command';
+import { getGitDiff } from './utils/command';
+import { dumpOutput, setResult } from './utils/misc';
 import { TARGET_EVENTS } from './constant';
 
 /**
@@ -15,16 +16,13 @@ async function run(): Promise<void> {
 
 	if (!isTargetEvent(TARGET_EVENTS, context)) {
 		logger.info('This is not target event.');
-		setOutput('diff', '');
+		setResult([]);
 		return;
 	}
 
 	const diff = await getGitDiff();
-	logger.startProcess('Dump output');
-	console.log(diff);
-	logger.endProcess();
-
-	setOutput('diff', getGitDiffOutput(diff));
+	dumpOutput(diff, logger);
+	setResult(diff);
 }
 
 run().catch(error => setFailed(error.message));
