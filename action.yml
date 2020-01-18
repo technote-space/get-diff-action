@@ -31,16 +31,6 @@ inputs:
     required: false
   FILES:
     description: Specific files.
-    default: |
-      package.json
-      package-lock.json
-      yarn.lock
-      composer.json
-      composer.lock
-      Gemfile
-      Gemfile.lock
-      Pipfile
-      Pipfile.lock
     required: false
   ABSOLUTE:
     description: Get as absolute path.
