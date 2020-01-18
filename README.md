@@ -131,5 +131,3 @@ If called on any other event, the result will be empty.
 ## Author
 [GitHub (Technote)](https://github.com/technote-space)  
 [Blog](https://technote.space)
-
-..
