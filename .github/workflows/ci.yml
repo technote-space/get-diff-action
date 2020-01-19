@@ -17,7 +17,6 @@ jobs:
         with:
           fetch-depth: 3
       - uses: technote-space/get-diff-action@gh-actions
-        id: git-diff
         with:
           PREFIX_FILTER: |
             src/
@@ -27,7 +26,7 @@ jobs:
       - name: Get Yarn Cache Directory
         id: yarn-cache
         run: echo "::set-output name=dir::$(yarn cache dir)"
-        if: steps.git-diff.outputs.diff
+        if: ${GIT_DIFF}
       - name: Cache node dependencies
         uses: actions/cache@v1
         with:
@@ -35,13 +34,13 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-        if: steps.git-diff.outputs.diff
+        if: ${GIT_DIFF}
       - name: Install Package dependencies
         run: yarn install
-        if: steps.git-diff.outputs.diff
+        if: ${GIT_DIFF}
       - name: Check code style
-        run: yarn eslint ${{ steps.git-diff.outputs.diff }}
-        if: steps.git-diff.outputs.diff
+        run: yarn eslint ${{ ${GIT_DIFF} }}
+        if: ${GIT_DIFF}
       - uses: 8398a7/action-slack@v1
         with:
           type: failure
@@ -62,7 +61,6 @@ jobs:
         with:
           fetch-depth: 3
       - uses: technote-space/get-diff-action@gh-actions
-        id: git-diff
         with:
           PREFIX_FILTER: |
             src/
@@ -75,11 +73,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-        if: steps.git-diff.outputs.diff || github.event_name == 'push'
+        if: ${GIT_DIFF} || github.event_name == 'push'
       - name: Get Yarn Cache Directory
         id: yarn-cache
         run: echo "::set-output name=dir::$(yarn cache dir)"
-        if: steps.git-diff.outputs.diff || github.event_name == 'push'
+        if: ${GIT_DIFF} || github.event_name == 'push'
       - name: Cache node dependencies
         uses: actions/cache@v1
         with:
@@ -87,19 +85,19 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-        if: steps.git-diff.outputs.diff || github.event_name == 'push'
+        if: ${GIT_DIFF} || github.event_name == 'push'
       - name: Install Package dependencies
         run: yarn install
-        if: steps.git-diff.outputs.diff || github.event_name == 'push'
+        if: ${GIT_DIFF} || github.event_name == 'push'
       - name: Run tests
         run: yarn cover
-        if: steps.git-diff.outputs.diff || github.event_name == 'push'
+        if: ${GIT_DIFF} || github.event_name == 'push'
       - name: Codecov
         run: curl -s https://codecov.io/bash | bash -s -- -t $CODECOV_TOKEN -f $COVERAGE_FILE
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           COVERAGE_FILE: ./coverage/lcov.info
-        if: matrix.node == '12' && (steps.git-diff.outputs.diff || github.event_name == 'push')
+        if: matrix.node == '12' && (${GIT_DIFF} || github.event_name == 'push')
       - uses: 8398a7/action-slack@v1
         with:
           type: failure
