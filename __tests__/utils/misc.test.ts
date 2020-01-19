@@ -64,18 +64,18 @@ describe('setResult', () => {
 
 		stdoutCalledWith(mockStdout, [
 			'::set-output name=diff::test1 test2',
+			'::set-env name=GIT_DIFF::test1 test2',
 		]);
 	});
 
-	it('should set result with env', () => {
-		process.env.INPUT_SET_ENV_NAME = 'DIFF';
+	it('should set result without env', () => {
+		process.env.INPUT_SET_ENV_NAME = '';
 		const mockStdout               = spyOnStdout();
 
 		setResult(['test1', 'test2']);
 
 		stdoutCalledWith(mockStdout, [
 			'::set-output name=diff::test1 test2',
-			'::set-env name=DIFF::test1 test2',
 		]);
 	});
 });
