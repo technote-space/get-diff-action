@@ -23,6 +23,10 @@ jobs:
             __tests__/
           SUFFIX_FILTER: .ts
           FILES: .eslintrc
+      - name: Dump Env context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(env) }}
+        run: echo "$ENV_CONTEXT"
       - name: Get Yarn Cache Directory
         id: yarn-cache
         run: echo "::set-output name=dir::$(yarn cache dir)"
