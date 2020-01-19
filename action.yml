@@ -38,6 +38,7 @@ inputs:
     required: false
   SET_ENV_NAME:
     description: Env name.
+    default: GIT_DIFF
     required: false
 outputs:
   diff:
