@@ -54,6 +54,7 @@ describe('getGitDiff', () => {
 		process.env.INPUT_PREFIX_FILTER = 'src/\n__tests__';
 		process.env.INPUT_SUFFIX_FILTER = '.ts\n.txt';
 		process.env.INPUT_ABSOLUTE      = 'false';
+		process.env.INPUT_SET_ENV_NAME  = '';
 		const mockExec                  = spyOnExec();
 		setChildProcessParams({
 			stdout: (command: string): string => {

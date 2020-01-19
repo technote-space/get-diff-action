@@ -41,7 +41,6 @@ jobs:
         with:
           fetch-depth: 3
       - uses: technote-space/get-diff-action@v1
-        id: git-diff
         with:
           PREFIX_FILTER: |
             src
@@ -49,11 +48,11 @@ jobs:
           SUFFIX_FILTER: .ts
       - name: Install Package dependencies
         run: yarn install
-        if: steps.git-diff.outputs.diff
+        if: env.GIT_DIFF
       - name: Check code style
         # Check only the source codes that have differences
-        run: yarn eslint ${{ steps.git-diff.outputs.diff }}
-        if: steps.git-diff.outputs.diff
+        run: yarn eslint ${{ env.GIT_DIFF }}
+        if: env.GIT_DIFF
 ```
 
 If there is no difference in the source code below, this workflow will skip the code style check
