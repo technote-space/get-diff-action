@@ -1,6 +1,7 @@
 import path from 'path';
 import { Logger, Command, Utils } from '@technote-space/github-action-helper';
 import { getInput } from '@actions/core' ;
+import { FileDiffResult, FileResult, DiffResult } from '../types';
 
 const getRawInput  = (name: string): string => process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
 const getFrom      = (): string => getInput('FROM', {required: true});
@@ -27,7 +28,24 @@ const isPrefixMatched = (item: string, prefix: string[]): boolean => !prefix.len
 const isSuffixMatched = (item: string, suffix: string[]): boolean => !suffix.length || !suffix.every(suffix => !Utils.getSuffixRegExp(suffix).test(item));
 const toAbsolute      = (item: string, workspace: string): string => workspace + item;
 
-export const getGitDiff = async(): Promise<string[]> => {
+export const getFileDiff = async(path: string): Promise<FileDiffResult> => {
+	const command = new Command(new Logger());
+	const stdout  = (await command.execAsync({
+		command: 'git diff',
+		args: ['--shortstat', path],
+		cwd: Utils.getWorkspace(),
+	})).stdout;
+
+	if ('' === stdout) {
+		return {insertions: 0, deletions: 0, lines: 0};
+	}
+
+	const insertions = Number.parseInt((stdout.match(/ (\d+) insertions/) ?? ['', '0'])[1]);
+	const deletions  = Number.parseInt((stdout.match(/ (\d+) deletions/) ?? ['', '0'])[1]);
+	return {insertions, deletions, lines: insertions + deletions};
+};
+
+export const getGitDiff = async(): Promise<DiffResult[]> => {
 	const files     = getFiles();
 	const prefix    = getPrefix();
 	const suffix    = getSuffix();
@@ -46,7 +64,8 @@ export const getGitDiff = async(): Promise<string[]> => {
 		stderrToStdout: true,
 		cwd: Utils.getWorkspace(),
 	});
-	return Utils.split((await command.execAsync({
+
+	return (await Promise.all(Utils.split((await command.execAsync({
 		command: `git diff "${Utils.replaceAll(getFrom(), /[^\\]"/g, '\\"')}"${getDot()}"${Utils.replaceAll(getTo(), /[^\\]"/g, '\\"')}"`,
 		args: [
 			'--diff-filter=' + getFilter(),
@@ -55,7 +74,9 @@ export const getGitDiff = async(): Promise<string[]> => {
 		cwd: Utils.getWorkspace(),
 	})).stdout)
 		.filter(item => isIgnore(item, files) || (isPrefixMatched(item, prefix) && isSuffixMatched(item, suffix)))
-		.map(item => toAbsolute(item, workspace));
+		.map(async item => ({file: item, ...await getFileDiff(item)}))))
+		.map(item => ({...item, file: toAbsolute(item.file, workspace)}));
 };
 
-export const getGitDiffOutput = (diffs: string[]): string => escape(diffs).join(getSeparator());
+export const getDiffFiles = (diffs: FileResult[]): string => escape(diffs.map(item => item.file)).join(getSeparator());
+export const sumResults   = (diffs: DiffResult[], map: (item: DiffResult) => number): number => diffs.map(map).reduce((acc, val) => acc + val, 0); // eslint-disable-line no-magic-numbers
