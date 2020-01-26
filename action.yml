@@ -1,7 +1,10 @@
 # https://help.github.com/ja/articles/metadata-syntax-for-github-actions
 name: Get Diff Action
+
 description: GitHub actions to get git diff.
+
 author: technote-space
+
 inputs:
   FROM:
     description: Commit A.
@@ -34,12 +37,13 @@ inputs:
     required: false
   ABSOLUTE:
     description: Get as absolute path.
-    default: 'true'
+    default: 'false'
     required: false
   SET_ENV_NAME:
     description: Env name.
     default: GIT_DIFF
     required: false
+
 outputs:
   diff:
     description: 'git diff results'
@@ -47,6 +51,7 @@ branding:
   # https://feathericons.com/
   icon: 'file'
   color: 'orange'
+
 runs:
   using: node12
   main: lib/main.js
