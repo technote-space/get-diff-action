@@ -31,8 +31,8 @@ const toAbsolute      = (item: string, workspace: string): string => workspace +
 export const getFileDiff = async(path: string, between: string): Promise<FileDiffResult> => {
 	const command = new Command(new Logger());
 	const stdout  = (await command.execAsync({
-		command: 'git diff',
-		args: ['--shortstat', between, path],
+		command: `git diff ${between}`,
+		args: ['--shortstat', path],
 		cwd: Utils.getWorkspace(),
 	})).stdout;
 
@@ -51,7 +51,7 @@ export const getGitDiff = async(): Promise<DiffResult[]> => {
 	const suffix    = getSuffix();
 	const workspace = getWorkspace();
 	const command   = new Command(new Logger());
-	const between   = `${Utils.replaceAll(getFrom(), /[^\\]"/g, '\\"')}${getDot()}${Utils.replaceAll(getTo(), /[^\\]"/g, '\\"')}`;
+	const between   = `"${Utils.replaceAll(getFrom(), /[^\\]"/g, '\\"')}"${getDot()}"${Utils.replaceAll(getTo(), /[^\\]"/g, '\\"')}"`;
 
 	await command.execAsync({
 		command: 'git fetch',
@@ -67,9 +67,8 @@ export const getGitDiff = async(): Promise<DiffResult[]> => {
 	});
 
 	return (await Promise.all(Utils.split((await command.execAsync({
-		command: 'git diff',
+		command: `git diff ${between}`,
 		args: [
-			between,
 			'--diff-filter=' + getFilter(),
 			'--name-only',
 		],
