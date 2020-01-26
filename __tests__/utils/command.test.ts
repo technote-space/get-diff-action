@@ -1,9 +1,15 @@
 /* eslint-disable no-magic-numbers */
 import path from 'path';
 import { testEnv, spyOnExec, testChildProcess, execCalledWith, setChildProcessParams } from '@technote-space/github-action-test-helper';
-import { getGitDiff, getGitDiffOutput } from '../../src/utils/command';
+import { getGitDiff, getFileDiff, getDiffFiles, sumResults } from '../../src/utils/command';
 
-const rootDir = path.resolve(__dirname, '..', '..');
+const rootDir   = path.resolve(__dirname, '..', '..');
+const diffs     = [
+	{file: 'test1', insertions: 1, deletions: 100, lines: 101},
+	{file: 'test2', insertions: 2, deletions: 200, lines: 202},
+	{file: 'test4', insertions: 4, deletions: 400, lines: 404},
+];
+const emptyDiff = {insertions: 0, deletions: 0, lines: 0};
 
 describe('getGitDiff', () => {
 	testEnv(rootDir);
@@ -27,15 +33,19 @@ describe('getGitDiff', () => {
 		});
 
 		expect(await getGitDiff()).toEqual([
-			'/home/runner/work/my-repo-name/my-repo-name/package.json',
-			'/home/runner/work/my-repo-name/my-repo-name/abc/composer.json',
-			'/home/runner/work/my-repo-name/my-repo-name/README.md',
-			'/home/runner/work/my-repo-name/my-repo-name/src/main.ts',
+			{file: 'package.json', ...emptyDiff},
+			{file: 'abc/composer.json', ...emptyDiff},
+			{file: 'README.md', ...emptyDiff},
+			{file: 'src/main.ts', ...emptyDiff},
 		]);
 		execCalledWith(mockExec, [
 			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
 			'git fetch --no-tags origin \'+refs/heads/master:refs/remotes/origin/master\'',
 			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" \'--diff-filter=AM\' --name-only',
+			'git diff --shortstat \'package.json\'',
+			'git diff --shortstat \'abc/composer.json\'',
+			'git diff --shortstat \'README.md\'',
+			'git diff --shortstat \'src/main.ts\'',
 		]);
 	});
 
@@ -53,7 +63,7 @@ describe('getGitDiff', () => {
 		process.env.INPUT_FILES         = 'package.json\ncomposer.json\nREADME2.md';
 		process.env.INPUT_PREFIX_FILTER = 'src/\n__tests__';
 		process.env.INPUT_SUFFIX_FILTER = '.ts\n.txt';
-		process.env.INPUT_ABSOLUTE      = 'false';
+		process.env.INPUT_ABSOLUTE      = 'true';
 		process.env.INPUT_SET_ENV_NAME  = '';
 		const mockExec                  = spyOnExec();
 		setChildProcessParams({
@@ -66,45 +76,96 @@ describe('getGitDiff', () => {
 		});
 
 		expect(await getGitDiff()).toEqual([
-			'package.json',
-			'abc/composer.json',
-			'src/main.ts',
-			'src/test/test2.txt',
-			'__tests__/main.test.ts',
+			{file: process.env.GITHUB_WORKSPACE + '/package.json', ...emptyDiff},
+			{file: process.env.GITHUB_WORKSPACE + '/abc/composer.json', ...emptyDiff},
+			{file: process.env.GITHUB_WORKSPACE + '/src/main.ts', ...emptyDiff},
+			{file: process.env.GITHUB_WORKSPACE + '/src/test/test2.txt', ...emptyDiff},
+			{file: process.env.GITHUB_WORKSPACE + '/__tests__/main.test.ts', ...emptyDiff},
 		]);
 		execCalledWith(mockExec, [
 			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
 			'git fetch --no-tags origin \'+refs/heads/master:refs/remotes/origin/master\'',
 			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" \'--diff-filter=AMD\' --name-only',
+			'git diff --shortstat \'package.json\'',
+			'git diff --shortstat \'abc/composer.json\'',
+			'git diff --shortstat \'src/main.ts\'',
+			'git diff --shortstat \'src/test/test2.txt\'',
+			'git diff --shortstat \'__tests__/main.test.ts\'',
 		]);
 	});
 });
 
-describe('getGitDiffOutput', () => {
+describe('getFileDiff', () => {
+	it('should get file diff', async() => {
+		const mockExec = spyOnExec();
+		setChildProcessParams({
+			stdout: ' 1 file changed, 25 insertions(+), 4 deletions(-)',
+		});
+
+		const diff = await getFileDiff('');
+
+		expect(diff.insertions).toBe(25);
+		expect(diff.deletions).toBe(4);
+		expect(diff.lines).toBe(29);
+
+		execCalledWith(mockExec, [
+			'git diff --shortstat',
+		]);
+	});
+
+	it('should return empty', async() => {
+		const mockExec = spyOnExec();
+		setChildProcessParams({
+			stdout: '',
+		});
+
+		const diff = await getFileDiff('');
+
+		expect(diff.insertions).toBe(0);
+		expect(diff.deletions).toBe(0);
+		expect(diff.lines).toBe(0);
+
+		execCalledWith(mockExec, [
+			'git diff --shortstat',
+		]);
+	});
+});
+
+describe('getDiffFiles', () => {
 	testEnv(rootDir);
 
 	it('get git diff output 1', () => {
-		expect(getGitDiffOutput([])).toEqual('');
-		expect(getGitDiffOutput(['test1'])).toEqual('test1');
-		expect(getGitDiffOutput(['test1', 'test2'])).toEqual('test1 test2');
-		expect(getGitDiffOutput(['test1', 'test2 test3'])).toEqual('test1 \'test2 test3\'');
-		expect(getGitDiffOutput(['test1/test2.txt'])).toEqual('\'test1/test2.txt\'');
+		expect(getDiffFiles([])).toEqual('');
+		expect(getDiffFiles([{file: 'test1'}])).toEqual('test1');
+		expect(getDiffFiles([{file: 'test1'}, {file: 'test2'}])).toEqual('test1 test2');
+		expect(getDiffFiles([{file: 'test1'}, {file: 'test2 test3'}])).toEqual('test1 \'test2 test3\'');
+		expect(getDiffFiles([{file: 'test1/test2.txt'}])).toEqual('\'test1/test2.txt\'');
 	});
 
 	it('get git diff output 2', () => {
 		process.env.INPUT_SEPARATOR = '\n';
 
-		expect(getGitDiffOutput([])).toEqual('');
-		expect(getGitDiffOutput(['test1'])).toEqual('test1');
-		expect(getGitDiffOutput(['test1', 'test2'])).toEqual('test1\ntest2');
-		expect(getGitDiffOutput(['test1', 'test2 test3'])).toEqual('test1\n\'test2 test3\'');
-		expect(getGitDiffOutput(['test1/test2.txt'])).toEqual('\'test1/test2.txt\'');
+		expect(getDiffFiles([])).toEqual('');
+		expect(getDiffFiles([{file: 'test1'}])).toEqual('test1');
+		expect(getDiffFiles([{file: 'test1'}, {file: 'test2'}])).toEqual('test1\ntest2');
+		expect(getDiffFiles([{file: 'test1'}, {file: 'test2 test3'}])).toEqual('test1\n\'test2 test3\'');
+		expect(getDiffFiles([{file: 'test1/test2.txt'}])).toEqual('\'test1/test2.txt\'');
 	});
 
 	it('get git diff output 3', () => {
 		delete process.env.INPUT_SEPARATOR;
 		process.env.INPUT_TEST = '';
 
-		expect(getGitDiffOutput([])).toEqual('');
+		expect(getDiffFiles([])).toEqual('');
+	});
+});
+
+describe('sumResults', () => {
+	it('should sum results', () => {
+		expect(sumResults([], item => item.lines)).toBe(0);
+
+		expect(sumResults(diffs, item => item.insertions)).toBe(7);
+		expect(sumResults(diffs, item => item.deletions)).toBe(700);
+		expect(sumResults(diffs, item => item.lines)).toBe(707);
 	});
 });
