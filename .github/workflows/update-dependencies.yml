@@ -1,12 +1,14 @@
 on:
   schedule:
-    - cron: 0 17 * * 5
+    - cron: 0 3 * * 2,6
   pull_request:
     types: [opened, synchronize, reopened, closed]
+  repository_dispatch:
+    types: [update-deps]
 
 name: Update dependencies
 jobs:
-  release:
+  update:
     name: Update npm dependencies
     runs-on: ubuntu-latest
     steps:
