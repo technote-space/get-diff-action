@@ -7,7 +7,6 @@ import { DiffResult } from './types';
 export const dumpOutput = (diff: DiffResult[], logger: Logger): void => {
 	logger.startProcess('Dump output');
 	console.log(diff);
-	logger.endProcess();
 };
 
 export const setResult = (diff: DiffResult[]): void => {
@@ -28,6 +27,7 @@ export const setResult = (diff: DiffResult[]): void => {
 		if (envName) {
 			exportVariable(envName, result);
 		}
+		console.log(`${setting.name}: ${result}`);
 	});
 };
 
@@ -35,4 +35,5 @@ export const execute = async(logger: Logger, diff?: DiffResult[]): Promise<void>
 	const _diff = diff ?? await getGitDiff();
 	dumpOutput(_diff, logger);
 	setResult(_diff);
+	logger.endProcess();
 };

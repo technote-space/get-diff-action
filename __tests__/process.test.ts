@@ -41,7 +41,6 @@ describe('dumpOutput', () => {
 			'\t\t"lines": 404\n' +
 			'\t}\n' +
 			']',
-			'::endgroup::',
 		]);
 	});
 });
@@ -57,10 +56,15 @@ describe('setResult', () => {
 		stdoutCalledWith(mockStdout, [
 			'::set-output name=diff::test1 test2 test4',
 			'::set-env name=GIT_DIFF::test1 test2 test4',
+			'"diff: test1 test2 test4"',
 			'::set-output name=count::3',
+			'"count: 3"',
 			'::set-output name=insertions::7',
+			'"insertions: 7"',
 			'::set-output name=deletions::700',
+			'"deletions: 700"',
 			'::set-output name=lines::707',
+			'"lines: 707"',
 		]);
 	});
 
@@ -76,14 +80,19 @@ describe('setResult', () => {
 
 		stdoutCalledWith(mockStdout, [
 			'::set-output name=diff::test1 test2 test4',
+			'"diff: test1 test2 test4"',
 			'::set-output name=count::3',
 			'::set-env name=FILE_COUNT::3',
+			'"count: 3"',
 			'::set-output name=insertions::7',
 			'::set-env name=INSERTIONS::7',
+			'"insertions: 7"',
 			'::set-output name=deletions::700',
 			'::set-env name=DELETIONS::700',
+			'"deletions: 700"',
 			'::set-output name=lines::707',
 			'::set-env name=LINES::707',
+			'"lines: 707"',
 		]);
 	});
 });
@@ -139,6 +148,7 @@ describe('execute', () => {
 			'  >> 1 file changed, 25 insertions(+), 4 deletions(-)',
 			'[command]git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat \'src/main.ts\'',
 			'  >> 1 file changed, 25 insertions(+), 4 deletions(-)',
+			'::endgroup::',
 			'::group::Dump output',
 			'[\n' +
 			'\t{\n' +
@@ -166,13 +176,18 @@ describe('execute', () => {
 			'\t\t"lines": 29\n' +
 			'\t}\n' +
 			']',
-			'::endgroup::',
 			'::set-output name=diff::\'package.json\' \'abc/composer.json\' \'README.md\' \'src/main.ts\'',
 			'::set-env name=GIT_DIFF::\'package.json\' \'abc/composer.json\' \'README.md\' \'src/main.ts\'',
+			'"diff: \'package.json\' \'abc/composer.json\' \'README.md\' \'src/main.ts\'"',
 			'::set-output name=count::4',
+			'"count: 4"',
 			'::set-output name=insertions::100',
+			'"insertions: 100"',
 			'::set-output name=deletions::16',
+			'"deletions: 16"',
 			'::set-output name=lines::116',
+			'"lines: 116"',
+			'::endgroup::',
 		]);
 	});
 
@@ -192,13 +207,18 @@ describe('execute', () => {
 		stdoutCalledWith(mockStdout, [
 			'::group::Dump output',
 			'[]',
-			'::endgroup::',
 			'::set-output name=diff::',
 			'::set-env name=GIT_DIFF::',
+			'"diff: "',
 			'::set-output name=count::0',
+			'"count: 0"',
 			'::set-output name=insertions::0',
+			'"insertions: 0"',
 			'::set-output name=deletions::0',
+			'"deletions: 0"',
 			'::set-output name=lines::0',
+			'"lines: 0"',
+			'::endgroup::',
 		]);
 	});
 });
