@@ -28,11 +28,11 @@ const isPrefixMatched = (item: string, prefix: string[]): boolean => !prefix.len
 const isSuffixMatched = (item: string, suffix: string[]): boolean => !suffix.length || !suffix.every(suffix => !Utils.getSuffixRegExp(suffix).test(item));
 const toAbsolute      = (item: string, workspace: string): string => workspace + item;
 
-export const getFileDiff = async(path: string): Promise<FileDiffResult> => {
+export const getFileDiff = async(path: string, between: string): Promise<FileDiffResult> => {
 	const command = new Command(new Logger());
 	const stdout  = (await command.execAsync({
 		command: 'git diff',
-		args: ['--shortstat', path],
+		args: ['--shortstat', between, path],
 		cwd: Utils.getWorkspace(),
 	})).stdout;
 
@@ -51,6 +51,7 @@ export const getGitDiff = async(): Promise<DiffResult[]> => {
 	const suffix    = getSuffix();
 	const workspace = getWorkspace();
 	const command   = new Command(new Logger());
+	const between   = `${Utils.replaceAll(getFrom(), /[^\\]"/g, '\\"')}${getDot()}${Utils.replaceAll(getTo(), /[^\\]"/g, '\\"')}`;
 
 	await command.execAsync({
 		command: 'git fetch',
@@ -66,15 +67,16 @@ export const getGitDiff = async(): Promise<DiffResult[]> => {
 	});
 
 	return (await Promise.all(Utils.split((await command.execAsync({
-		command: `git diff "${Utils.replaceAll(getFrom(), /[^\\]"/g, '\\"')}"${getDot()}"${Utils.replaceAll(getTo(), /[^\\]"/g, '\\"')}"`,
+		command: 'git diff',
 		args: [
+			between,
 			'--diff-filter=' + getFilter(),
 			'--name-only',
 		],
 		cwd: Utils.getWorkspace(),
 	})).stdout)
 		.filter(item => isIgnore(item, files) || (isPrefixMatched(item, prefix) && isSuffixMatched(item, suffix)))
-		.map(async item => ({file: item, ...await getFileDiff(item)}))))
+		.map(async item => ({file: item, ...await getFileDiff(item, between)}))))
 		.map(item => ({...item, file: toAbsolute(item.file, workspace)}));
 };
 

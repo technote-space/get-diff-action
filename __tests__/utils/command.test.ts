@@ -41,11 +41,11 @@ describe('getGitDiff', () => {
 		execCalledWith(mockExec, [
 			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
 			'git fetch --no-tags origin \'+refs/heads/master:refs/remotes/origin/master\'',
-			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" \'--diff-filter=AM\' --name-only',
-			'git diff --shortstat \'package.json\'',
-			'git diff --shortstat \'abc/composer.json\'',
-			'git diff --shortstat \'README.md\'',
-			'git diff --shortstat \'src/main.ts\'',
+			'git diff \'origin/${GITHUB_BASE_REF}...${GITHUB_REF#refs/}\' \'--diff-filter=AM\' --name-only',
+			'git diff --shortstat \'origin/${GITHUB_BASE_REF}...${GITHUB_REF#refs/}\' \'package.json\'',
+			'git diff --shortstat \'origin/${GITHUB_BASE_REF}...${GITHUB_REF#refs/}\' \'abc/composer.json\'',
+			'git diff --shortstat \'origin/${GITHUB_BASE_REF}...${GITHUB_REF#refs/}\' \'README.md\'',
+			'git diff --shortstat \'origin/${GITHUB_BASE_REF}...${GITHUB_REF#refs/}\' \'src/main.ts\'',
 		]);
 	});
 
@@ -85,12 +85,12 @@ describe('getGitDiff', () => {
 		execCalledWith(mockExec, [
 			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
 			'git fetch --no-tags origin \'+refs/heads/master:refs/remotes/origin/master\'',
-			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" \'--diff-filter=AMD\' --name-only',
-			'git diff --shortstat \'package.json\'',
-			'git diff --shortstat \'abc/composer.json\'',
-			'git diff --shortstat \'src/main.ts\'',
-			'git diff --shortstat \'src/test/test2.txt\'',
-			'git diff --shortstat \'__tests__/main.test.ts\'',
+			'git diff \'\\"#$%&\'\\\'\'()-=~^|\\[];+*,./..test\' \'--diff-filter=AMD\' --name-only',
+			'git diff --shortstat \'\\"#$%&\'\\\'\'()-=~^|\\[];+*,./..test\' \'package.json\'',
+			'git diff --shortstat \'\\"#$%&\'\\\'\'()-=~^|\\[];+*,./..test\' \'abc/composer.json\'',
+			'git diff --shortstat \'\\"#$%&\'\\\'\'()-=~^|\\[];+*,./..test\' \'src/main.ts\'',
+			'git diff --shortstat \'\\"#$%&\'\\\'\'()-=~^|\\[];+*,./..test\' \'src/test/test2.txt\'',
+			'git diff --shortstat \'\\"#$%&\'\\\'\'()-=~^|\\[];+*,./..test\' \'__tests__/main.test.ts\'',
 		]);
 	});
 });
@@ -102,14 +102,14 @@ describe('getFileDiff', () => {
 			stdout: ' 1 file changed, 25 insertions(+), 4 deletions(-)',
 		});
 
-		const diff = await getFileDiff('');
+		const diff = await getFileDiff('test.js', 'master...pull/132/merge');
 
 		expect(diff.insertions).toBe(25);
 		expect(diff.deletions).toBe(4);
 		expect(diff.lines).toBe(29);
 
 		execCalledWith(mockExec, [
-			'git diff --shortstat',
+			'git diff --shortstat \'master...pull/132/merge\' \'test.js\'',
 		]);
 	});
 
@@ -119,14 +119,14 @@ describe('getFileDiff', () => {
 			stdout: '',
 		});
 
-		const diff = await getFileDiff('');
+		const diff = await getFileDiff('test.js', 'master...pull/132/merge');
 
 		expect(diff.insertions).toBe(0);
 		expect(diff.deletions).toBe(0);
 		expect(diff.lines).toBe(0);
 
 		execCalledWith(mockExec, [
-			'git diff --shortstat',
+			'git diff --shortstat \'master...pull/132/merge\' \'test.js\'',
 		]);
 	});
 });
