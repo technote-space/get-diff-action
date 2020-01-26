@@ -1,7 +1,10 @@
 # https://help.github.com/ja/articles/metadata-syntax-for-github-actions
 name: Get Diff Action
+
 description: GitHub actions to get git diff.
+
 author: technote-space
+
 inputs:
   FROM:
     description: Commit A.
@@ -34,19 +37,42 @@ inputs:
     required: false
   ABSOLUTE:
     description: Get as absolute path.
-    default: 'true'
+    default: 'false'
     required: false
   SET_ENV_NAME:
-    description: Env name.
+    description: Env name (diff).
     default: GIT_DIFF
     required: false
+  SET_ENV_NAME_COUNT:
+    description: Env name (count).
+    required: false
+  SET_ENV_NAME_INSERTIONS:
+    description: Env name (insertions).
+    required: false
+  SET_ENV_NAME_DELETIONS:
+    description: Env name (deletions).
+    required: false
+  SET_ENV_NAME_LINES:
+    description: Env name (lines).
+    required: false
+
 outputs:
   diff:
-    description: 'git diff results'
+    description: 'The results of diff file names (if SET_ENV_NAME is set)'
+  count:
+    description: 'The number of diff files (if SET_ENV_NAME_COUNT is set)'
+  insertions:
+    description: 'The number of insertions lines (if SET_ENV_NAME_INSERTIONS is set)'
+  deletions:
+    description: 'The number of deletions lines (if SET_ENV_NAME_DELETIONS is set)'
+  lines:
+    description: 'The number of diff lines  (if SET_ENV_NAME_LINES is set)'
+
 branding:
   # https://feathericons.com/
   icon: 'file'
   color: 'orange'
+
 runs:
   using: node12
   main: lib/main.js
