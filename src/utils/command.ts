@@ -40,8 +40,8 @@ export const getFileDiff = async(path: string, between: string): Promise<FileDif
 		return {insertions: 0, deletions: 0, lines: 0};
 	}
 
-	const insertions = Number.parseInt((stdout.match(/ (\d+) insertions/) ?? ['', '0'])[1]);
-	const deletions  = Number.parseInt((stdout.match(/ (\d+) deletions/) ?? ['', '0'])[1]);
+	const insertions = Number.parseInt((stdout.match(/ (\d+) insertions?\(/) ?? ['', '0'])[1]);
+	const deletions  = Number.parseInt((stdout.match(/ (\d+) deletions?\(/) ?? ['', '0'])[1]);
 	return {insertions, deletions, lines: insertions + deletions};
 };
 

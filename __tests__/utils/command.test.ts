@@ -96,10 +96,10 @@ describe('getGitDiff', () => {
 });
 
 describe('getFileDiff', () => {
-	it('should get file diff', async() => {
+	it('should get file diff 1', async() => {
 		const mockExec = spyOnExec();
 		setChildProcessParams({
-			stdout: ' 1 file changed, 25 insertions(+), 4 deletions(-)',
+			stdout: '1 file changed, 25 insertions(+), 4 deletions(-)',
 		});
 
 		const diff = await getFileDiff('test.js', 'master...pull/132/merge');
@@ -107,6 +107,40 @@ describe('getFileDiff', () => {
 		expect(diff.insertions).toBe(25);
 		expect(diff.deletions).toBe(4);
 		expect(diff.lines).toBe(29);
+
+		execCalledWith(mockExec, [
+			'git diff master...pull/132/merge --shortstat \'test.js\'',
+		]);
+	});
+
+	it('should get file diff 2', async() => {
+		const mockExec = spyOnExec();
+		setChildProcessParams({
+			stdout: '1 file changed, 1 insertion(+), 3 deletions(-)',
+		});
+
+		const diff = await getFileDiff('test.js', 'master...pull/132/merge');
+
+		expect(diff.insertions).toBe(1);
+		expect(diff.deletions).toBe(3);
+		expect(diff.lines).toBe(4);
+
+		execCalledWith(mockExec, [
+			'git diff master...pull/132/merge --shortstat \'test.js\'',
+		]);
+	});
+
+	it('should get file diff 3', async() => {
+		const mockExec = spyOnExec();
+		setChildProcessParams({
+			stdout: '1 file changed, 3 insertions(+)',
+		});
+
+		const diff = await getFileDiff('test.js', 'master...pull/132/merge');
+
+		expect(diff.insertions).toBe(3);
+		expect(diff.deletions).toBe(0);
+		expect(diff.lines).toBe(3);
 
 		execCalledWith(mockExec, [
 			'git diff master...pull/132/merge --shortstat \'test.js\'',

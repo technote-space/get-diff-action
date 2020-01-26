@@ -113,7 +113,7 @@ describe('execute', () => {
 			stdout: (command: string): string => {
 				if (command.startsWith('git diff')) {
 					if (command.includes('shortstat')) {
-						return ' 1 file changed, 25 insertions(+), 4 deletions(-)';
+						return '1 file changed, 25 insertions(+), 4 deletions(-)';
 					}
 					return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
 				}
