@@ -120,6 +120,28 @@ jobs:
    /home/runner/work/my-repo-name/my-repo-name/src/main.ts /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
    ```
 
+## 出力
+### diff
+差分のあるファイルの結果  
+もし `SET_ENV_NAME` が設定されている場合、その名前で環境変数が設定されます。  
+default: `SET_ENV_NAME=GIT_DIFF`
+### count
+差分のあるファイル数  
+もし `SET_ENV_NAME_COUNT` が設定されている場合、その名前で環境変数が設定されます。  
+default: `SET_ENV_NAME_COUNT=`
+### insertions
+追加された行数  
+もし `SET_ENV_NAME_INSERTIONS` が設定されている場合、その名前で環境変数が設定されます。  
+default: `SET_ENV_NAME_INSERTIONS=`
+### deletions
+削除された行数  
+もし `SET_ENV_NAME_DELETIONS` が設定されている場合、その名前で環境変数が設定されます。  
+default: `SET_ENV_NAME_DELETIONS=`
+### lines
+追加された行数と削除された行数の和  
+もし `SET_ENV_NAME_LINES` が設定されている場合、その名前で環境変数が設定されます。  
+default: `SET_ENV_NAME_LINES=`
+
 ## Action イベント詳細
 ### 対象イベント
 | eventName | action |

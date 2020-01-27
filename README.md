@@ -119,6 +119,28 @@ If there is no difference in the source code below, this workflow will skip the 
    /home/runner/work/my-repo-name/my-repo-name/src/main.ts /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
    ```
 
+## Outputs
+### diff
+The results of diff file names.  
+if inputs `SET_ENV_NAME` is set, an environment variable is set with that name.  
+default: `SET_ENV_NAME=GIT_DIFF`
+### count
+The number of diff files.  
+if inputs `SET_ENV_NAME_COUNT` is set, an environment variable is set with that name.  
+default: `SET_ENV_NAME_COUNT=`
+### insertions
+The number of insertions lines.  
+if inputs `SET_ENV_NAME_INSERTIONS` is set, an environment variable is set with that name.  
+default: `SET_ENV_NAME_INSERTIONS=`
+### deletions
+The number of deletions lines.  
+if inputs `SET_ENV_NAME_DELETIONS` is set, an environment variable is set with that name.  
+default: `SET_ENV_NAME_DELETIONS=`
+### lines
+The number of diff lines.  
+if inputs `SET_ENV_NAME_LINES` is set, an environment variable is set with that name.  
+default: `SET_ENV_NAME_LINES=`
+
 ## Action event details
 ### Target events
 | eventName | action |
