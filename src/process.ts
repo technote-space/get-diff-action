@@ -4,19 +4,21 @@ import { getGitDiff } from './utils/command';
 import { getDiffFiles, sumResults } from './utils/command';
 import { DiffResult } from './types';
 
-export const dumpOutput = (diff: DiffResult[], logger: Logger): void => {
-	logger.startProcess('Dump output');
-	console.log(diff);
+export const dumpDiffs = (diffs: DiffResult[], logger: Logger): void => {
+	logger.startProcess('Dump diffs');
+	console.log(diffs);
+	logger.endProcess();
 };
 
-export const setResult = (diff: DiffResult[]): void => {
-	const result     = getDiffFiles(diff);
-	const insertions = sumResults(diff, item => item.insertions);
-	const deletions  = sumResults(diff, item => item.deletions);
+export const setResult = (diffs: DiffResult[], logger: Logger): void => {
+	const result     = getDiffFiles(diffs);
+	const insertions = sumResults(diffs, item => item.insertions);
+	const deletions  = sumResults(diffs, item => item.deletions);
 
+	logger.startProcess('Dump output');
 	[
 		{name: 'diff', value: result, envNameSuffix: ''},
-		{name: 'count', value: diff.length},
+		{name: 'count', value: diffs.length},
 		{name: 'insertions', value: insertions},
 		{name: 'deletions', value: deletions},
 		{name: 'lines', value: insertions + deletions},
@@ -29,11 +31,11 @@ export const setResult = (diff: DiffResult[]): void => {
 		}
 		console.log(`${setting.name}: ${result}`);
 	});
+	logger.endProcess();
 };
 
-export const execute = async(logger: Logger, diff?: DiffResult[]): Promise<void> => {
-	const _diff = diff ?? await getGitDiff();
-	dumpOutput(_diff, logger);
-	setResult(_diff);
-	logger.endProcess();
+export const execute = async(logger: Logger, diffs?: DiffResult[]): Promise<void> => {
+	const _diff = diffs ?? await getGitDiff();
+	dumpDiffs(_diff, logger);
+	setResult(_diff, logger);
 };

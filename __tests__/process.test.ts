@@ -2,7 +2,7 @@
 import path from 'path';
 import { testEnv, spyOnStdout, stdoutCalledWith, spyOnExec, setChildProcessParams, execCalledWith } from '@technote-space/github-action-test-helper';
 import { Logger } from '@technote-space/github-action-helper';
-import { dumpOutput, setResult, execute } from '../src/process';
+import { dumpDiffs, setResult, execute } from '../src/process';
 
 const rootDir = path.resolve(__dirname, '..');
 const diffs   = [
@@ -11,16 +11,16 @@ const diffs   = [
 	{file: 'test4', insertions: 4, deletions: 400, lines: 404, filterIgnored: true, prefixMatched: true, suffixMatched: false},
 ];
 
-describe('dumpOutput', () => {
+describe('dumpDiffs', () => {
 	testEnv(rootDir);
 
 	it('should dump output', () => {
 		const mockStdout = spyOnStdout();
 
-		dumpOutput(diffs, new Logger());
+		dumpDiffs(diffs, new Logger());
 
 		stdoutCalledWith(mockStdout, [
-			'::group::Dump output',
+			'::group::Dump diffs',
 			'[\n' +
 			'\t{\n' +
 			'\t\t"file": "test1",\n' +
@@ -50,6 +50,7 @@ describe('dumpOutput', () => {
 			'\t\t"suffixMatched": false\n' +
 			'\t}\n' +
 			']',
+			'::endgroup::',
 		]);
 	});
 });
@@ -60,9 +61,10 @@ describe('setResult', () => {
 	it('should set result', () => {
 		const mockStdout = spyOnStdout();
 
-		setResult(diffs);
+		setResult(diffs, new Logger());
 
 		stdoutCalledWith(mockStdout, [
+			'::group::Dump output',
 			'::set-output name=diff::test1 test2 test4',
 			'::set-env name=GIT_DIFF::test1 test2 test4',
 			'"diff: test1 test2 test4"',
@@ -74,6 +76,7 @@ describe('setResult', () => {
 			'"deletions: 300"',
 			'::set-output name=lines::303',
 			'"lines: 303"',
+			'::endgroup::',
 		]);
 	});
 
@@ -85,9 +88,10 @@ describe('setResult', () => {
 		process.env.INPUT_SET_ENV_NAME_LINES      = 'LINES';
 		const mockStdout                          = spyOnStdout();
 
-		setResult(diffs);
+		setResult(diffs, new Logger());
 
 		stdoutCalledWith(mockStdout, [
+			'::group::Dump output',
 			'::set-output name=diff::test1 test2 test4',
 			'"diff: test1 test2 test4"',
 			'::set-output name=count::3',
@@ -102,6 +106,7 @@ describe('setResult', () => {
 			'::set-output name=lines::303',
 			'::set-env name=LINES::303',
 			'"lines: 303"',
+			'::endgroup::',
 		]);
 	});
 });
@@ -157,8 +162,7 @@ describe('execute', () => {
 			'  >> 1 file changed, 25 insertions(+), 4 deletions(-)',
 			'[command]git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat \'src/main.ts\'',
 			'  >> 1 file changed, 25 insertions(+), 4 deletions(-)',
-			'::endgroup::',
-			'::group::Dump output',
+			'::group::Dump diffs',
 			'[\n' +
 			'\t{\n' +
 			'\t\t"file": "package.json",\n' +
@@ -197,6 +201,8 @@ describe('execute', () => {
 			'\t\t"lines": 29\n' +
 			'\t}\n' +
 			']',
+			'::endgroup::',
+			'::group::Dump output',
 			'::set-output name=diff::\'package.json\' \'abc/composer.json\' \'README.md\' \'src/main.ts\'',
 			'::set-env name=GIT_DIFF::\'package.json\' \'abc/composer.json\' \'README.md\' \'src/main.ts\'',
 			'"diff: \'package.json\' \'abc/composer.json\' \'README.md\' \'src/main.ts\'"',
@@ -226,8 +232,10 @@ describe('execute', () => {
 
 		execCalledWith(mockExec, []);
 		stdoutCalledWith(mockStdout, [
-			'::group::Dump output',
+			'::group::Dump diffs',
 			'[]',
+			'::endgroup::',
+			'::group::Dump output',
 			'::set-output name=diff::',
 			'::set-env name=GIT_DIFF::',
 			'"diff: "',
