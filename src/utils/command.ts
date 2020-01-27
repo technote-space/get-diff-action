@@ -78,7 +78,7 @@ export const getGitDiff = async(): Promise<DiffResult[]> => {
 		.map((item: string): FileResult => {
 			const prefixMatched = isPrefixMatched(item, prefix);
 			const suffixMatched = isSuffixMatched(item, suffix);
-			const filterIgnored = !(prefixMatched && suffixMatched) && isFilterIgnored(item, files);
+			const filterIgnored = isFilterIgnored(item, files);
 			return {file: item, filterIgnored, prefixMatched, suffixMatched};
 		})
 		.filter(item => item.filterIgnored || (item.prefixMatched && item.suffixMatched))
