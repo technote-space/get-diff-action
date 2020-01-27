@@ -35,9 +35,11 @@ inputs:
   FILES:
     description: Specific files.
     required: false
+  SUMMARY_INCLUDE_FILES:
+    description: Whether the summary contains the result of specific files.
+    required: false
   ABSOLUTE:
     description: Get as absolute path.
-    default: 'false'
     required: false
   SET_ENV_NAME:
     description: Env name (diff).
