@@ -43,10 +43,10 @@ describe('getGitDiff', () => {
 			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
 			'git fetch --no-tags origin \'+refs/heads/*:refs/remotes/origin/*\'',
 			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" \'--diff-filter=AM\' --name-only',
-			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat \'package.json\'',
-			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat \'abc/composer.json\'',
-			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat \'README.md\'',
-			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat \'src/main.ts\'',
+			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat -w \'package.json\'',
+			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat -w \'abc/composer.json\'',
+			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat -w \'README.md\'',
+			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat -w \'src/main.ts\'',
 		]);
 	});
 
@@ -87,11 +87,11 @@ describe('getGitDiff', () => {
 			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
 			'git fetch --no-tags origin \'+refs/heads/*:refs/remotes/origin/*\'',
 			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" \'--diff-filter=AMD\' --name-only',
-			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" --shortstat \'package.json\'',
-			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" --shortstat \'abc/composer.json\'',
-			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" --shortstat \'src/main.ts\'',
-			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" --shortstat \'src/test/test2.txt\'',
-			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" --shortstat \'__tests__/main.test.ts\'',
+			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" --shortstat -w \'package.json\'',
+			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" --shortstat -w \'abc/composer.json\'',
+			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" --shortstat -w \'src/main.ts\'',
+			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" --shortstat -w \'src/test/test2.txt\'',
+			'git diff "\\"#$%&\'()-=~^|\\[];+*,./".."test" --shortstat -w \'__tests__/main.test.ts\'',
 		]);
 	});
 });
@@ -110,7 +110,7 @@ describe('getFileDiff', () => {
 		expect(diff.lines).toBe(29);
 
 		execCalledWith(mockExec, [
-			'git diff master...pull/132/merge --shortstat \'test.js\'',
+			'git diff master...pull/132/merge --shortstat -w \'test.js\'',
 		]);
 	});
 
@@ -127,7 +127,7 @@ describe('getFileDiff', () => {
 		expect(diff.lines).toBe(4);
 
 		execCalledWith(mockExec, [
-			'git diff master...pull/132/merge --shortstat \'test.js\'',
+			'git diff master...pull/132/merge --shortstat -w \'test.js\'',
 		]);
 	});
 
@@ -144,7 +144,7 @@ describe('getFileDiff', () => {
 		expect(diff.lines).toBe(3);
 
 		execCalledWith(mockExec, [
-			'git diff master...pull/132/merge --shortstat \'test.js\'',
+			'git diff master...pull/132/merge --shortstat -w \'test.js\'',
 		]);
 	});
 
@@ -161,7 +161,7 @@ describe('getFileDiff', () => {
 		expect(diff.lines).toBe(0);
 
 		execCalledWith(mockExec, [
-			'git diff master...pull/132/merge --shortstat \'test.js\'',
+			'git diff master...pull/132/merge --shortstat -w \'test.js\'',
 		]);
 	});
 });

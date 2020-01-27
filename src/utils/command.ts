@@ -34,7 +34,7 @@ const toAbsolute      = (item: string, workspace: string): string => workspace +
 export const getFileDiff = async(file: FileResult, between: string): Promise<FileDiffResult> => {
 	const stdout = (await command.execAsync({
 		command: `git diff ${between}`,
-		args: ['--shortstat', file.file],
+		args: ['--shortstat', '-w', file.file],
 		cwd: Utils.getWorkspace(),
 	})).stdout;
 
