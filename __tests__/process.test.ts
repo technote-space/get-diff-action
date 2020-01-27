@@ -6,9 +6,9 @@ import { dumpOutput, setResult, execute } from '../src/process';
 
 const rootDir = path.resolve(__dirname, '..');
 const diffs   = [
-	{file: 'test1', insertions: 1, deletions: 100, lines: 101},
-	{file: 'test2', insertions: 2, deletions: 200, lines: 202},
-	{file: 'test4', insertions: 4, deletions: 400, lines: 404},
+	{file: 'test1', insertions: 1, deletions: 100, lines: 101, filterIgnored: false, prefixMatched: true, suffixMatched: true},
+	{file: 'test2', insertions: 2, deletions: 200, lines: 202, filterIgnored: false, prefixMatched: true, suffixMatched: true},
+	{file: 'test4', insertions: 4, deletions: 400, lines: 404, filterIgnored: true, prefixMatched: true, suffixMatched: false},
 ];
 
 describe('dumpOutput', () => {
@@ -26,19 +26,28 @@ describe('dumpOutput', () => {
 			'\t\t"file": "test1",\n' +
 			'\t\t"insertions": 1,\n' +
 			'\t\t"deletions": 100,\n' +
-			'\t\t"lines": 101\n' +
+			'\t\t"lines": 101,\n' +
+			'\t\t"filterIgnored": false,\n' +
+			'\t\t"prefixMatched": true,\n' +
+			'\t\t"suffixMatched": true\n' +
 			'\t},\n' +
 			'\t{\n' +
 			'\t\t"file": "test2",\n' +
 			'\t\t"insertions": 2,\n' +
 			'\t\t"deletions": 200,\n' +
-			'\t\t"lines": 202\n' +
+			'\t\t"lines": 202,\n' +
+			'\t\t"filterIgnored": false,\n' +
+			'\t\t"prefixMatched": true,\n' +
+			'\t\t"suffixMatched": true\n' +
 			'\t},\n' +
 			'\t{\n' +
 			'\t\t"file": "test4",\n' +
 			'\t\t"insertions": 4,\n' +
 			'\t\t"deletions": 400,\n' +
-			'\t\t"lines": 404\n' +
+			'\t\t"lines": 404,\n' +
+			'\t\t"filterIgnored": true,\n' +
+			'\t\t"prefixMatched": true,\n' +
+			'\t\t"suffixMatched": false\n' +
 			'\t}\n' +
 			']',
 		]);
@@ -59,12 +68,12 @@ describe('setResult', () => {
 			'"diff: test1 test2 test4"',
 			'::set-output name=count::3',
 			'"count: 3"',
-			'::set-output name=insertions::7',
-			'"insertions: 7"',
-			'::set-output name=deletions::700',
-			'"deletions: 700"',
-			'::set-output name=lines::707',
-			'"lines: 707"',
+			'::set-output name=insertions::3',
+			'"insertions: 3"',
+			'::set-output name=deletions::300',
+			'"deletions: 300"',
+			'::set-output name=lines::303',
+			'"lines: 303"',
 		]);
 	});
 
@@ -84,15 +93,15 @@ describe('setResult', () => {
 			'::set-output name=count::3',
 			'::set-env name=FILE_COUNT::3',
 			'"count: 3"',
-			'::set-output name=insertions::7',
-			'::set-env name=INSERTIONS::7',
-			'"insertions: 7"',
-			'::set-output name=deletions::700',
-			'::set-env name=DELETIONS::700',
-			'"deletions: 700"',
-			'::set-output name=lines::707',
-			'::set-env name=LINES::707',
-			'"lines: 707"',
+			'::set-output name=insertions::3',
+			'::set-env name=INSERTIONS::3',
+			'"insertions: 3"',
+			'::set-output name=deletions::300',
+			'::set-env name=DELETIONS::300',
+			'"deletions: 300"',
+			'::set-output name=lines::303',
+			'::set-env name=LINES::303',
+			'"lines: 303"',
 		]);
 	});
 });
@@ -125,7 +134,7 @@ describe('execute', () => {
 
 		execCalledWith(mockExec, [
 			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
-			'git fetch --no-tags origin \'+refs/heads/master:refs/remotes/origin/master\'',
+			'git fetch --no-tags origin \'+refs/heads/*:refs/remotes/origin/*\'',
 			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" \'--diff-filter=AM\' --name-only',
 			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat \'package.json\'',
 			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat \'abc/composer.json\'',
@@ -134,7 +143,7 @@ describe('execute', () => {
 		]);
 		stdoutCalledWith(mockStdout, [
 			'[command]git fetch --no-tags origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
-			'[command]git fetch --no-tags origin \'+refs/heads/master:refs/remotes/origin/master\'',
+			'[command]git fetch --no-tags origin \'+refs/heads/*:refs/remotes/origin/*\'',
 			'[command]git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" \'--diff-filter=AM\' --name-only',
 			'  >> package.json',
 			'  >> abc/composer.json',
@@ -153,24 +162,36 @@ describe('execute', () => {
 			'[\n' +
 			'\t{\n' +
 			'\t\t"file": "package.json",\n' +
+			'\t\t"filterIgnored": false,\n' +
+			'\t\t"prefixMatched": true,\n' +
+			'\t\t"suffixMatched": true,\n' +
 			'\t\t"insertions": 25,\n' +
 			'\t\t"deletions": 4,\n' +
 			'\t\t"lines": 29\n' +
 			'\t},\n' +
 			'\t{\n' +
 			'\t\t"file": "abc/composer.json",\n' +
+			'\t\t"filterIgnored": false,\n' +
+			'\t\t"prefixMatched": true,\n' +
+			'\t\t"suffixMatched": true,\n' +
 			'\t\t"insertions": 25,\n' +
 			'\t\t"deletions": 4,\n' +
 			'\t\t"lines": 29\n' +
 			'\t},\n' +
 			'\t{\n' +
 			'\t\t"file": "README.md",\n' +
+			'\t\t"filterIgnored": false,\n' +
+			'\t\t"prefixMatched": true,\n' +
+			'\t\t"suffixMatched": true,\n' +
 			'\t\t"insertions": 25,\n' +
 			'\t\t"deletions": 4,\n' +
 			'\t\t"lines": 29\n' +
 			'\t},\n' +
 			'\t{\n' +
 			'\t\t"file": "src/main.ts",\n' +
+			'\t\t"filterIgnored": false,\n' +
+			'\t\t"prefixMatched": true,\n' +
+			'\t\t"suffixMatched": true,\n' +
 			'\t\t"insertions": 25,\n' +
 			'\t\t"deletions": 4,\n' +
 			'\t\t"lines": 29\n' +
