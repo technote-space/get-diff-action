@@ -60,15 +60,15 @@ inputs:
 
 outputs:
   diff:
-    description: 'The results of diff file names (if SET_ENV_NAME is set)'
+    description: The results of diff file names.
   count:
-    description: 'The number of diff files (if SET_ENV_NAME_COUNT is set)'
+    description: The number of diff files.
   insertions:
-    description: 'The number of insertions lines (if SET_ENV_NAME_INSERTIONS is set)'
+    description: The number of insertions lines.
   deletions:
-    description: 'The number of deletions lines (if SET_ENV_NAME_DELETIONS is set)'
+    description: The number of deletions lines.
   lines:
-    description: 'The number of diff lines  (if SET_ENV_NAME_LINES is set)'
+    description: The number of diff lines.
 
 branding:
   # https://feathericons.com/

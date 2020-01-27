@@ -16,6 +16,12 @@
 - [スクリーンショット](#%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88)
 - [使用方法](#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95)
 - [動作](#%E5%8B%95%E4%BD%9C)
+- [出力](#%E5%87%BA%E5%8A%9B)
+  - [diff](#diff)
+  - [count](#count)
+  - [insertions](#insertions)
+  - [deletions](#deletions)
+  - [lines](#lines)
 - [Action イベント詳細](#action-%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E8%A9%B3%E7%B4%B0)
   - [対象イベント](#%E5%AF%BE%E8%B1%A1%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88)
 - [Author](#author)
@@ -119,6 +125,28 @@ jobs:
    ```
    /home/runner/work/my-repo-name/my-repo-name/src/main.ts /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
    ```
+
+## 出力
+### diff
+差分のあるファイルの結果  
+もし `SET_ENV_NAME` が設定されている場合、その名前で環境変数が設定されます。  
+default: `SET_ENV_NAME=GIT_DIFF`
+### count
+差分のあるファイル数  
+もし `SET_ENV_NAME_COUNT` が設定されている場合、その名前で環境変数が設定されます。  
+default: `SET_ENV_NAME_COUNT=`
+### insertions
+追加された行数  
+もし `SET_ENV_NAME_INSERTIONS` が設定されている場合、その名前で環境変数が設定されます。  
+default: `SET_ENV_NAME_INSERTIONS=`
+### deletions
+削除された行数  
+もし `SET_ENV_NAME_DELETIONS` が設定されている場合、その名前で環境変数が設定されます。  
+default: `SET_ENV_NAME_DELETIONS=`
+### lines
+追加された行数と削除された行数の和  
+もし `SET_ENV_NAME_LINES` が設定されている場合、その名前で環境変数が設定されます。  
+default: `SET_ENV_NAME_LINES=`
 
 ## Action イベント詳細
 ### 対象イベント
