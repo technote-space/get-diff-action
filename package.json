@@ -43,7 +43,7 @@
     "setup": "bash bin/setup.sh && rm -rdf bin",
     "build": "tsc",
     "test": "yarn lint && yarn cover",
-    "lint": "eslint 'src/**/*.ts' '__tests__/**/*.ts'",
+    "lint": "eslint 'src/**/*.ts' '__tests__/**/*.ts' --cache",
     "lint:fix": "eslint --fix 'src/**/*.ts' '__tests__/**/*.ts'",
     "cover": "jest --coverage",
     "update": "ncu -u && yarn install && yarn upgrade && yarn audit"
