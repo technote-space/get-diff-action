@@ -18,6 +18,7 @@ Helper to filter GitHub Actions.
   - [Results from the above example](#results-from-the-above-example)
     - [isTargetEvent](#istargetevent)
     - [isTargetLabels](#istargetlabels)
+  - [Ignore check](#ignore-check)
 - [Author](#author)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -90,6 +91,12 @@ console.log( isTargetLabels( includes, excludes, context ) );
 |issues|label1|---|label1|false|
 |issues|label1, label2|label1|label2|false|
 |issues|label1, label2|label1|label3|true|
+
+### Ignore check
+```
+with:
+  IGNORE_CONTEXT_CHECK: true
+```
 
 ## Author
 [GitHub (Technote)](https://github.com/technote-space)  
