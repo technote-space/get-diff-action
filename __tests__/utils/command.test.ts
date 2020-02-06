@@ -1,6 +1,7 @@
 /* eslint-disable no-magic-numbers */
 import path from 'path';
-import { testEnv, spyOnExec, testChildProcess, execCalledWith, setChildProcessParams } from '@technote-space/github-action-test-helper';
+import { testEnv, spyOnExec, testChildProcess, execCalledWith, setChildProcessParams, testFs } from '@technote-space/github-action-test-helper';
+import { Logger } from '@technote-space/github-action-helper';
 import { getGitDiff, getFileDiff, getDiffFiles, sumResults } from '../../src/utils/command';
 
 const rootDir           = path.resolve(__dirname, '../..');
@@ -11,6 +12,7 @@ const diffs             = [
 	{file: 'test4', insertions: 4, deletions: 400, lines: 404, filterIgnored: true, prefixMatched: true, suffixMatched: false},
 ];
 const emptyDiff         = {insertions: 0, deletions: 0, lines: 0, ...defaultFileResult};
+testFs(true);
 
 describe('getGitDiff', () => {
 	testEnv(rootDir);
@@ -33,7 +35,7 @@ describe('getGitDiff', () => {
 			},
 		});
 
-		expect(await getGitDiff()).toEqual([
+		expect(await getGitDiff(new Logger())).toEqual([
 			{file: 'package.json', ...emptyDiff},
 			{file: 'abc/composer.json', ...emptyDiff},
 			{file: 'README.md', ...emptyDiff},
@@ -76,7 +78,7 @@ describe('getGitDiff', () => {
 			},
 		});
 
-		expect(await getGitDiff()).toEqual([
+		expect(await getGitDiff(new Logger())).toEqual([
 			{file: process.env.GITHUB_WORKSPACE + '/package.json', ...emptyDiff, filterIgnored: true, prefixMatched: false, suffixMatched: false},
 			{file: process.env.GITHUB_WORKSPACE + '/abc/composer.json', ...emptyDiff, filterIgnored: true, prefixMatched: false, suffixMatched: false},
 			{file: process.env.GITHUB_WORKSPACE + '/src/main.ts', ...emptyDiff},

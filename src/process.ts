@@ -34,7 +34,7 @@ export const setResult = (diffs: DiffResult[], logger: Logger): void => {
 };
 
 export const execute = async(logger: Logger, diffs?: DiffResult[]): Promise<void> => {
-	const _diff = diffs ?? await getGitDiff();
+	const _diff = diffs ?? await getGitDiff(logger);
 	dumpDiffs(_diff, logger);
 	setResult(_diff, logger);
 };

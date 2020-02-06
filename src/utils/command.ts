@@ -47,7 +47,12 @@ export const getFileDiff = async(file: FileResult, between: string): Promise<Fil
 	return {insertions, deletions, lines: insertions + deletions};
 };
 
-export const getGitDiff = async(): Promise<DiffResult[]> => {
+export const getGitDiff = async(logger: Logger): Promise<DiffResult[]> => {
+	if (!Utils.isCloned(Utils.getWorkspace())) {
+		logger.warn('Please checkout before call this action.');
+		return [];
+	}
+
 	const files     = getFiles();
 	const prefix    = getPrefix();
 	const suffix    = getSuffix();
