@@ -1,15 +1,25 @@
 /* eslint-disable no-magic-numbers */
 import path from 'path';
-import { testEnv, spyOnStdout, stdoutCalledWith, spyOnExec, setChildProcessParams, execCalledWith } from '@technote-space/github-action-test-helper';
+import {
+	testEnv,
+	spyOnStdout,
+	stdoutCalledWith,
+	spyOnExec,
+	testChildProcess,
+	setChildProcessParams,
+	execCalledWith,
+	testFs,
+} from '@technote-space/github-action-test-helper';
 import { Logger } from '@technote-space/github-action-helper';
 import { dumpDiffs, setResult, execute } from '../src/process';
 
-const rootDir = path.resolve(__dirname, '..');
-const diffs   = [
+const rootDir   = path.resolve(__dirname, '..');
+const diffs     = [
 	{file: 'test1', insertions: 1, deletions: 100, lines: 101, filterIgnored: false, prefixMatched: true, suffixMatched: true},
 	{file: 'test2', insertions: 2, deletions: 200, lines: 202, filterIgnored: false, prefixMatched: true, suffixMatched: true},
 	{file: 'test4', insertions: 4, deletions: 400, lines: 404, filterIgnored: true, prefixMatched: true, suffixMatched: false},
 ];
+const setExists = testFs(true);
 
 describe('dumpDiffs', () => {
 	testEnv(rootDir);
@@ -113,6 +123,7 @@ describe('setResult', () => {
 
 describe('execute', () => {
 	testEnv(rootDir);
+	testChildProcess();
 
 	it('should execute', async() => {
 		process.env.GITHUB_WORKSPACE = '/home/runner/work/my-repo-name/my-repo-name';
@@ -232,6 +243,52 @@ describe('execute', () => {
 
 		execCalledWith(mockExec, []);
 		stdoutCalledWith(mockStdout, [
+			'::group::Dump diffs',
+			'[]',
+			'::endgroup::',
+			'::group::Dump output',
+			'::set-output name=diff::',
+			'::set-env name=GIT_DIFF::',
+			'"diff: "',
+			'::set-output name=count::0',
+			'"count: 0"',
+			'::set-output name=insertions::0',
+			'"insertions: 0"',
+			'::set-output name=deletions::0',
+			'"deletions: 0"',
+			'::set-output name=lines::0',
+			'"lines: 0"',
+			'::endgroup::',
+		]);
+	});
+
+	it('should not execute if not cloned', async() => {
+		process.env.GITHUB_WORKSPACE = '/home/runner/work/my-repo-name/my-repo-name';
+		process.env.GITHUB_REF       = 'refs/pull/123/merge';
+		process.env.GITHUB_SHA       = 'f01e53bb1f41af4e132326dad21e82c77ee1ff48';
+		process.env.GITHUB_HEAD_REF  = 'release/v0.3.13';
+		process.env.GITHUB_BASE_REF  = 'master';
+
+		const mockExec   = spyOnExec();
+		const mockStdout = spyOnStdout();
+		setChildProcessParams({
+			stdout: (command: string): string => {
+				if (command.startsWith('git diff')) {
+					if (command.includes('shortstat')) {
+						return '1 file changed, 25 insertions(+), 4 deletions(-)';
+					}
+					return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
+				}
+				return '';
+			},
+		});
+		setExists(false);
+
+		await execute(new Logger());
+
+		execCalledWith(mockExec, []);
+		stdoutCalledWith(mockStdout, [
+			'::warning::Please checkout before call this action.',
 			'::group::Dump diffs',
 			'[]',
 			'::endgroup::',

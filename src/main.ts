@@ -1,6 +1,6 @@
 import path from 'path';
 import { setFailed } from '@actions/core';
-import { context } from '@actions/github';
+import { Context } from '@actions/github/lib/context';
 import { isTargetEvent } from '@technote-space/filter-github-action';
 import { Logger, ContextHelper } from '@technote-space/github-action-helper';
 import { execute } from './process';
@@ -10,7 +10,8 @@ import { TARGET_EVENTS } from './constant';
  * run
  */
 async function run(): Promise<void> {
-	const logger = new Logger();
+	const logger  = new Logger();
+	const context = new Context();
 	ContextHelper.showActionInfo(path.resolve(__dirname, '..'), logger, context);
 
 	if (!isTargetEvent(TARGET_EVENTS, context)) {
