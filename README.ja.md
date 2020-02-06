@@ -44,8 +44,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 3
       - uses: technote-space/get-diff-action@v1
         id: git-diff
         with:

@@ -1,7 +1,6 @@
 import { Logger } from '@technote-space/github-action-helper';
 import { exportVariable, getInput, setOutput } from '@actions/core' ;
-import { getGitDiff } from './utils/command';
-import { getDiffFiles, sumResults } from './utils/command';
+import { getGitDiff, getDiffFiles, sumResults } from './utils/command';
 import { DiffResult } from './types';
 
 export const dumpDiffs = (diffs: DiffResult[], logger: Logger): void => {

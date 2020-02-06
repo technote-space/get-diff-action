@@ -1,6 +1,6 @@
 /* eslint-disable no-magic-numbers */
 import path from 'path';
-import { testEnv, spyOnStdout, stdoutCalledWith, spyOnExec, setChildProcessParams, execCalledWith } from '@technote-space/github-action-test-helper';
+import { testEnv, spyOnStdout, stdoutCalledWith, spyOnExec, testChildProcess, setChildProcessParams, execCalledWith } from '@technote-space/github-action-test-helper';
 import { Logger } from '@technote-space/github-action-helper';
 import { dumpDiffs, setResult, execute } from '../src/process';
 
@@ -113,6 +113,7 @@ describe('setResult', () => {
 
 describe('execute', () => {
 	testEnv(rootDir);
+	testChildProcess();
 
 	it('should execute', async() => {
 		process.env.GITHUB_WORKSPACE = '/home/runner/work/my-repo-name/my-repo-name';

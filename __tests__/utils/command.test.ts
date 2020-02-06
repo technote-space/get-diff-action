@@ -3,7 +3,7 @@ import path from 'path';
 import { testEnv, spyOnExec, testChildProcess, execCalledWith, setChildProcessParams } from '@technote-space/github-action-test-helper';
 import { getGitDiff, getFileDiff, getDiffFiles, sumResults } from '../../src/utils/command';
 
-const rootDir           = path.resolve(__dirname, '..', '..');
+const rootDir           = path.resolve(__dirname, '../..');
 const defaultFileResult = {filterIgnored: false, prefixMatched: true, suffixMatched: true};
 const diffs             = [
 	{file: 'test1', insertions: 1, deletions: 100, lines: 101, ...defaultFileResult},
