@@ -27,12 +27,12 @@
   "dependencies": {
     "@actions/core": "^1.2.2",
     "@actions/github": "^2.1.0",
-    "@technote-space/filter-github-action": "^0.2.0",
-    "@technote-space/github-action-helper": "^0.8.4"
+    "@technote-space/filter-github-action": "^0.2.1",
+    "@technote-space/github-action-helper": "^0.8.7"
   },
   "devDependencies": {
-    "@technote-space/github-action-test-helper": "^0.1.5",
-    "@types/jest": "^25.1.1",
+    "@technote-space/github-action-test-helper": "^0.2.0",
+    "@types/jest": "^25.1.2",
     "@types/node": "^13.7.0",
     "@typescript-eslint/eslint-plugin": "^2.19.0",
     "@typescript-eslint/parser": "^2.19.0",
