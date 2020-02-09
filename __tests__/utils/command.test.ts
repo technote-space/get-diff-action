@@ -126,6 +126,8 @@ describe('getGitDiff', () => {
 			{file: 'src/main.ts', ...emptyDiff},
 		]);
 		execCalledWith(mockExec, [
+			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/pull/*/merge\'',
+			'git fetch --no-tags origin \'+refs/heads/*:refs/remotes/origin/*\'',
 			'git diff \'before-sha...after-sha\' \'--diff-filter=AM\' --name-only',
 			'git diff \'before-sha...after-sha\' --shortstat -w \'package.json\'',
 			'git diff \'before-sha...after-sha\' --shortstat -w \'abc/composer.json\'',
@@ -200,6 +202,8 @@ describe('getGitDiff', () => {
 			{file: 'src/main.ts', ...emptyDiff},
 		]);
 		execCalledWith(mockExec, [
+			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/pull/*/merge\'',
+			'git fetch --no-tags origin \'+refs/heads/*:refs/remotes/origin/*\'',
 			'git diff \'before-sha...after-sha\' \'--diff-filter=AM\' --name-only',
 			'git diff \'before-sha...after-sha\' --shortstat -w \'package.json\'',
 			'git diff \'before-sha...after-sha\' --shortstat -w \'abc/composer.json\'',

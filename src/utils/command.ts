@@ -60,17 +60,27 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
 		return [];
 	}
 
-	await ['base', 'head'].reduce(async(prev, target) => {
-		await prev;
-		if (Utils.isRef(diffInfo[target])) {
+	if (Utils.isRef(diffInfo.base) && Utils.isRef(diffInfo.head)) {
+		await ['base', 'head'].reduce(async(prev, target) => {
+			await prev;
 			await command.execAsync({
 				command: 'git fetch',
 				args: ['--no-tags', 'origin', Utils.getRefspec(diffInfo[target])],
 				stderrToStdout: true,
 				cwd: Utils.getWorkspace(),
 			});
-		}
-	}, Promise.resolve());
+		}, Promise.resolve());
+	} else {
+		await ['+refs/pull/*/merge:refs/pull/*/merge', '+refs/heads/*:refs/remotes/origin/*'].reduce(async(prev, item) => {
+			await prev;
+			await command.execAsync({
+				command: 'git fetch',
+				args: ['--no-tags', 'origin', item],
+				stderrToStdout: true,
+				cwd: Utils.getWorkspace(),
+			});
+		}, Promise.resolve());
+	}
 
 	return (await Utils.split((await command.execAsync({
 		command: 'git diff',
