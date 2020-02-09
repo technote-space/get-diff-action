@@ -1,7 +1,7 @@
 import path from 'path';
 import { getInput } from '@actions/core' ;
 import { Context } from '@actions/github/lib/context';
-import { Logger, Command, Utils } from '@technote-space/github-action-helper';
+import { Logger, Command, Utils, ContextHelper } from '@technote-space/github-action-helper';
 import { escape, getDiffInfo } from './misc';
 import { FileDiffResult, FileResult, DiffResult, DiffInfo } from '../types';
 
@@ -56,17 +56,21 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
 	const workspace = getWorkspace();
 	const diffInfo  = await getDiffInfo(Utils.getOctokit(), context);
 
-	await ['base', 'head'].reduce(async(prev, target) => {
-		await prev;
-		if (Utils.isRef(diffInfo[target])) {
+	if (diffInfo.base === diffInfo.head) {
+		return [];
+	}
+
+	if (!ContextHelper.isPr(context)) {
+		await ['+refs/pull/*/merge:refs/pull/*/merge', '+refs/heads/*:refs/remotes/origin/*'].reduce(async(prev, item) => {
+			await prev;
 			await command.execAsync({
 				command: 'git fetch',
-				args: ['--no-tags', 'origin', Utils.getRefspec(diffInfo[target])],
+				args: ['--no-tags', 'origin', item],
 				stderrToStdout: true,
 				cwd: Utils.getWorkspace(),
 			});
-		}
-	}, Promise.resolve());
+		}, Promise.resolve());
+	}
 
 	return (await Utils.split((await command.execAsync({
 		command: 'git diff',

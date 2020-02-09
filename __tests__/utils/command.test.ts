@@ -90,8 +90,6 @@ describe('getGitDiff', () => {
 			{file: 'src/main.ts', ...emptyDiff},
 		]);
 		execCalledWith(mockExec, [
-			'git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
-			'git fetch --no-tags origin \'refs/pull/55/merge:refs/pull/55/merge\'',
 			'git diff \'origin/master...pull/55/merge\' \'--diff-filter=AM\' --name-only',
 			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'package.json\'',
 			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'abc/composer.json\'',
@@ -100,7 +98,7 @@ describe('getGitDiff', () => {
 		]);
 	});
 
-	it('should get git diff (pull, default branch, not merge)', async() => {
+	it('should get git diff (push)', async() => {
 		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
 		process.env.INPUT_GITHUB_TOKEN = 'test token';
 
@@ -126,6 +124,8 @@ describe('getGitDiff', () => {
 			{file: 'src/main.ts', ...emptyDiff},
 		]);
 		execCalledWith(mockExec, [
+			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/pull/*/merge\'',
+			'git fetch --no-tags origin \'+refs/heads/*:refs/remotes/origin/*\'',
 			'git diff \'before-sha...after-sha\' \'--diff-filter=AM\' --name-only',
 			'git diff \'before-sha...after-sha\' --shortstat -w \'package.json\'',
 			'git diff \'before-sha...after-sha\' --shortstat -w \'abc/composer.json\'',
@@ -134,42 +134,7 @@ describe('getGitDiff', () => {
 		]);
 	});
 
-	it('should get git diff (pull, default branch, merged)', async() => {
-		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
-		process.env.INPUT_GITHUB_TOKEN = 'test token';
-
-		const mockExec = spyOnExec();
-		setChildProcessParams({
-			stdout: (command: string): string => {
-				if (command.startsWith('git diff')) {
-					return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
-				}
-				return '';
-			},
-		});
-
-		nock('https://api.github.com')
-			.persist()
-			.get('/repos/hello/world/commits/before-sha/pulls')
-			.reply(200, () => getApiFixture(fixtureRootDir, 'pulls.list2'));
-
-		expect(await getGitDiff(logger, pullContext)).toEqual([
-			{file: 'package.json', ...emptyDiff},
-			{file: 'abc/composer.json', ...emptyDiff},
-			{file: 'README.md', ...emptyDiff},
-			{file: 'src/main.ts', ...emptyDiff},
-		]);
-		execCalledWith(mockExec, [
-			'git fetch --no-tags origin \'refs/pull/1347/merge:refs/pull/1347/merge\'',
-			'git diff \'pull/1347/merge...after-sha\' \'--diff-filter=AM\' --name-only',
-			'git diff \'pull/1347/merge...after-sha\' --shortstat -w \'package.json\'',
-			'git diff \'pull/1347/merge...after-sha\' --shortstat -w \'abc/composer.json\'',
-			'git diff \'pull/1347/merge...after-sha\' --shortstat -w \'README.md\'',
-			'git diff \'pull/1347/merge...after-sha\' --shortstat -w \'src/main.ts\'',
-		]);
-	});
-
-	it('should get git diff (pull, default branch, merged default branch)', async() => {
+	it('should get git diff (push, tag)', async() => {
 		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
 		process.env.INPUT_GITHUB_TOKEN = 'test token';
 
@@ -196,95 +161,8 @@ describe('getGitDiff', () => {
 					'default_branch': 'master',
 				},
 			},
-		}))).toEqual([
-			{file: 'package.json', ...emptyDiff},
-			{file: 'abc/composer.json', ...emptyDiff},
-			{file: 'README.md', ...emptyDiff},
-			{file: 'src/main.ts', ...emptyDiff},
-		]);
-		execCalledWith(mockExec, [
-			'git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
-			'git fetch --no-tags origin \'refs/pull/1347/merge:refs/pull/1347/merge\'',
-			'git diff \'origin/master...pull/1347/merge\' \'--diff-filter=AM\' --name-only',
-			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'package.json\'',
-			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'abc/composer.json\'',
-			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'README.md\'',
-			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'src/main.ts\'',
-		]);
-	});
-
-	it('should get git diff (pull, found pr)', async() => {
-		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
-		process.env.INPUT_GITHUB_TOKEN = 'test token';
-
-		const mockExec = spyOnExec();
-		setChildProcessParams({
-			stdout: (command: string): string => {
-				if (command.startsWith('git diff')) {
-					return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
-				}
-				return '';
-			},
-		});
-
-		nock('https://api.github.com')
-			.persist()
-			.get('/repos/hello/world/pulls?head=hello%3Atest')
-			.reply(200, () => getApiFixture(fixtureRootDir, 'pulls.list1'));
-
-		expect(await getGitDiff(logger, Object.assign({}, pullContext, {
-			ref: 'refs/heads/test',
-		}))).toEqual([
-			{file: 'package.json', ...emptyDiff},
-			{file: 'abc/composer.json', ...emptyDiff},
-			{file: 'README.md', ...emptyDiff},
-			{file: 'src/main.ts', ...emptyDiff},
-		]);
-		execCalledWith(mockExec, [
-			'git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
-			'git fetch --no-tags origin \'refs/pull/1347/merge:refs/pull/1347/merge\'',
-			'git diff \'origin/master...pull/1347/merge\' \'--diff-filter=AM\' --name-only',
-			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'package.json\'',
-			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'abc/composer.json\'',
-			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'README.md\'',
-			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'src/main.ts\'',
-		]);
-	});
-
-	it('should get git diff (pull, not found pr)', async() => {
-		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
-		process.env.INPUT_GITHUB_TOKEN = 'test token';
-
-		const mockExec = spyOnExec();
-		setChildProcessParams({
-			stdout: (command: string): string => {
-				if (command.startsWith('git diff')) {
-					return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
-				}
-				return '';
-			},
-		});
-
-		nock('https://api.github.com')
-			.persist()
-			.get('/repos/hello/world/pulls?head=hello%3Atest')
-			.reply(200, () => []);
-
-		expect(await getGitDiff(logger, Object.assign({}, pullContext, {
-			ref: 'refs/heads/test',
-		}))).toEqual([
-			{file: 'package.json', ...emptyDiff},
-			{file: 'abc/composer.json', ...emptyDiff},
-			{file: 'README.md', ...emptyDiff},
-			{file: 'src/main.ts', ...emptyDiff},
-		]);
-		execCalledWith(mockExec, [
-			'git diff \'before-sha...after-sha\' \'--diff-filter=AM\' --name-only',
-			'git diff \'before-sha...after-sha\' --shortstat -w \'package.json\'',
-			'git diff \'before-sha...after-sha\' --shortstat -w \'abc/composer.json\'',
-			'git diff \'before-sha...after-sha\' --shortstat -w \'README.md\'',
-			'git diff \'before-sha...after-sha\' --shortstat -w \'src/main.ts\'',
-		]);
+		}))).toEqual([]);
+		execCalledWith(mockExec, []);
 	});
 
 	it('should get git diff (env)', async() => {
@@ -315,8 +193,6 @@ describe('getGitDiff', () => {
 			{file: process.env.GITHUB_WORKSPACE + '/__tests__/main.test.ts', ...emptyDiff},
 		]);
 		execCalledWith(mockExec, [
-			'git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
-			'git fetch --no-tags origin \'refs/pull/55/merge:refs/pull/55/merge\'',
 			'git diff \'origin/master..pull/55/merge\' \'--diff-filter=AMD\' --name-only',
 			'git diff \'origin/master..pull/55/merge\' --shortstat -w \'package.json\'',
 			'git diff \'origin/master..pull/55/merge\' --shortstat -w \'abc/composer.json\'',
