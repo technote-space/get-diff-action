@@ -56,6 +56,10 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
 	const workspace = getWorkspace();
 	const diffInfo  = await getDiffInfo(Utils.getOctokit(), context);
 
+	if (diffInfo.base === diffInfo.head) {
+		return [];
+	}
+
 	await ['base', 'head'].reduce(async(prev, target) => {
 		await prev;
 		if (Utils.isRef(diffInfo[target])) {
