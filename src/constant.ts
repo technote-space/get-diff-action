@@ -5,4 +5,5 @@ export const TARGET_EVENTS = {
 		'rerequested',
 		'synchronize',
 	],
+	'push': '*',
 };
