@@ -170,6 +170,8 @@ describe('execute', () => {
 		await execute(logger, prContext);
 
 		execCalledWith(mockExec, [
+			'git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
+			'git fetch --no-tags origin \'refs/pull/55/merge:refs/pull/55/merge\'',
 			'git diff \'origin/master...pull/55/merge\' \'--diff-filter=AM\' --name-only',
 			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'package.json\'',
 			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'abc/composer.json\'',
@@ -177,6 +179,8 @@ describe('execute', () => {
 			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'src/main.ts\'',
 		]);
 		stdoutCalledWith(mockStdout, [
+			'[command]git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
+			'[command]git fetch --no-tags origin \'refs/pull/55/merge:refs/pull/55/merge\'',
 			'[command]git diff \'origin/master...pull/55/merge\' \'--diff-filter=AM\' --name-only',
 			'  >> package.json',
 			'  >> abc/composer.json',
