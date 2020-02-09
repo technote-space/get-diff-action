@@ -9,6 +9,7 @@ import {
 	setChildProcessParams,
 	execCalledWith,
 	testFs,
+	generateContext,
 } from '@technote-space/github-action-test-helper';
 import { Logger } from '@technote-space/github-action-helper';
 import { dumpDiffs, setResult, execute } from '../src/process';
@@ -20,6 +21,29 @@ const diffs     = [
 	{file: 'test4', insertions: 4, deletions: 400, lines: 404, filterIgnored: true, prefixMatched: true, suffixMatched: false},
 ];
 const setExists = testFs(true);
+const logger    = new Logger();
+const prContext = generateContext({
+	owner: 'hello',
+	repo: 'world',
+	event: 'pull_request',
+	ref: 'pull/55/merge',
+}, {
+	payload: {
+		number: 11,
+		'pull_request': {
+			number: 11,
+			id: 21031067,
+			head: {
+				ref: 'feature/new-feature',
+			},
+			base: {
+				ref: 'master',
+			},
+			title: 'title',
+			'html_url': 'test url',
+		},
+	},
+});
 
 describe('dumpDiffs', () => {
 	testEnv(rootDir);
@@ -27,7 +51,7 @@ describe('dumpDiffs', () => {
 	it('should dump output', () => {
 		const mockStdout = spyOnStdout();
 
-		dumpDiffs(diffs, new Logger());
+		dumpDiffs(diffs, logger);
 
 		stdoutCalledWith(mockStdout, [
 			'::group::Dump diffs',
@@ -71,7 +95,7 @@ describe('setResult', () => {
 	it('should set result', () => {
 		const mockStdout = spyOnStdout();
 
-		setResult(diffs, new Logger());
+		setResult(diffs, logger);
 
 		stdoutCalledWith(mockStdout, [
 			'::group::Dump output',
@@ -98,7 +122,7 @@ describe('setResult', () => {
 		process.env.INPUT_SET_ENV_NAME_LINES      = 'LINES';
 		const mockStdout                          = spyOnStdout();
 
-		setResult(diffs, new Logger());
+		setResult(diffs, logger);
 
 		stdoutCalledWith(mockStdout, [
 			'::group::Dump output',
@@ -126,11 +150,8 @@ describe('execute', () => {
 	testChildProcess();
 
 	it('should execute', async() => {
-		process.env.GITHUB_WORKSPACE = '/home/runner/work/my-repo-name/my-repo-name';
-		process.env.GITHUB_REF       = 'refs/pull/123/merge';
-		process.env.GITHUB_SHA       = 'f01e53bb1f41af4e132326dad21e82c77ee1ff48';
-		process.env.GITHUB_HEAD_REF  = 'release/v0.3.13';
-		process.env.GITHUB_BASE_REF  = 'master';
+		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
+		process.env.INPUT_GITHUB_TOKEN = 'test token';
 
 		const mockExec   = spyOnExec();
 		const mockStdout = spyOnStdout();
@@ -146,32 +167,32 @@ describe('execute', () => {
 			},
 		});
 
-		await execute(new Logger());
+		await execute(logger, prContext);
 
 		execCalledWith(mockExec, [
-			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
-			'git fetch --no-tags origin \'+refs/heads/*:refs/remotes/origin/*\'',
-			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" \'--diff-filter=AM\' --name-only',
-			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat -w \'package.json\'',
-			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat -w \'abc/composer.json\'',
-			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat -w \'README.md\'',
-			'git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat -w \'src/main.ts\'',
+			'git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
+			'git fetch --no-tags origin \'refs/pull/55/merge:refs/remotes/pull/55/merge\'',
+			'git diff \'origin/master...pull/55/merge\' \'--diff-filter=AM\' --name-only',
+			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'package.json\'',
+			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'abc/composer.json\'',
+			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'README.md\'',
+			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'src/main.ts\'',
 		]);
 		stdoutCalledWith(mockStdout, [
-			'[command]git fetch --no-tags origin \'+refs/pull/*/merge:refs/remotes/pull/*/merge\'',
-			'[command]git fetch --no-tags origin \'+refs/heads/*:refs/remotes/origin/*\'',
-			'[command]git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" \'--diff-filter=AM\' --name-only',
+			'[command]git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
+			'[command]git fetch --no-tags origin \'refs/pull/55/merge:refs/remotes/pull/55/merge\'',
+			'[command]git diff \'origin/master...pull/55/merge\' \'--diff-filter=AM\' --name-only',
 			'  >> package.json',
 			'  >> abc/composer.json',
 			'  >> README.md',
 			'  >> src/main.ts',
-			'[command]git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat -w \'package.json\'',
+			'[command]git diff \'origin/master...pull/55/merge\' --shortstat -w \'package.json\'',
 			'  >> 1 file changed, 25 insertions(+), 4 deletions(-)',
-			'[command]git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat -w \'abc/composer.json\'',
+			'[command]git diff \'origin/master...pull/55/merge\' --shortstat -w \'abc/composer.json\'',
 			'  >> 1 file changed, 25 insertions(+), 4 deletions(-)',
-			'[command]git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat -w \'README.md\'',
+			'[command]git diff \'origin/master...pull/55/merge\' --shortstat -w \'README.md\'',
 			'  >> 1 file changed, 25 insertions(+), 4 deletions(-)',
-			'[command]git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" --shortstat -w \'src/main.ts\'',
+			'[command]git diff \'origin/master...pull/55/merge\' --shortstat -w \'src/main.ts\'',
 			'  >> 1 file changed, 25 insertions(+), 4 deletions(-)',
 			'::group::Dump diffs',
 			'[\n' +
@@ -231,15 +252,11 @@ describe('execute', () => {
 
 	it('should execute empty', async() => {
 		process.env.GITHUB_WORKSPACE = '/home/runner/work/my-repo-name/my-repo-name';
-		process.env.GITHUB_REF       = 'refs/pull/123/merge';
-		process.env.GITHUB_SHA       = 'f01e53bb1f41af4e132326dad21e82c77ee1ff48';
-		process.env.GITHUB_HEAD_REF  = 'release/v0.3.13';
-		process.env.GITHUB_BASE_REF  = 'master';
 
 		const mockExec   = spyOnExec();
 		const mockStdout = spyOnStdout();
 
-		await execute(new Logger(), []);
+		await execute(logger, prContext, []);
 
 		execCalledWith(mockExec, []);
 		stdoutCalledWith(mockStdout, [
@@ -264,10 +281,6 @@ describe('execute', () => {
 
 	it('should not execute if not cloned', async() => {
 		process.env.GITHUB_WORKSPACE = '/home/runner/work/my-repo-name/my-repo-name';
-		process.env.GITHUB_REF       = 'refs/pull/123/merge';
-		process.env.GITHUB_SHA       = 'f01e53bb1f41af4e132326dad21e82c77ee1ff48';
-		process.env.GITHUB_HEAD_REF  = 'release/v0.3.13';
-		process.env.GITHUB_BASE_REF  = 'master';
 
 		const mockExec   = spyOnExec();
 		const mockStdout = spyOnStdout();
@@ -284,7 +297,7 @@ describe('execute', () => {
 		});
 		setExists(false);
 
-		await execute(new Logger());
+		await execute(logger, prContext);
 
 		execCalledWith(mockExec, []);
 		stdoutCalledWith(mockStdout, [

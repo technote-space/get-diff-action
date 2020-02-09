@@ -1,5 +1,6 @@
-import { Logger } from '@technote-space/github-action-helper';
 import { exportVariable, getInput, setOutput } from '@actions/core' ;
+import { Context } from '@actions/github/lib/context';
+import { Logger } from '@technote-space/github-action-helper';
 import { getGitDiff, getDiffFiles, sumResults } from './utils/command';
 import { DiffResult } from './types';
 
@@ -33,8 +34,8 @@ export const setResult = (diffs: DiffResult[], logger: Logger): void => {
 	logger.endProcess();
 };
 
-export const execute = async(logger: Logger, diffs?: DiffResult[]): Promise<void> => {
-	const _diff = diffs ?? await getGitDiff(logger);
+export const execute = async(logger: Logger, context: Context, diffs?: DiffResult[]): Promise<void> => {
+	const _diff = diffs ?? await getGitDiff(logger, context);
 	dumpDiffs(_diff, logger);
 	setResult(_diff, logger);
 };
