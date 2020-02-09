@@ -13,31 +13,45 @@ export const escape = (items: string[]): string[] => items.map(item => {
 	return item;
 });
 
-export const getRelatedPullRequest = async(octokit: Octokit, context: Context): Promise<Octokit.PullsListResponseItem | null> => await (new ApiHelper(octokit, context)).findPullRequest(context.ref);
-
 export const getDiffInfoForPR = (pull: PullRequestParams, context: Context): DiffInfo => ({
-	from: pull.base.ref,
-	to: Utils.getRefForUpdate(context.ref),
+	base: pull.base.ref,
+	head: Utils.getRefForUpdate(context.ref),
 });
 
 export const isDefaultBranch = async(octokit: Octokit, context: Context): Promise<boolean> => await (new ApiHelper(octokit, context)).getDefaultBranch() === Utils.getBranch(context);
 
 export const getDiffInfoForPush = async(octokit: Octokit, context: Context): Promise<DiffInfo> => {
 	if (!await isDefaultBranch(octokit, context)) {
-		const pull = await getRelatedPullRequest(octokit, context);
+		const pull = await (new ApiHelper(octokit, context)).findPullRequest(context.ref);
 		if (pull) {
 			return {
-				from: pull.base.ref,
-				to: `pull/${pull.number}/merge`,
+				base: pull.base.ref,
+				head: `pull/${pull.number}/merge`,
+			};
+		}
+	} else {
+		// merge
+		const pulls = (await octokit.paginate(
+			octokit.repos.listPullRequestsAssociatedWithCommit.endpoint.merge({
+				owner: context.repo.owner,
+				repo: context.repo.repo,
+				'commit_sha': context.payload.before,
+			}),
+		)).filter(pull => context.payload.before === pull.merge_commit_sha);
+		if (pulls.length) {
+			return {
+				base: `pull/${pulls[0].number}/merge`,
+				head: context.payload.after,
+				headIsSha: true,
 			};
 		}
 	}
 
 	return {
-		from: context.payload.before,
-		to: context.payload.after,
-		fromIsSha: true,
-		toIsSha: true,
+		base: context.payload.before,
+		head: context.payload.after,
+		baseIsSha: true,
+		headIsSha: true,
 	};
 };
 

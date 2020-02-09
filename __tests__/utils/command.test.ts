@@ -62,11 +62,11 @@ const pullContext       = generateContext({
 	},
 });
 testFs(true);
-disableNetConnect(nock);
 
 describe('getGitDiff', () => {
 	testEnv(rootDir);
 	testChildProcess();
+	disableNetConnect(nock);
 
 	it('should get git diff (pull request)', async() => {
 		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
@@ -99,7 +99,7 @@ describe('getGitDiff', () => {
 		]);
 	});
 
-	it('should get git diff (pull, default branch)', async() => {
+	it('should get git diff (pull, default branch, not merge)', async() => {
 		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
 		process.env.INPUT_GITHUB_TOKEN = 'test token';
 
@@ -113,6 +113,11 @@ describe('getGitDiff', () => {
 			},
 		});
 
+		nock('https://api.github.com')
+			.persist()
+			.get('/repos/hello/world/commits/before-sha/pulls')
+			.reply(200, () => getApiFixture(fixtureRootDir, 'pulls.list1'));
+
 		expect(await getGitDiff(logger, pullContext)).toEqual([
 			{file: 'package.json', ...emptyDiff},
 			{file: 'abc/composer.json', ...emptyDiff},
@@ -125,6 +130,41 @@ describe('getGitDiff', () => {
 			'git diff \'before-sha...after-sha\' --shortstat -w \'abc/composer.json\'',
 			'git diff \'before-sha...after-sha\' --shortstat -w \'README.md\'',
 			'git diff \'before-sha...after-sha\' --shortstat -w \'src/main.ts\'',
+		]);
+	});
+
+	it('should get git diff (pull, default branch, merged)', async() => {
+		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
+		process.env.INPUT_GITHUB_TOKEN = 'test token';
+
+		const mockExec = spyOnExec();
+		setChildProcessParams({
+			stdout: (command: string): string => {
+				if (command.startsWith('git diff')) {
+					return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
+				}
+				return '';
+			},
+		});
+
+		nock('https://api.github.com')
+			.persist()
+			.get('/repos/hello/world/commits/before-sha/pulls')
+			.reply(200, () => getApiFixture(fixtureRootDir, 'pulls.list2'));
+
+		expect(await getGitDiff(logger, pullContext)).toEqual([
+			{file: 'package.json', ...emptyDiff},
+			{file: 'abc/composer.json', ...emptyDiff},
+			{file: 'README.md', ...emptyDiff},
+			{file: 'src/main.ts', ...emptyDiff},
+		]);
+		execCalledWith(mockExec, [
+			'git fetch --no-tags origin \'refs/heads/pull/1347/merge:refs/remotes/origin/pull/1347/merge\'',
+			'git diff \'origin/pull/1347/merge...after-sha\' \'--diff-filter=AM\' --name-only',
+			'git diff \'origin/pull/1347/merge...after-sha\' --shortstat -w \'package.json\'',
+			'git diff \'origin/pull/1347/merge...after-sha\' --shortstat -w \'abc/composer.json\'',
+			'git diff \'origin/pull/1347/merge...after-sha\' --shortstat -w \'README.md\'',
+			'git diff \'origin/pull/1347/merge...after-sha\' --shortstat -w \'src/main.ts\'',
 		]);
 	});
 
@@ -145,7 +185,7 @@ describe('getGitDiff', () => {
 		nock('https://api.github.com')
 			.persist()
 			.get('/repos/hello/world/pulls?head=hello%3Atest')
-			.reply(200, () => getApiFixture(fixtureRootDir, 'pulls.list'));
+			.reply(200, () => getApiFixture(fixtureRootDir, 'pulls.list1'));
 
 		expect(await getGitDiff(logger, Object.assign({}, pullContext, {
 			ref: 'refs/heads/test',
@@ -249,7 +289,7 @@ describe('getFileDiff', () => {
 			stdout: '1 file changed, 25 insertions(+), 4 deletions(-)',
 		});
 
-		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {from: 'master', to: 'pull/123/merge'}, '...');
+		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'master', head: 'pull/123/merge'}, '...');
 
 		expect(diff.insertions).toBe(25);
 		expect(diff.deletions).toBe(4);
@@ -266,7 +306,7 @@ describe('getFileDiff', () => {
 			stdout: '1 file changed, 1 insertion(+), 3 deletions(-)',
 		});
 
-		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {from: 'master', to: 'pull/123/merge'}, '...');
+		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'master', head: 'pull/123/merge'}, '...');
 
 		expect(diff.insertions).toBe(1);
 		expect(diff.deletions).toBe(3);
@@ -283,7 +323,7 @@ describe('getFileDiff', () => {
 			stdout: '1 file changed, 3 insertions(+)',
 		});
 
-		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {from: 'master', to: 'pull/123/merge'}, '...');
+		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'master', head: 'pull/123/merge'}, '...');
 
 		expect(diff.insertions).toBe(3);
 		expect(diff.deletions).toBe(0);
@@ -300,7 +340,7 @@ describe('getFileDiff', () => {
 			stdout: '',
 		});
 
-		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {from: 'master', to: 'pull/123/merge'}, '...');
+		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'master', head: 'pull/123/merge'}, '...');
 
 		expect(diff.insertions).toBe(0);
 		expect(diff.deletions).toBe(0);

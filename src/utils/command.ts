@@ -24,7 +24,7 @@ export const getFileDiff = async(file: FileResult, diffInfo: DiffInfo, dot: stri
 	const stdout = (await command.execAsync({
 		command: 'git diff',
 		args: [
-			`${(diffInfo.fromIsSha ? '' : 'origin/') + diffInfo.from}${dot}${diffInfo.to}`,
+			`${(diffInfo.baseIsSha ? '' : 'origin/') + diffInfo.base}${dot}${diffInfo.head}`,
 			'--shortstat',
 			'-w',
 			file.file,
@@ -54,19 +54,19 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<DiffR
 	const workspace = getWorkspace();
 	const diffInfo  = await getDiffInfo(Utils.getOctokit(), context);
 
-	if (!diffInfo.fromIsSha) {
+	if (!diffInfo.baseIsSha) {
 		await command.execAsync({
 			command: 'git fetch',
-			args: ['--no-tags', 'origin', `refs/heads/${diffInfo.from}:refs/remotes/origin/${diffInfo.from}`],
+			args: ['--no-tags', 'origin', `refs/heads/${diffInfo.base}:refs/remotes/origin/${diffInfo.base}`],
 			stderrToStdout: true,
 			cwd: Utils.getWorkspace(),
 		});
 	}
 
-	if (!diffInfo.toIsSha) {
+	if (!diffInfo.headIsSha) {
 		await command.execAsync({
 			command: 'git fetch',
-			args: ['--no-tags', 'origin', `refs/${diffInfo.to}:refs/remotes/${diffInfo.to}`],
+			args: ['--no-tags', 'origin', `refs/${diffInfo.head}:refs/remotes/${diffInfo.head}`],
 			stderrToStdout: true,
 			cwd: Utils.getWorkspace(),
 		});
@@ -75,7 +75,7 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<DiffR
 	return (await Promise.all(Utils.split((await command.execAsync({
 		command: 'git diff',
 		args: [
-			`${(diffInfo.fromIsSha ? '' : 'origin/') + diffInfo.from}${dot}${diffInfo.to}`,
+			`${(diffInfo.baseIsSha ? '' : 'origin/') + diffInfo.base}${dot}${diffInfo.head}`,
 			'--diff-filter=' + getFilter(),
 			'--name-only',
 		],

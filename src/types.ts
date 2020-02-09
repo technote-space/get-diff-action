@@ -7,8 +7,8 @@ export type PullRequestParams = {
 	};
 }
 export type DiffInfo = {
-	readonly from: string;
-	readonly to: string;
-	readonly fromIsSha?: boolean;
-	readonly toIsSha?: boolean;
+	readonly base: string;
+	readonly head: string;
+	readonly baseIsSha?: boolean;
+	readonly headIsSha?: boolean;
 }
