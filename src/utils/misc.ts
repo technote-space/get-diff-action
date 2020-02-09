@@ -14,8 +14,8 @@ export const escape = (items: string[]): string[] => items.map(item => {
 });
 
 export const getDiffInfoForPR = (pull: PullRequestParams, context: Context): DiffInfo => ({
-	base: pull.base.ref,
-	head: Utils.getRefForUpdate(context.ref),
+	base: Utils.normalizeRef(pull.base.ref),
+	head: Utils.normalizeRef(context.ref),
 });
 
 export const isDefaultBranch = async(octokit: Octokit, context: Context): Promise<boolean> => await (new ApiHelper(octokit, context)).getDefaultBranch() === Utils.getBranch(context);
@@ -25,33 +25,45 @@ export const getDiffInfoForPush = async(octokit: Octokit, context: Context): Pro
 		const pull = await (new ApiHelper(octokit, context)).findPullRequest(context.ref);
 		if (pull) {
 			return {
-				base: pull.base.ref,
-				head: `pull/${pull.number}/merge`,
+				base: Utils.normalizeRef(pull.base.ref),
+				head: `refs/pull/${pull.number}/merge`,
 			};
 		}
 	} else {
 		// merge
-		const pulls = (await octokit.paginate(
-			octokit.repos.listPullRequestsAssociatedWithCommit.endpoint.merge({
-				owner: context.repo.owner,
-				repo: context.repo.repo,
-				'commit_sha': context.payload.before,
-			}),
-		)).filter(pull => context.payload.before === pull.merge_commit_sha);
-		if (pulls.length) {
+		if (/^0+$/.test(context.payload.before)) {
+			// default branch => branch
+			const pulls = (await octokit.paginate(
+				octokit.repos.listPullRequestsAssociatedWithCommit.endpoint.merge({
+					owner: context.repo.owner,
+					repo: context.repo.repo,
+					'commit_sha': context.sha,
+				}),
+			));
 			return {
-				base: `pull/${pulls[0].number}/merge`,
-				head: context.payload.after,
-				headIsSha: true,
+				base: Utils.normalizeRef(pulls[0].base.ref),
+				head: `refs/pull/${pulls[0].number}/merge`,
 			};
+		} else {
+			const pulls = (await octokit.paginate(
+				octokit.repos.listPullRequestsAssociatedWithCommit.endpoint.merge({
+					owner: context.repo.owner,
+					repo: context.repo.repo,
+					'commit_sha': context.payload.before,
+				}),
+			)).filter(pull => context.payload.before === pull.merge_commit_sha);
+			if (pulls.length) {
+				return {
+					base: `refs/pull/${pulls[0].number}/merge`,
+					head: context.payload.after,
+				};
+			}
 		}
 	}
 
 	return {
 		base: context.payload.before,
 		head: context.payload.after,
-		baseIsSha: true,
-		headIsSha: true,
 	};
 };
 

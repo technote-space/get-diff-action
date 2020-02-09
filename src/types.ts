@@ -9,6 +9,4 @@ export type PullRequestParams = {
 export type DiffInfo = {
 	readonly base: string;
 	readonly head: string;
-	readonly baseIsSha?: boolean;
-	readonly headIsSha?: boolean;
 }

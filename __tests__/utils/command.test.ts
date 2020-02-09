@@ -29,7 +29,7 @@ const prContext         = generateContext({
 	owner: 'hello',
 	repo: 'world',
 	event: 'pull_request',
-	ref: 'pull/55/merge',
+	ref: 'refs/pull/55/merge',
 }, {
 	payload: {
 		number: 11,
@@ -52,6 +52,7 @@ const pullContext       = generateContext({
 	repo: 'world',
 	event: 'pull',
 	ref: 'refs/heads/master',
+	sha: 'sha',
 }, {
 	payload: {
 		before: 'before-sha',
@@ -90,7 +91,7 @@ describe('getGitDiff', () => {
 		]);
 		execCalledWith(mockExec, [
 			'git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
-			'git fetch --no-tags origin \'refs/pull/55/merge:refs/remotes/pull/55/merge\'',
+			'git fetch --no-tags origin \'refs/pull/55/merge:refs/pull/55/merge\'',
 			'git diff \'origin/master...pull/55/merge\' \'--diff-filter=AM\' --name-only',
 			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'package.json\'',
 			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'abc/composer.json\'',
@@ -159,12 +160,56 @@ describe('getGitDiff', () => {
 			{file: 'src/main.ts', ...emptyDiff},
 		]);
 		execCalledWith(mockExec, [
-			'git fetch --no-tags origin \'refs/heads/pull/1347/merge:refs/remotes/origin/pull/1347/merge\'',
-			'git diff \'origin/pull/1347/merge...after-sha\' \'--diff-filter=AM\' --name-only',
-			'git diff \'origin/pull/1347/merge...after-sha\' --shortstat -w \'package.json\'',
-			'git diff \'origin/pull/1347/merge...after-sha\' --shortstat -w \'abc/composer.json\'',
-			'git diff \'origin/pull/1347/merge...after-sha\' --shortstat -w \'README.md\'',
-			'git diff \'origin/pull/1347/merge...after-sha\' --shortstat -w \'src/main.ts\'',
+			'git fetch --no-tags origin \'refs/pull/1347/merge:refs/pull/1347/merge\'',
+			'git diff \'pull/1347/merge...after-sha\' \'--diff-filter=AM\' --name-only',
+			'git diff \'pull/1347/merge...after-sha\' --shortstat -w \'package.json\'',
+			'git diff \'pull/1347/merge...after-sha\' --shortstat -w \'abc/composer.json\'',
+			'git diff \'pull/1347/merge...after-sha\' --shortstat -w \'README.md\'',
+			'git diff \'pull/1347/merge...after-sha\' --shortstat -w \'src/main.ts\'',
+		]);
+	});
+
+	it('should get git diff (pull, default branch, merged default branch)', async() => {
+		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
+		process.env.INPUT_GITHUB_TOKEN = 'test token';
+
+		const mockExec = spyOnExec();
+		setChildProcessParams({
+			stdout: (command: string): string => {
+				if (command.startsWith('git diff')) {
+					return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
+				}
+				return '';
+			},
+		});
+
+		nock('https://api.github.com')
+			.persist()
+			.get('/repos/hello/world/commits/sha/pulls')
+			.reply(200, () => getApiFixture(fixtureRootDir, 'pulls.list1'));
+
+		expect(await getGitDiff(logger, Object.assign({}, pullContext, {
+			payload: {
+				before: '0000000000000000000000000000000000000000',
+				after: 'after-sha',
+				repository: {
+					'default_branch': 'master',
+				},
+			},
+		}))).toEqual([
+			{file: 'package.json', ...emptyDiff},
+			{file: 'abc/composer.json', ...emptyDiff},
+			{file: 'README.md', ...emptyDiff},
+			{file: 'src/main.ts', ...emptyDiff},
+		]);
+		execCalledWith(mockExec, [
+			'git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
+			'git fetch --no-tags origin \'refs/pull/1347/merge:refs/pull/1347/merge\'',
+			'git diff \'origin/master...pull/1347/merge\' \'--diff-filter=AM\' --name-only',
+			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'package.json\'',
+			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'abc/composer.json\'',
+			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'README.md\'',
+			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'src/main.ts\'',
 		]);
 	});
 
@@ -197,7 +242,7 @@ describe('getGitDiff', () => {
 		]);
 		execCalledWith(mockExec, [
 			'git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
-			'git fetch --no-tags origin \'refs/pull/1347/merge:refs/remotes/pull/1347/merge\'',
+			'git fetch --no-tags origin \'refs/pull/1347/merge:refs/pull/1347/merge\'',
 			'git diff \'origin/master...pull/1347/merge\' \'--diff-filter=AM\' --name-only',
 			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'package.json\'',
 			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'abc/composer.json\'',
@@ -271,7 +316,7 @@ describe('getGitDiff', () => {
 		]);
 		execCalledWith(mockExec, [
 			'git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
-			'git fetch --no-tags origin \'refs/pull/55/merge:refs/remotes/pull/55/merge\'',
+			'git fetch --no-tags origin \'refs/pull/55/merge:refs/pull/55/merge\'',
 			'git diff \'origin/master..pull/55/merge\' \'--diff-filter=AMD\' --name-only',
 			'git diff \'origin/master..pull/55/merge\' --shortstat -w \'package.json\'',
 			'git diff \'origin/master..pull/55/merge\' --shortstat -w \'abc/composer.json\'',
@@ -289,7 +334,7 @@ describe('getFileDiff', () => {
 			stdout: '1 file changed, 25 insertions(+), 4 deletions(-)',
 		});
 
-		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'master', head: 'pull/123/merge'}, '...');
+		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'refs/heads/master', head: 'refs/pull/123/merge'}, '...');
 
 		expect(diff.insertions).toBe(25);
 		expect(diff.deletions).toBe(4);
@@ -306,7 +351,7 @@ describe('getFileDiff', () => {
 			stdout: '1 file changed, 1 insertion(+), 3 deletions(-)',
 		});
 
-		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'master', head: 'pull/123/merge'}, '...');
+		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'refs/heads/master', head: 'refs/pull/123/merge'}, '...');
 
 		expect(diff.insertions).toBe(1);
 		expect(diff.deletions).toBe(3);
@@ -323,7 +368,7 @@ describe('getFileDiff', () => {
 			stdout: '1 file changed, 3 insertions(+)',
 		});
 
-		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'master', head: 'pull/123/merge'}, '...');
+		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'refs/heads/master', head: 'refs/pull/123/merge'}, '...');
 
 		expect(diff.insertions).toBe(3);
 		expect(diff.deletions).toBe(0);
@@ -340,7 +385,7 @@ describe('getFileDiff', () => {
 			stdout: '',
 		});
 
-		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'master', head: 'pull/123/merge'}, '...');
+		const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'refs/heads/master', head: 'refs/pull/123/merge'}, '...');
 
 		expect(diff.insertions).toBe(0);
 		expect(diff.deletions).toBe(0);

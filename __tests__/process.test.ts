@@ -26,7 +26,7 @@ const prContext = generateContext({
 	owner: 'hello',
 	repo: 'world',
 	event: 'pull_request',
-	ref: 'pull/55/merge',
+	ref: 'refs/pull/55/merge',
 }, {
 	payload: {
 		number: 11,
@@ -171,7 +171,7 @@ describe('execute', () => {
 
 		execCalledWith(mockExec, [
 			'git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
-			'git fetch --no-tags origin \'refs/pull/55/merge:refs/remotes/pull/55/merge\'',
+			'git fetch --no-tags origin \'refs/pull/55/merge:refs/pull/55/merge\'',
 			'git diff \'origin/master...pull/55/merge\' \'--diff-filter=AM\' --name-only',
 			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'package.json\'',
 			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'abc/composer.json\'',
@@ -180,7 +180,7 @@ describe('execute', () => {
 		]);
 		stdoutCalledWith(mockStdout, [
 			'[command]git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
-			'[command]git fetch --no-tags origin \'refs/pull/55/merge:refs/remotes/pull/55/merge\'',
+			'[command]git fetch --no-tags origin \'refs/pull/55/merge:refs/pull/55/merge\'',
 			'[command]git diff \'origin/master...pull/55/merge\' \'--diff-filter=AM\' --name-only',
 			'  >> package.json',
 			'  >> abc/composer.json',
