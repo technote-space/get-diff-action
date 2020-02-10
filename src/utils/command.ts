@@ -1,9 +1,10 @@
 import path from 'path';
 import { getInput } from '@actions/core' ;
 import { Context } from '@actions/github/lib/context';
-import { Logger, Command, Utils } from '@technote-space/github-action-helper';
+import { Logger, Command, Utils, GitHelper } from '@technote-space/github-action-helper';
 import { escape, getDiffInfo } from './misc';
 import { FileDiffResult, FileResult, DiffResult, DiffInfo } from '../types';
+import { REMOTE_NAME } from '../constant';
 
 const command                    = new Command(new Logger());
 const getRawInput                = (name: string): string => process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
@@ -20,7 +21,7 @@ const isPrefixMatched            = (item: string, prefix: string[]): boolean => 
 const isSuffixMatched            = (item: string, suffix: string[]): boolean => !suffix.length || !suffix.every(suffix => !Utils.getSuffixRegExp(suffix).test(item));
 const toAbsolute                 = (item: string, workspace: string): string => workspace + item;
 
-const getCompareRef = (ref: string): string => Utils.isRef(ref) ? Utils.getLocalRefspec(ref) : ref;
+const getCompareRef = (ref: string): string => Utils.isRef(ref) ? Utils.getLocalRefspec(ref, REMOTE_NAME) : ref;
 
 export const getFileDiff = async(file: FileResult, diffInfo: DiffInfo, dot: string): Promise<FileDiffResult> => {
 	const stdout = (await command.execAsync({
@@ -60,26 +61,26 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
 		return [];
 	}
 
+	const helper = new GitHelper(logger);
+	helper.useOrigin(REMOTE_NAME);
+
 	if (Utils.isRef(diffInfo.base) && Utils.isRef(diffInfo.head)) {
-		await ['base', 'head'].reduce(async(prev, target) => {
-			await prev;
-			await command.execAsync({
-				command: 'git fetch',
-				args: ['--no-tags', 'origin', Utils.getRefspec(diffInfo[target])],
-				stderrToStdout: true,
-				cwd: Utils.getWorkspace(),
-			});
-		}, Promise.resolve());
+		await helper.fetchOrigin(Utils.getWorkspace(), context, [
+			'--no-tags',
+			'--no-recurse-submodules',
+			'--depth=3',
+		], [
+			Utils.getRefspec(diffInfo.base, REMOTE_NAME),
+			Utils.getRefspec(diffInfo.head, REMOTE_NAME),
+		]);
 	} else {
-		await ['+refs/pull/*/merge:refs/pull/*/merge', '+refs/heads/*:refs/remotes/origin/*'].reduce(async(prev, item) => {
-			await prev;
-			await command.execAsync({
-				command: 'git fetch',
-				args: ['--no-tags', 'origin', item],
-				stderrToStdout: true,
-				cwd: Utils.getWorkspace(),
-			});
-		}, Promise.resolve());
+		await helper.fetchOrigin(Utils.getWorkspace(), context, [
+			'--no-tags',
+			'--no-recurse-submodules',
+			'--depth=3',
+		], [
+			Utils.getRefspec(context.ref, REMOTE_NAME),
+		]);
 	}
 
 	return (await Utils.split((await command.execAsync({
@@ -90,6 +91,7 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
 			'--name-only',
 		],
 		cwd: Utils.getWorkspace(),
+		suppressError: true,
 	})).stdout)
 		.map(item => ({
 			file: item,

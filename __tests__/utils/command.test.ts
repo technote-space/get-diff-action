@@ -90,13 +90,13 @@ describe('getGitDiff', () => {
 			{file: 'src/main.ts', ...emptyDiff},
 		]);
 		execCalledWith(mockExec, [
-			'git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
-			'git fetch --no-tags origin \'refs/pull/55/merge:refs/pull/55/merge\'',
-			'git diff \'origin/master...pull/55/merge\' \'--diff-filter=AM\' --name-only',
-			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'package.json\'',
-			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'abc/composer.json\'',
-			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'README.md\'',
-			'git diff \'origin/master...pull/55/merge\' --shortstat -w \'src/main.ts\'',
+			'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' > /dev/null 2>&1 || :',
+			'git fetch --no-tags --no-recurse-submodules \'--depth=3\' get-diff-action \'refs/heads/master:refs/remotes/get-diff-action/master\' \'refs/pull/55/merge:refs/pull/55/merge\' || :',
+			'git diff \'get-diff-action/master...pull/55/merge\' \'--diff-filter=AM\' --name-only || :',
+			'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'package.json\'',
+			'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'abc/composer.json\'',
+			'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'README.md\'',
+			'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'src/main.ts\'',
 		]);
 	});
 
@@ -126,9 +126,9 @@ describe('getGitDiff', () => {
 			{file: 'src/main.ts', ...emptyDiff},
 		]);
 		execCalledWith(mockExec, [
-			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/pull/*/merge\'',
-			'git fetch --no-tags origin \'+refs/heads/*:refs/remotes/origin/*\'',
-			'git diff \'before-sha...after-sha\' \'--diff-filter=AM\' --name-only',
+			'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' > /dev/null 2>&1 || :',
+			'git fetch --no-tags --no-recurse-submodules \'--depth=3\' get-diff-action \'refs/heads/master:refs/remotes/get-diff-action/master\' || :',
+			'git diff \'before-sha...after-sha\' \'--diff-filter=AM\' --name-only || :',
 			'git diff \'before-sha...after-sha\' --shortstat -w \'package.json\'',
 			'git diff \'before-sha...after-sha\' --shortstat -w \'abc/composer.json\'',
 			'git diff \'before-sha...after-sha\' --shortstat -w \'README.md\'',
@@ -164,13 +164,13 @@ describe('getGitDiff', () => {
 			{file: 'src/main.ts', ...emptyDiff},
 		]);
 		execCalledWith(mockExec, [
-			'git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
-			'git fetch --no-tags origin \'refs/pull/1347/merge:refs/pull/1347/merge\'',
-			'git diff \'origin/master...pull/1347/merge\' \'--diff-filter=AM\' --name-only',
-			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'package.json\'',
-			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'abc/composer.json\'',
-			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'README.md\'',
-			'git diff \'origin/master...pull/1347/merge\' --shortstat -w \'src/main.ts\'',
+			'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' > /dev/null 2>&1 || :',
+			'git fetch --no-tags --no-recurse-submodules \'--depth=3\' get-diff-action \'refs/heads/master:refs/remotes/get-diff-action/master\' \'refs/pull/1347/merge:refs/pull/1347/merge\' || :',
+			'git diff \'get-diff-action/master...pull/1347/merge\' \'--diff-filter=AM\' --name-only || :',
+			'git diff \'get-diff-action/master...pull/1347/merge\' --shortstat -w \'package.json\'',
+			'git diff \'get-diff-action/master...pull/1347/merge\' --shortstat -w \'abc/composer.json\'',
+			'git diff \'get-diff-action/master...pull/1347/merge\' --shortstat -w \'README.md\'',
+			'git diff \'get-diff-action/master...pull/1347/merge\' --shortstat -w \'src/main.ts\'',
 		]);
 	});
 
@@ -202,9 +202,9 @@ describe('getGitDiff', () => {
 			{file: 'src/main.ts', ...emptyDiff},
 		]);
 		execCalledWith(mockExec, [
-			'git fetch --no-tags origin \'+refs/pull/*/merge:refs/pull/*/merge\'',
-			'git fetch --no-tags origin \'+refs/heads/*:refs/remotes/origin/*\'',
-			'git diff \'before-sha...after-sha\' \'--diff-filter=AM\' --name-only',
+			'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' > /dev/null 2>&1 || :',
+			'git fetch --no-tags --no-recurse-submodules \'--depth=3\' get-diff-action \'refs/heads/test:refs/remotes/get-diff-action/test\' || :',
+			'git diff \'before-sha...after-sha\' \'--diff-filter=AM\' --name-only || :',
 			'git diff \'before-sha...after-sha\' --shortstat -w \'package.json\'',
 			'git diff \'before-sha...after-sha\' --shortstat -w \'abc/composer.json\'',
 			'git diff \'before-sha...after-sha\' --shortstat -w \'README.md\'',
@@ -260,14 +260,14 @@ describe('getGitDiff', () => {
 			{file: process.env.GITHUB_WORKSPACE + '/__tests__/main.test.ts', ...emptyDiff},
 		]);
 		execCalledWith(mockExec, [
-			'git fetch --no-tags origin \'refs/heads/master:refs/remotes/origin/master\'',
-			'git fetch --no-tags origin \'refs/pull/55/merge:refs/pull/55/merge\'',
-			'git diff \'origin/master..pull/55/merge\' \'--diff-filter=AMD\' --name-only',
-			'git diff \'origin/master..pull/55/merge\' --shortstat -w \'package.json\'',
-			'git diff \'origin/master..pull/55/merge\' --shortstat -w \'abc/composer.json\'',
-			'git diff \'origin/master..pull/55/merge\' --shortstat -w \'src/main.ts\'',
-			'git diff \'origin/master..pull/55/merge\' --shortstat -w \'src/test/test2.txt\'',
-			'git diff \'origin/master..pull/55/merge\' --shortstat -w \'__tests__/main.test.ts\'',
+			'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' > /dev/null 2>&1 || :',
+			'git fetch --no-tags --no-recurse-submodules \'--depth=3\' get-diff-action \'refs/heads/master:refs/remotes/get-diff-action/master\' \'refs/pull/55/merge:refs/pull/55/merge\' || :',
+			'git diff \'get-diff-action/master..pull/55/merge\' \'--diff-filter=AMD\' --name-only || :',
+			'git diff \'get-diff-action/master..pull/55/merge\' --shortstat -w \'package.json\'',
+			'git diff \'get-diff-action/master..pull/55/merge\' --shortstat -w \'abc/composer.json\'',
+			'git diff \'get-diff-action/master..pull/55/merge\' --shortstat -w \'src/main.ts\'',
+			'git diff \'get-diff-action/master..pull/55/merge\' --shortstat -w \'src/test/test2.txt\'',
+			'git diff \'get-diff-action/master..pull/55/merge\' --shortstat -w \'__tests__/main.test.ts\'',
 		]);
 	});
 });
@@ -286,7 +286,7 @@ describe('getFileDiff', () => {
 		expect(diff.lines).toBe(29);
 
 		execCalledWith(mockExec, [
-			'git diff \'origin/master...pull/123/merge\' --shortstat -w \'test.js\'',
+			'git diff \'get-diff-action/master...pull/123/merge\' --shortstat -w \'test.js\'',
 		]);
 	});
 
@@ -303,7 +303,7 @@ describe('getFileDiff', () => {
 		expect(diff.lines).toBe(4);
 
 		execCalledWith(mockExec, [
-			'git diff \'origin/master...pull/123/merge\' --shortstat -w \'test.js\'',
+			'git diff \'get-diff-action/master...pull/123/merge\' --shortstat -w \'test.js\'',
 		]);
 	});
 
@@ -320,7 +320,7 @@ describe('getFileDiff', () => {
 		expect(diff.lines).toBe(3);
 
 		execCalledWith(mockExec, [
-			'git diff \'origin/master...pull/123/merge\' --shortstat -w \'test.js\'',
+			'git diff \'get-diff-action/master...pull/123/merge\' --shortstat -w \'test.js\'',
 		]);
 	});
 
@@ -337,7 +337,7 @@ describe('getFileDiff', () => {
 		expect(diff.lines).toBe(0);
 
 		execCalledWith(mockExec, [
-			'git diff \'origin/master...pull/123/merge\' --shortstat -w \'test.js\'',
+			'git diff \'get-diff-action/master...pull/123/merge\' --shortstat -w \'test.js\'',
 		]);
 	});
 });

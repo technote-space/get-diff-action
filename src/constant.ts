@@ -7,3 +7,4 @@ export const TARGET_EVENTS = {
 	],
 	'push': '*',
 };
+export const REMOTE_NAME   = 'get-diff-action';

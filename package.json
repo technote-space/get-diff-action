@@ -28,7 +28,7 @@
     "@actions/core": "^1.2.2",
     "@actions/github": "^2.1.0",
     "@technote-space/filter-github-action": "^0.2.1",
-    "@technote-space/github-action-helper": "^1.0.4"
+    "@technote-space/github-action-helper": "^1.0.6"
   },
   "devDependencies": {
     "@technote-space/github-action-test-helper": "^0.2.1",
@@ -39,7 +39,7 @@
     "eslint": "^6.8.0",
     "jest": "^25.1.0",
     "jest-circus": "^25.1.0",
-    "nock": "^11.7.2",
+    "nock": "^11.8.2",
     "ts-jest": "^25.2.0",
     "typescript": "^3.7.5"
   },
