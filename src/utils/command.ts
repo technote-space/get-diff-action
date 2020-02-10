@@ -64,24 +64,18 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
 	const helper = new GitHelper(logger);
 	helper.useOrigin(REMOTE_NAME);
 
-	if (Utils.isRef(diffInfo.base) && Utils.isRef(diffInfo.head)) {
-		await helper.fetchOrigin(Utils.getWorkspace(), context, [
-			'--no-tags',
-			'--no-recurse-submodules',
-			'--depth=3',
-		], [
-			Utils.getRefspec(diffInfo.base, REMOTE_NAME),
-			Utils.getRefspec(diffInfo.head, REMOTE_NAME),
-		]);
-	} else {
-		await helper.fetchOrigin(Utils.getWorkspace(), context, [
-			'--no-tags',
-			'--no-recurse-submodules',
-			'--depth=3',
-		], [
-			Utils.getRefspec(context.ref, REMOTE_NAME),
-		]);
+	const refs = [Utils.normalizeRef(context.ref)];
+	if (Utils.isRef(diffInfo.base)) {
+		refs.push(diffInfo.base);
 	}
+	if (Utils.isRef(diffInfo.head)) {
+		refs.push(diffInfo.head);
+	}
+	await helper.fetchOrigin(Utils.getWorkspace(), context, [
+		'--no-tags',
+		'--no-recurse-submodules',
+		'--depth=3',
+	], Utils.uniqueArray(refs).map(ref => Utils.getRefspec(ref, REMOTE_NAME)));
 
 	return (await Utils.split((await command.execAsync({
 		command: 'git diff',
