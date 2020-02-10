@@ -6,13 +6,8 @@ description: GitHub actions to get git diff.
 author: technote-space
 
 inputs:
-  FROM:
-    description: Commit A.
-    default: 'origin/${GITHUB_BASE_REF}'
-    required: true
-  TO:
-    description: Commit B.
-    default: '${GITHUB_REF#refs/}'
+  GITHUB_TOKEN:
+    description: Secret GitHub API token used to make API requests.
     required: true
   DOT:
     description: Dot.

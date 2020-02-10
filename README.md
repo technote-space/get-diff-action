@@ -50,6 +50,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v1
         with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PREFIX_FILTER: |
             src
             __tests__
@@ -76,8 +77,6 @@ If there is no difference in the source code below, this workflow will skip the 
 
    e.g. (default)
    ```yaml
-   FROM: 'origin/${GITHUB_BASE_REF}'
-   TO: '${GITHUB_REF#refs/}'
    DOT: '...'
    DIFF_FILTER: 'AM'
    ```
@@ -154,6 +153,7 @@ default: `SET_ENV_NAME_LINES=`
 | eventName | action |
 |:---:|:---:|
 |pull_request|opened, reopened, rerequested, synchronize|
+|push|*|
 
 If called on any other event, the result will be empty.
 

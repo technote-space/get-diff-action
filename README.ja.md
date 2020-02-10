@@ -51,6 +51,7 @@ jobs:
       - uses: technote-space/get-diff-action@v1
         id: git-diff
         with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PREFIX_FILTER: |
             src
             __tests__
@@ -77,8 +78,6 @@ jobs:
 
    例：(default)
    ```yaml
-   FROM: 'origin/${GITHUB_BASE_REF}'
-   TO: '${GITHUB_REF#refs/}'
    DOT: '...'
    DIFF_FILTER: 'AM'
    ```
@@ -155,6 +154,7 @@ default: `SET_ENV_NAME_LINES=`
 | eventName | action |
 |:---:|:---:|
 |pull_request|opened, reopened, rerequested, synchronize|
+|pull_request|*|
 
 もしこれ以外のイベントで呼ばれた場合、結果は空になります。
 

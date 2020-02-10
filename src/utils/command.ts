@@ -1,13 +1,13 @@
 import path from 'path';
-import { Logger, Command, Utils } from '@technote-space/github-action-helper';
 import { getInput } from '@actions/core' ;
-import { FileDiffResult, FileResult, DiffResult } from '../types';
+import { Context } from '@actions/github/lib/context';
+import { Logger, Command, Utils, GitHelper } from '@technote-space/github-action-helper';
+import { escape, getDiffInfo } from './misc';
+import { FileDiffResult, FileResult, DiffResult, DiffInfo } from '../types';
+import { REMOTE_NAME } from '../constant';
 
-const command = new Command(new Logger());
-
+const command                    = new Command(new Logger());
 const getRawInput                = (name: string): string => process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
-const getFrom                    = (): string => getInput('FROM', {required: true});
-const getTo                      = (): string => getInput('TO', {required: true});
 const getDot                     = (): string => getInput('DOT', {required: true});
 const getFilter                  = (): string => getInput('DIFF_FILTER', {required: true});
 const getSeparator               = (): string => getRawInput('SEPARATOR');
@@ -16,25 +16,22 @@ const getSuffix                  = (): string[] => Utils.getArrayInput('SUFFIX_F
 const getFiles                   = (): string[] => Utils.getArrayInput('FILES', undefined, '');
 const getWorkspace               = (): string => Utils.getBoolValue(getInput('ABSOLUTE')) ? (Utils.getWorkspace() + '/') : '';
 const getSummaryIncludeFilesFlag = (): boolean => Utils.getBoolValue(getInput('SUMMARY_INCLUDE_FILES'));
+const isFilterIgnored            = (item: string, files: string[]): boolean => !!(files.length && files.includes(path.basename(item)));
+const isPrefixMatched            = (item: string, prefix: string[]): boolean => !prefix.length || !prefix.every(prefix => !Utils.getPrefixRegExp(prefix).test(item));
+const isSuffixMatched            = (item: string, suffix: string[]): boolean => !suffix.length || !suffix.every(suffix => !Utils.getSuffixRegExp(suffix).test(item));
+const toAbsolute                 = (item: string, workspace: string): string => workspace + item;
 
-const escape          = (items: string[]): string[] => items.map(item => {
-	// eslint-disable-next-line no-useless-escape
-	if (!/^[A-Za-z0-9_\/-]+$/.test(item)) {
-		item = '\'' + item.replace(/'/g, '\'\\\'\'') + '\'';
-		item = item.replace(/^(?:'')+/g, '') // unduplicate single-quote at the beginning
-			.replace(/\\'''/g, '\\\''); // remove non-escaped single-quote if there are enclosed between 2 escaped
-	}
-	return item;
-});
-const isFilterIgnored = (item: string, files: string[]): boolean => !!(files.length && files.includes(path.basename(item)));
-const isPrefixMatched = (item: string, prefix: string[]): boolean => !prefix.length || !prefix.every(prefix => !Utils.getPrefixRegExp(prefix).test(item));
-const isSuffixMatched = (item: string, suffix: string[]): boolean => !suffix.length || !suffix.every(suffix => !Utils.getSuffixRegExp(suffix).test(item));
-const toAbsolute      = (item: string, workspace: string): string => workspace + item;
+const getCompareRef = (ref: string): string => Utils.isRef(ref) ? Utils.getLocalRefspec(ref, REMOTE_NAME) : ref;
 
-export const getFileDiff = async(file: FileResult, between: string): Promise<FileDiffResult> => {
+export const getFileDiff = async(file: FileResult, diffInfo: DiffInfo, dot: string): Promise<FileDiffResult> => {
 	const stdout = (await command.execAsync({
-		command: `git diff ${between}`,
-		args: ['--shortstat', '-w', file.file],
+		command: 'git diff',
+		args: [
+			`${getCompareRef(diffInfo.base)}${dot}${getCompareRef(diffInfo.head)}`,
+			'--shortstat',
+			'-w',
+			file.file,
+		],
 		cwd: Utils.getWorkspace(),
 	})).stdout;
 
@@ -47,47 +44,61 @@ export const getFileDiff = async(file: FileResult, between: string): Promise<Fil
 	return {insertions, deletions, lines: insertions + deletions};
 };
 
-export const getGitDiff = async(logger: Logger): Promise<DiffResult[]> => {
+export const getGitDiff = async(logger: Logger, context: Context): Promise<Array<DiffResult>> => {
 	if (!Utils.isCloned(Utils.getWorkspace())) {
 		logger.warn('Please checkout before call this action.');
 		return [];
 	}
 
+	const dot       = getDot();
 	const files     = getFiles();
 	const prefix    = getPrefix();
 	const suffix    = getSuffix();
 	const workspace = getWorkspace();
-	const between   = `"${Utils.replaceAll(getFrom(), /[^\\]"/g, '\\"')}"${getDot()}"${Utils.replaceAll(getTo(), /[^\\]"/g, '\\"')}"`;
+	const diffInfo  = await getDiffInfo(Utils.getOctokit(), context);
 
-	await command.execAsync({
-		command: 'git fetch',
-		args: ['--no-tags', 'origin', '+refs/pull/*/merge:refs/remotes/pull/*/merge'],
-		stderrToStdout: true,
-		cwd: Utils.getWorkspace(),
-	});
-	await command.execAsync({
-		command: 'git fetch',
-		args: ['--no-tags', 'origin', '+refs/heads/*:refs/remotes/origin/*'],
-		stderrToStdout: true,
-		cwd: Utils.getWorkspace(),
-	});
+	if (diffInfo.base === diffInfo.head) {
+		return [];
+	}
 
-	return (await Promise.all(Utils.split((await command.execAsync({
-		command: `git diff ${between}`,
+	const helper = new GitHelper(logger);
+	helper.useOrigin(REMOTE_NAME);
+
+	const refs = [Utils.normalizeRef(context.ref)];
+	if (Utils.isRef(diffInfo.base)) {
+		refs.push(diffInfo.base);
+	}
+	if (Utils.isRef(diffInfo.head)) {
+		refs.push(diffInfo.head);
+	}
+	await helper.fetchOrigin(Utils.getWorkspace(), context, [
+		'--no-tags',
+		'--no-recurse-submodules',
+		'--depth=3',
+	], Utils.uniqueArray(refs).map(ref => Utils.getRefspec(ref, REMOTE_NAME)));
+
+	return (await Utils.split((await command.execAsync({
+		command: 'git diff',
 		args: [
+			`${getCompareRef(diffInfo.base)}${dot}${getCompareRef(diffInfo.head)}`,
 			'--diff-filter=' + getFilter(),
 			'--name-only',
 		],
 		cwd: Utils.getWorkspace(),
+		suppressError: true,
 	})).stdout)
-		.map((item: string): FileResult => {
-			const prefixMatched = isPrefixMatched(item, prefix);
-			const suffixMatched = isSuffixMatched(item, suffix);
-			const filterIgnored = isFilterIgnored(item, files);
-			return {file: item, filterIgnored, prefixMatched, suffixMatched};
-		})
+		.map(item => ({
+			file: item,
+			filterIgnored: isFilterIgnored(item, files),
+			prefixMatched: isPrefixMatched(item, prefix),
+			suffixMatched: isSuffixMatched(item, suffix),
+		}))
 		.filter(item => item.filterIgnored || (item.prefixMatched && item.suffixMatched))
-		.map(async item => ({...item, ...await getFileDiff(item, between)}))))
+		.map(async item => ({...item, ...await getFileDiff(item, diffInfo, dot)}))
+		.reduce(async(prev, item) => {
+			const acc = await prev;
+			return acc.concat(await item);
+		}, Promise.resolve([] as Array<DiffResult>)))
 		.map(item => ({...item, file: toAbsolute(item.file, workspace)}));
 };
 

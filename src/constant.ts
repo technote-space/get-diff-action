@@ -5,4 +5,6 @@ export const TARGET_EVENTS = {
 		'rerequested',
 		'synchronize',
 	],
+	'push': '*',
 };
+export const REMOTE_NAME   = 'get-diff-action';

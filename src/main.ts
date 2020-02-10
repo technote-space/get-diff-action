@@ -16,11 +16,11 @@ async function run(): Promise<void> {
 
 	if (!isTargetEvent(TARGET_EVENTS, context)) {
 		logger.info('This is not target event.');
-		await execute(logger, []);
+		await execute(logger, context, []);
 		return;
 	}
 
-	await execute(logger);
+	await execute(logger, context);
 }
 
 run().catch(error => setFailed(error.message));
