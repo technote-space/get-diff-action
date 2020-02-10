@@ -232,6 +232,51 @@ describe('getGitDiff', () => {
 		execCalledWith(mockExec, []);
 	});
 
+	it('should get git diff (push, create new branch)', async() => {
+		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
+		process.env.INPUT_GITHUB_TOKEN = 'test token';
+
+		const mockExec = spyOnExec();
+		setChildProcessParams({
+			stdout: (command: string): string => {
+				if (command.startsWith('git diff')) {
+					return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
+				}
+				return '';
+			},
+		});
+
+		nock('https://api.github.com')
+			.persist()
+			.get('/repos/hello/world/pulls?head=hello%3Atest')
+			.reply(200, () => []);
+
+		expect(await getGitDiff(logger, Object.assign({}, pushContext, {
+			ref: 'refs/heads/test',
+			payload: {
+				before: '0000000000000000000000000000000000000000',
+				after: 'after-sha',
+				repository: {
+					'default_branch': 'master',
+				},
+			},
+		}))).toEqual([
+			{file: 'package.json', ...emptyDiff},
+			{file: 'abc/composer.json', ...emptyDiff},
+			{file: 'README.md', ...emptyDiff},
+			{file: 'src/main.ts', ...emptyDiff},
+		]);
+		execCalledWith(mockExec, [
+			'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' > /dev/null 2>&1 || :',
+			'git fetch --no-tags --no-recurse-submodules \'--depth=3\' get-diff-action \'refs/heads/test:refs/remotes/get-diff-action/test\' || :',
+			'git diff \'get-diff-action/master...after-sha\' \'--diff-filter=AM\' --name-only || :',
+			'git diff \'get-diff-action/master...after-sha\' --shortstat -w \'package.json\'',
+			'git diff \'get-diff-action/master...after-sha\' --shortstat -w \'abc/composer.json\'',
+			'git diff \'get-diff-action/master...after-sha\' --shortstat -w \'README.md\'',
+			'git diff \'get-diff-action/master...after-sha\' --shortstat -w \'src/main.ts\'',
+		]);
+	});
+
 	it('should get git diff (env)', async() => {
 		process.env.GITHUB_WORKSPACE    = '/home/runner/work/my-repo-name/my-repo-name';
 		process.env.INPUT_GITHUB_TOKEN  = 'test token';

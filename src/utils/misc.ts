@@ -35,6 +35,13 @@ export const getDiffInfoForPush = async(octokit: Octokit, context: Context): Pro
 		}
 	}
 
+	if (/^0+$/.test(context.payload.before)) {
+		return {
+			base: Utils.normalizeRef(await (new ApiHelper(octokit, context)).getDefaultBranch()),
+			head: context.payload.after,
+		};
+	}
+
 	return {
 		base: context.payload.before,
 		head: context.payload.after,
