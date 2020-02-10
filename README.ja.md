@@ -78,8 +78,6 @@ jobs:
 
    例：(default)
    ```yaml
-   FROM: 'origin/${GITHUB_BASE_REF}'
-   TO: '${GITHUB_REF#refs/}'
    DOT: '...'
    DIFF_FILTER: 'AM'
    ```
