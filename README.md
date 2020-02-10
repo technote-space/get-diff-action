@@ -77,8 +77,6 @@ If there is no difference in the source code below, this workflow will skip the 
 
    e.g. (default)
    ```yaml
-   FROM: 'origin/${GITHUB_BASE_REF}'
-   TO: '${GITHUB_REF#refs/}'
    DOT: '...'
    DIFF_FILTER: 'AM'
    ```
