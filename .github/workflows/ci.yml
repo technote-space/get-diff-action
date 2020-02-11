@@ -19,7 +19,9 @@ jobs:
           PREFIX_FILTER: |
             src/
             __tests__/
-          SUFFIX_FILTER: .ts
+          SUFFIX_FILTER: |
+            .js
+            .ts
           FILES: .eslintrc
         if: "! contains(env.COMMIT_MESSAGE, '[skip ci]') && ! contains(env.COMMIT_MESSAGE, '[ci skip]')"
       - name: Set running flag
@@ -52,8 +54,8 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         if: failure()
 
-  jest:
-    name: Jest
+  cover:
+    name: Coverage
     needs: eslint
     runs-on: ubuntu-latest
     strategy:
@@ -70,7 +72,10 @@ jobs:
           PREFIX_FILTER: |
             src/
             __tests__/
-          SUFFIX_FILTER: .ts
+          SUFFIX_FILTER: |
+            .js
+            .ts
+            .snap
           FILES: |
             yarn.lock
             jest.config.js
@@ -81,6 +86,11 @@ jobs:
       - name: Set running flag
         if: matrix.node == '12' && startsWith(github.ref, 'refs/tags/')
         run: echo "::set-env name=RUNNING::1"
+      - name: Set running flag
+        run: |
+          if [[ ! -f package.json ]] || ! < package.json jq -r '.scripts | keys[]' | grep -qe '^cover$'; then
+            echo "::set-env name=RUNNING::"
+          fi
 
       - name: Setup node
         uses: actions/setup-node@v1
@@ -124,7 +134,7 @@ jobs:
 
   release:
     name: Release GitHub Actions
-    needs: jest
+    needs: cover
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
@@ -158,7 +168,7 @@ jobs:
 
   package:
     name: Publish Package
-    needs: jest
+    needs: cover
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     strategy:
@@ -214,6 +224,7 @@ jobs:
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
         if: matrix.target == 'gpr'
       - uses: 8398a7/action-slack@v2
         with:
