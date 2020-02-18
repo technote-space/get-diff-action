@@ -27,6 +27,8 @@
   - [lines](#lines)
 - [Action イベント詳細](#action-%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E8%A9%B3%E7%B4%B0)
   - [対象イベント](#%E5%AF%BE%E8%B1%A1%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88)
+- [補足](#%E8%A3%9C%E8%B6%B3)
+  - [FROM, TO](#from-to)
 - [Author](#author)
 
 </details>

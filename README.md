@@ -27,6 +27,8 @@ GitHub actions to get git diff.
   - [lines](#lines)
 - [Action event details](#action-event-details)
   - [Target events](#target-events)
+- [Addition](#addition)
+  - [FROM, TO](#from-to)
 - [Author](#author)
 
 </details>
