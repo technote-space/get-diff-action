@@ -49,6 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v1
+        # id: git-diff
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PREFIX_FILTER: |
@@ -57,10 +58,13 @@ jobs:
           SUFFIX_FILTER: .ts
       - name: Install Package dependencies
         run: yarn install
+        # if: steps.git-diff.outputs.diff
         if: env.GIT_DIFF
       - name: Check code style
         # Check only the source codes that have differences
+        # run: yarn eslint ${{ steps.git-diff.outputs.diff }}
         run: yarn eslint ${{ env.GIT_DIFF }}
+        # if: steps.git-diff.outputs.diff
         if: env.GIT_DIFF
 ```
 
@@ -72,7 +76,7 @@ If there is no difference in the source code below, this workflow will skip the 
 1. Get git diff
 
    ```shell script
-   git diff "${FROM}"${DOT}"${TO}" '--diff-filter=${DIFF_FILTER}' --name-only
+   git diff ${FROM}${DOT}${TO} '--diff-filter=${DIFF_FILTER}' --name-only
    ```
 
    e.g. (default)
@@ -82,7 +86,7 @@ If there is no difference in the source code below, this workflow will skip the 
    ```
    =>
    ```shell script
-   git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" '--diff-filter=AM' --name-only
+   git diff ${FROM}...${TO} '--diff-filter=AM' --name-only
    ```
    =>
    ```
@@ -93,6 +97,8 @@ If there is no difference in the source code below, this workflow will skip the 
    src/utils/command.ts
    yarn.lock
    ```
+   
+   [${FROM}, ${TO}](#from-to)
 
 1. Filtered by `PREFIX_FILTER` or `SUFFIX_FILTER` option
 
@@ -107,9 +113,9 @@ If there is no difference in the source code below, this workflow will skip the 
    src/utils/command.ts
    ```
 
-1. Mapped to absolute if `ABSOLUTE` option is true(default)
+1. Mapped to absolute if `ABSOLUTE` option is true (default: false)
 
-   e.g. (default)
+   e.g. 
    ```
    /home/runner/work/my-repo-name/my-repo-name/src/main.ts
    /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
@@ -117,7 +123,7 @@ If there is no difference in the source code below, this workflow will skip the 
 
 1. Combined by `SEPARATOR` option
 
-   e.g.
+   e.g. (default)
    ```yaml
    SEPARATOR: ' '
    ```
@@ -156,6 +162,15 @@ default: `SET_ENV_NAME_LINES=`
 |push|*|
 
 If called on any other event, the result will be empty.
+
+## Addition
+### FROM, TO
+| condition | FROM | TO |
+|:---:|:---:|:---:|
+| tag push |x|x|
+| pull request (not default branch) | base ref (e.g. master) | merge ref (e.g. refs/pull/123/merge) |
+| payload.before = '000...000' | default branch (e.g. master) | payload.after |
+| else | payload.before | payload.after |
 
 ## Author
 [GitHub (Technote)](https://github.com/technote-space)  
