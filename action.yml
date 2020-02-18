@@ -40,6 +40,10 @@ inputs:
     description: Env name (diff).
     default: GIT_DIFF
     required: false
+  SET_ENV_NAME_FILTERED_DIFF:
+    description: Env name (filtered_diff).
+    default: GIT_DIFF_FILTERED
+    required: false
   SET_ENV_NAME_COUNT:
     description: Env name (count).
     required: false
@@ -55,6 +59,8 @@ inputs:
 
 outputs:
   diff:
+    description: The results of diff file names.
+  filtered_diff:
     description: The results of diff file names.
   count:
     description: The number of diff files.

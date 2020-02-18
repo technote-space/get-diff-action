@@ -391,28 +391,35 @@ describe('getDiffFiles', () => {
 	testEnv(rootDir);
 
 	it('get git diff output 1', () => {
-		expect(getDiffFiles([])).toEqual('');
-		expect(getDiffFiles([{file: 'test1', ...defaultFileResult}])).toEqual('test1');
-		expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2', ...defaultFileResult}])).toEqual('test1 test2');
-		expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2 test3', ...defaultFileResult}])).toEqual('test1 \'test2 test3\'');
-		expect(getDiffFiles([{file: 'test1/test2.txt', ...defaultFileResult}])).toEqual('\'test1/test2.txt\'');
+		expect(getDiffFiles([], false)).toEqual('');
+		expect(getDiffFiles([{file: 'test1', ...defaultFileResult}], false)).toEqual('test1');
+		expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2', ...defaultFileResult}], false)).toEqual('test1 test2');
+		expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2 test3', ...defaultFileResult}], false)).toEqual('test1 \'test2 test3\'');
+		expect(getDiffFiles([{file: 'test1/test2.txt', ...defaultFileResult}], false)).toEqual('\'test1/test2.txt\'');
 	});
 
 	it('get git diff output 2', () => {
 		process.env.INPUT_SEPARATOR = '\n';
 
-		expect(getDiffFiles([])).toEqual('');
-		expect(getDiffFiles([{file: 'test1', ...defaultFileResult}])).toEqual('test1');
-		expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2', ...defaultFileResult}])).toEqual('test1\ntest2');
-		expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2 test3', ...defaultFileResult}])).toEqual('test1\n\'test2 test3\'');
-		expect(getDiffFiles([{file: 'test1/test2.txt', ...defaultFileResult}])).toEqual('\'test1/test2.txt\'');
+		expect(getDiffFiles([], false)).toEqual('');
+		expect(getDiffFiles([{file: 'test1', ...defaultFileResult}], false)).toEqual('test1');
+		expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2', ...defaultFileResult}], false)).toEqual('test1\ntest2');
+		expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2 test3', ...defaultFileResult}], false)).toEqual('test1\n\'test2 test3\'');
+		expect(getDiffFiles([{file: 'test1/test2.txt', ...defaultFileResult}], false)).toEqual('\'test1/test2.txt\'');
 	});
 
 	it('get git diff output 3', () => {
 		delete process.env.INPUT_SEPARATOR;
 		process.env.INPUT_TEST = '';
 
-		expect(getDiffFiles([])).toEqual('');
+		expect(getDiffFiles([], false)).toEqual('');
+	});
+
+	it('get git diff output 4', () => {
+		expect(getDiffFiles([], true)).toEqual('');
+		expect(getDiffFiles([{file: 'test1', ...defaultFileResult, prefixMatched: false}], true)).toEqual('');
+		expect(getDiffFiles([{file: 'test1', ...defaultFileResult, prefixMatched: false}, {file: 'test2', ...defaultFileResult}], true)).toEqual('test2');
+		expect(getDiffFiles([{file: 'test1', ...defaultFileResult, prefixMatched: false}, {file: 'test2 test3', ...defaultFileResult}], true)).toEqual('\'test2 test3\'');
 	});
 });
 
