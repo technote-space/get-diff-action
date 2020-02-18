@@ -102,7 +102,7 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
 		.map(item => ({...item, file: toAbsolute(item.file, workspace)}));
 };
 
-export const getDiffFiles = (diffs: FileResult[]): string => escape(diffs.filter(item => item.prefixMatched && item.suffixMatched).map(item => item.file)).join(getSeparator());
+export const getDiffFiles = (diffs: FileResult[], filter: boolean): string => escape(diffs.filter(item => !filter || item.prefixMatched && item.suffixMatched).map(item => item.file)).join(getSeparator());
 export const sumResults   = (diffs: DiffResult[], map: (item: DiffResult) => number): number => getSummaryIncludeFilesFlag() ?
 	diffs.map(map).reduce((acc, val) => acc + val, 0) : // eslint-disable-line no-magic-numbers
 	diffs.filter(item => !item.filterIgnored).map(map).reduce((acc, val) => acc + val, 0); // eslint-disable-line no-magic-numbers

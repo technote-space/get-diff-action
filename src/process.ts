@@ -11,13 +11,13 @@ export const dumpDiffs = (diffs: DiffResult[], logger: Logger): void => {
 };
 
 export const setResult = (diffs: DiffResult[], logger: Logger): void => {
-	const result     = getDiffFiles(diffs);
 	const insertions = sumResults(diffs, item => item.insertions);
 	const deletions  = sumResults(diffs, item => item.deletions);
 
 	logger.startProcess('Dump output');
 	[
-		{name: 'diff', value: result, envNameSuffix: ''},
+		{name: 'diff', value: getDiffFiles(diffs, true), envNameSuffix: ''},
+		{name: 'diff_all', value: getDiffFiles(diffs, false)},
 		{name: 'count', value: diffs.length},
 		{name: 'insertions', value: insertions},
 		{name: 'deletions', value: deletions},
