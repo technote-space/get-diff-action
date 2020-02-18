@@ -99,9 +99,9 @@ describe('setResult', () => {
 
 		stdoutCalledWith(mockStdout, [
 			'::group::Dump output',
-			'::set-output name=diff::test1 test2 test4',
-			'::set-env name=GIT_DIFF::test1 test2 test4',
-			'"diff: test1 test2 test4"',
+			'::set-output name=diff::test1 test2',
+			'::set-env name=GIT_DIFF::test1 test2',
+			'"diff: test1 test2"',
 			'::set-output name=count::3',
 			'"count: 3"',
 			'::set-output name=insertions::3',
@@ -126,8 +126,8 @@ describe('setResult', () => {
 
 		stdoutCalledWith(mockStdout, [
 			'::group::Dump output',
-			'::set-output name=diff::test1 test2 test4',
-			'"diff: test1 test2 test4"',
+			'::set-output name=diff::test1 test2',
+			'"diff: test1 test2"',
 			'::set-output name=count::3',
 			'::set-env name=FILE_COUNT::3',
 			'"count: 3"',
