@@ -49,7 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v1
-        id: git-diff
+        # id: git-diff
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PREFIX_FILTER: |
@@ -58,11 +58,14 @@ jobs:
           SUFFIX_FILTER: .ts
       - name: Install Package dependencies
         run: yarn install
-        if: steps.git-diff.outputs.diff
+        # if: steps.git-diff.outputs.diff
+        if: env.GIT_DIFF
       - name: Check code style
         # 差分があるソースコードだけチェック
-        run: yarn eslint ${{ steps.git-diff.outputs.diff }}
-        if: steps.git-diff.outputs.diff
+        # run: yarn eslint ${{ steps.git-diff.outputs.diff }}
+        run: yarn eslint ${{ env.GIT_DIFF }}
+        # if: steps.git-diff.outputs.diff
+        if: env.GIT_DIFF
 ```
 
 以下のソースコードに差分がない場合、この Workflow はコードのスタイルチェックをスキップします。
@@ -73,7 +76,7 @@ jobs:
 1. `git diff` を取得
 
    ```shell script
-   git diff "${FROM}"${DOT}"${TO}" '--diff-filter=${DIFF_FILTER}' --name-only
+   git diff ${FROM}${DOT}${TO} '--diff-filter=${DIFF_FILTER}' --name-only
    ```
 
    例：(default)
@@ -83,7 +86,7 @@ jobs:
    ```
    =>
    ```shell script
-   git diff "origin/${GITHUB_BASE_REF}"..."${GITHUB_REF#refs/}" '--diff-filter=AM' --name-only
+   git diff ${FROM}...${TO} '--diff-filter=AM' --name-only
    ```
    =>
    ```
@@ -94,6 +97,8 @@ jobs:
    src/utils/command.ts
    yarn.lock
    ```
+   
+   [${FROM}, ${TO}](#from-to)
 
 1. `PREFIX_FILTER` や `SUFFIX_FILTER` オプションによるフィルタ
 
@@ -108,9 +113,9 @@ jobs:
    src/utils/command.ts
    ```
 
-1. `ABSOLUTE` オプションがtrue(default)の場合に絶対パスに変換
+1. `ABSOLUTE` オプションがtrue場合に絶対パスに変換 (default: false)
 
-   例：(default)
+   例：
    ```
    /home/runner/work/my-repo-name/my-repo-name/src/main.ts
    /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
@@ -118,7 +123,7 @@ jobs:
 
 1. `SEPARATOR` オプションの値で結合
 
-   例：
+   例：(default: false)
    ```yaml
    SEPARATOR: ' '
    ```
@@ -154,9 +159,18 @@ default: `SET_ENV_NAME_LINES=`
 | eventName | action |
 |:---:|:---:|
 |pull_request|opened, reopened, rerequested, synchronize|
-|pull_request|*|
+|push|*|
 
 もしこれ以外のイベントで呼ばれた場合、結果は空になります。
+
+## 補足
+### FROM, TO
+| condition | FROM | TO |
+|:---:|:---:|:---:|
+| tag push |x|x|
+| pull request (not default branch) | base ref (e.g. master) | merge ref (e.g. refs/pull/123/merge) |
+| payload.before = '000...000' | default branch (e.g. master) | payload.after |
+| else | payload.before | payload.after |
 
 ## Author
 [GitHub (Technote)](https://github.com/technote-space)  
