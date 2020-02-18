@@ -16,8 +16,8 @@ export const setResult = (diffs: DiffResult[], logger: Logger): void => {
 
 	logger.startProcess('Dump output');
 	[
-		{name: 'diff', value: getDiffFiles(diffs, true), envNameSuffix: ''},
-		{name: 'diff_all', value: getDiffFiles(diffs, false)},
+		{name: 'diff', value: getDiffFiles(diffs, false), envNameSuffix: ''},
+		{name: 'filtered_diff', value: getDiffFiles(diffs, true)},
 		{name: 'count', value: diffs.length},
 		{name: 'insertions', value: insertions},
 		{name: 'deletions', value: deletions},
