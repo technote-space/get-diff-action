@@ -49,13 +49,6 @@ jobs:
       - name: Check code style
         run: yarn lint
         if: env.RUNNING && !env.GIT_DIFF_FILTERED
-      - uses: 8398a7/action-slack@v2
-        with:
-          status: failure
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: failure()
 
   cover:
     name: Coverage
@@ -127,13 +120,6 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           COVERAGE_FILE: ./coverage/lcov.info
         if: env.RUNNING && matrix.node == '12'
-      - uses: 8398a7/action-slack@v2
-        with:
-          status: failure
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: failure()
 
   release:
     name: Release GitHub Actions
@@ -161,13 +147,6 @@ jobs:
           TEST_TAG_PREFIX: test/
           ORIGINAL_TAG_PREFIX: original/
           CLEAN_TEST_TAG: true
-      - uses: 8398a7/action-slack@v2
-        with:
-          status: failure
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: failure()
 
   package:
     name: Publish Package
@@ -239,13 +218,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: env.RUNNING && matrix.target == 'gpr'
-      - uses: 8398a7/action-slack@v2
-        with:
-          status: failure
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: failure()
 
   publishRelease:
     name: Create Release
@@ -271,11 +243,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: always() && steps.drafter.outputs.html_url
+        if: success()
+
+  slack:
+    name: Slack
+    needs: publishRelease
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: technote-space/workflow-conclusion-action@gh-actions
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: 8398a7/action-slack@v2
         with:
-          status: ${{ job.status }}
+          status: failure
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: always() && ! steps.drafter.outputs.html_url
+        if: env.WORKFLOW_CONCLUSION == 'failure'
