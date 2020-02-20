@@ -169,10 +169,11 @@ default: `SET_ENV_NAME_LINES=`
 ### FROM, TO
 | condition | FROM | TO |
 |:---:|:---:|:---:|
-| tag push |x|x|
-| pull request (not default branch) | base ref (e.g. master) | merge ref (e.g. refs/pull/123/merge) |
-| payload.before = '000...000' | default branch (e.g. master) | payload.after |
-| else | payload.before | payload.after |
+| tag push |---|---|
+| pull request | pull.base.ref (e.g. master) | context.ref (e.g. refs/pull/123/merge) |
+| push (has related pull request) | pull.base.ref (e.g. master) | `refs/pull/${pull.number}/merge` (e.g. refs/pull/123/merge) |
+| context.payload.before = '000...000' | default branch (e.g. master) | context.payload.after |
+| else | context.payload.before | context.payload.after |
 
 ## Author
 [GitHub (Technote)](https://github.com/technote-space)  
