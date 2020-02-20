@@ -27,6 +27,8 @@
   - [lines](#lines)
 - [Action イベント詳細](#action-%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E8%A9%B3%E7%B4%B0)
   - [対象イベント](#%E5%AF%BE%E8%B1%A1%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88)
+- [補足](#%E8%A3%9C%E8%B6%B3)
+  - [FROM, TO](#from-to)
 - [Author](#author)
 
 </details>
@@ -167,10 +169,11 @@ default: `SET_ENV_NAME_LINES=`
 ### FROM, TO
 | condition | FROM | TO |
 |:---:|:---:|:---:|
-| tag push |x|x|
-| pull request (not default branch) | base ref (e.g. master) | merge ref (e.g. refs/pull/123/merge) |
-| payload.before = '000...000' | default branch (e.g. master) | payload.after |
-| else | payload.before | payload.after |
+| tag push |---|---|
+| pull request | pull.base.ref (e.g. master) | context.ref (e.g. refs/pull/123/merge) |
+| push (has related pull request) | pull.base.ref (e.g. master) | `refs/pull/${pull.number}/merge` (e.g. refs/pull/123/merge) |
+| context.payload.before = '000...000' | default branch (e.g. master) | context.payload.after |
+| else | context.payload.before | context.payload.after |
 
 ## Author
 [GitHub (Technote)](https://github.com/technote-space)  
