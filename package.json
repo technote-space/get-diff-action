@@ -25,7 +25,7 @@
     "action.yml"
   ],
   "dependencies": {
-    "@actions/core": "^1.2.2",
+    "@actions/core": "^1.2.3",
     "@actions/github": "^2.1.1",
     "@technote-space/filter-github-action": "^0.2.5",
     "@technote-space/github-action-helper": "^1.2.2"
@@ -34,12 +34,12 @@
     "@technote-space/github-action-test-helper": "^0.2.5",
     "@types/jest": "^25.1.3",
     "@types/node": "^13.7.7",
-    "@typescript-eslint/eslint-plugin": "^2.21.0",
-    "@typescript-eslint/parser": "^2.21.0",
+    "@typescript-eslint/eslint-plugin": "^2.22.0",
+    "@typescript-eslint/parser": "^2.22.0",
     "eslint": "^6.8.0",
     "jest": "^25.1.0",
     "jest-circus": "^25.1.0",
-    "nock": "^12.0.1",
+    "nock": "^12.0.2",
     "ts-jest": "^25.2.1",
     "typescript": "^3.8.3"
   },
