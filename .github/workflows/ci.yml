@@ -15,7 +15,6 @@ jobs:
       - uses: technote-space/get-git-comment-action@v1
       - uses: technote-space/get-diff-action@gh-actions
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PREFIX_FILTER: |
             src/
             __tests__/
@@ -64,7 +63,6 @@ jobs:
       - uses: technote-space/get-git-comment-action@v1
       - uses: technote-space/get-diff-action@gh-actions
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PREFIX_FILTER: |
             src/
             __tests__/

@@ -53,7 +53,6 @@ jobs:
       - uses: technote-space/get-diff-action@v1
         # id: git-diff
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PREFIX_FILTER: |
             src
             __tests__
