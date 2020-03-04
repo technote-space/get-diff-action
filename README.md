@@ -160,7 +160,7 @@ default: `SET_ENV_NAME_LINES=`
 ### Target events
 | eventName | action |
 |:---:|:---:|
-|pull_request|opened, reopened, rerequested, synchronize|
+|pull_request|opened, reopened, synchronize|
 |push|*|
 
 If called on any other event, the result will be empty.
