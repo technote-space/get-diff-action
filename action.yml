@@ -8,7 +8,7 @@ author: technote-space
 inputs:
   GITHUB_TOKEN:
     description: Secret GitHub API token used to make API requests.
-    #default: ${{ github.token }}
+    default: ${{ github.token }}
     required: true
   DOT:
     description: Dot.
