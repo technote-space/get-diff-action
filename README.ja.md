@@ -53,7 +53,6 @@ jobs:
       - uses: technote-space/get-diff-action@v1
         # id: git-diff
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PREFIX_FILTER: |
             src
             __tests__
@@ -160,7 +159,7 @@ default: `SET_ENV_NAME_LINES=`
 ### 対象イベント
 | eventName | action |
 |:---:|:---:|
-|pull_request|opened, reopened, rerequested, synchronize|
+|pull_request|opened, reopened, synchronize|
 |push|*|
 
 もしこれ以外のイベントで呼ばれた場合、結果は空になります。
