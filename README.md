@@ -51,7 +51,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v1
-        # id: git-diff
         with:
           PREFIX_FILTER: |
             src
@@ -59,14 +58,29 @@ jobs:
           SUFFIX_FILTER: .ts
       - name: Install Package dependencies
         run: yarn install
-        # if: steps.git-diff.outputs.diff
         if: env.GIT_DIFF
       - name: Check code style
         # Check only the source codes that have differences
-        # run: yarn eslint ${{ steps.git-diff.outputs.diff }}
         run: yarn eslint ${{ env.GIT_DIFF }}
-        # if: steps.git-diff.outputs.diff
         if: env.GIT_DIFF
+
+  phpmd:
+    name: PHPMD
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: technote-space/get-diff-action@v1
+        id: git_diff
+        with:
+          SUFFIX_FILTER: .php
+          SEPARATOR: ','
+      - name: Install composer
+        run: composer install
+        if: steps.git_diff.outputs.diff
+      - name: Check code style
+        # Check only the source codes that have differences
+        run: vendor/bin/phpmd ${{ steps.git_diff.outputs.diff }} ansi phpmd.xml
+        if: steps.git_diff.outputs.diff
 ```
 
 If there is no difference in the source code below, this workflow will skip the code style check
