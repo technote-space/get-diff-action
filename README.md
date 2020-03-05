@@ -20,11 +20,6 @@ GitHub actions to get git diff.
 - [Usage](#usage)
 - [Behavior](#behavior)
 - [Outputs](#outputs)
-  - [diff](#diff)
-  - [count](#count)
-  - [insertions](#insertions)
-  - [deletions](#deletions)
-  - [lines](#lines)
 - [Action event details](#action-event-details)
   - [Target events](#target-events)
 - [Addition](#addition)
@@ -51,23 +46,36 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v1
-        # id: git-diff
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PREFIX_FILTER: |
             src
             __tests__
           SUFFIX_FILTER: .ts
       - name: Install Package dependencies
         run: yarn install
-        # if: steps.git-diff.outputs.diff
         if: env.GIT_DIFF
       - name: Check code style
         # Check only the source codes that have differences
-        # run: yarn eslint ${{ steps.git-diff.outputs.diff }}
         run: yarn eslint ${{ env.GIT_DIFF }}
-        # if: steps.git-diff.outputs.diff
         if: env.GIT_DIFF
+
+  phpmd:
+    name: PHPMD
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: technote-space/get-diff-action@v1
+        id: git_diff
+        with:
+          SUFFIX_FILTER: .php
+          SEPARATOR: ','
+      - name: Install composer
+        run: composer install
+        if: steps.git_diff.outputs.diff
+      - name: Check code style
+        # Check only the source codes that have differences
+        run: vendor/bin/phpmd ${{ steps.git_diff.outputs.diff }} ansi phpmd.xml
+        if: steps.git_diff.outputs.diff
 ```
 
 If there is no difference in the source code below, this workflow will skip the code style check
@@ -135,32 +143,19 @@ If there is no difference in the source code below, this workflow will skip the 
    ```
 
 ## Outputs
-### diff
-The results of diff file names.  
-if inputs `SET_ENV_NAME` is set, an environment variable is set with that name.  
-default: `SET_ENV_NAME=GIT_DIFF`
-### count
-The number of diff files.  
-if inputs `SET_ENV_NAME_COUNT` is set, an environment variable is set with that name.  
-default: `SET_ENV_NAME_COUNT=`
-### insertions
-The number of insertions lines.  
-if inputs `SET_ENV_NAME_INSERTIONS` is set, an environment variable is set with that name.  
-default: `SET_ENV_NAME_INSERTIONS=`
-### deletions
-The number of deletions lines.  
-if inputs `SET_ENV_NAME_DELETIONS` is set, an environment variable is set with that name.  
-default: `SET_ENV_NAME_DELETIONS=`
-### lines
-The number of diff lines.  
-if inputs `SET_ENV_NAME_LINES` is set, an environment variable is set with that name.  
-default: `SET_ENV_NAME_LINES=`
+| name | description | e.g. |
+|:---:|:---|:---:|
+|diff|The results of diff file names.<br>If inputs `SET_ENV_NAME`(default: `GIT_DIFF`) is set, an environment variable is set with that name.|`src/main.ts src/utils/command.ts`|
+|count|The number of diff files.<br>If inputs `SET_ENV_NAME_COUNT`(default: `''`) is set, an environment variable is set with that name.|`100`|
+|insertions|The number of insertions lines.<br>If inputs `SET_ENV_NAME_INSERTIONS`(default: `''`) is set, an environment variable is set with that name.|`100`|
+|deletions|The number of deletions lines.<br>If inputs `SET_ENV_NAME_DELETIONS`(default: `''`) is set, an environment variable is set with that name.|`100`|
+|lines|The number of diff lines.<br>If inputs `SET_ENV_NAME_LINES`(default: `''`) is set, an environment variable is set with that name.|`200`|
 
 ## Action event details
 ### Target events
 | eventName | action |
 |:---:|:---:|
-|pull_request|opened, reopened, rerequested, synchronize|
+|pull_request|opened, reopened, synchronize|
 |push|*|
 
 If called on any other event, the result will be empty.
