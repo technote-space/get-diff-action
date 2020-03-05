@@ -148,26 +148,13 @@ If there is no difference in the source code below, this workflow will skip the 
    ```
 
 ## Outputs
-### diff
-The results of diff file names.  
-if inputs `SET_ENV_NAME` is set, an environment variable is set with that name.  
-default: `SET_ENV_NAME=GIT_DIFF`
-### count
-The number of diff files.  
-if inputs `SET_ENV_NAME_COUNT` is set, an environment variable is set with that name.  
-default: `SET_ENV_NAME_COUNT=`
-### insertions
-The number of insertions lines.  
-if inputs `SET_ENV_NAME_INSERTIONS` is set, an environment variable is set with that name.  
-default: `SET_ENV_NAME_INSERTIONS=`
-### deletions
-The number of deletions lines.  
-if inputs `SET_ENV_NAME_DELETIONS` is set, an environment variable is set with that name.  
-default: `SET_ENV_NAME_DELETIONS=`
-### lines
-The number of diff lines.  
-if inputs `SET_ENV_NAME_LINES` is set, an environment variable is set with that name.  
-default: `SET_ENV_NAME_LINES=`
+| name | description | e.g. |
+|:---:|:---|:---:|
+|diff|The results of diff file names.<br>If inputs `SET_ENV_NAME`(default: `GIT_DIFF`) is set, an environment variable is set with that name.|`src/main.ts src/utils/command.ts`|
+|count|The number of diff files.<br>If inputs `SET_ENV_NAME_COUNT`(default: `''`) is set, an environment variable is set with that name.|`100`|
+|insertions|The number of insertions lines.<br>If inputs `SET_ENV_NAME_INSERTIONS`(default: `''`) is set, an environment variable is set with that name.|`100`|
+|deletions|The number of deletions lines.<br>If inputs `SET_ENV_NAME_DELETIONS`(default: `''`) is set, an environment variable is set with that name.|`100`|
+|lines|The number of diff lines.<br>If inputs `SET_ENV_NAME_LINES`(default: `''`) is set, an environment variable is set with that name.|`200`|
 
 ## Action event details
 ### Target events
