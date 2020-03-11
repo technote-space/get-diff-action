@@ -1,0 +1,82 @@
+# https://help.github.com/ja/articles/metadata-syntax-for-github-actions
+name: Get Diff Action
+
+description: GitHub actions to get git diff.
+
+author: technote-space
+
+inputs:
+  GITHUB_TOKEN:
+    description: Secret GitHub API token used to make API requests.
+    default: ${{ github.token }}
+    required: true
+  DOT:
+    description: Dot.
+    default: '...'
+    required: true
+  DIFF_FILTER:
+    description: Diff filter.
+    default: 'AM'
+    required: true
+  SEPARATOR:
+    description: Separator of diffs.
+    default: ' '
+    required: true
+  PREFIX_FILTER:
+    description: Prefix filter.
+    required: false
+  SUFFIX_FILTER:
+    description: Suffix filter.
+    required: false
+  FILES:
+    description: Specific files.
+    required: false
+  SUMMARY_INCLUDE_FILES:
+    description: Whether the summary contains the result of specific files.
+    required: false
+  ABSOLUTE:
+    description: Get as absolute path.
+    required: false
+  SET_ENV_NAME:
+    description: Env name (diff).
+    default: GIT_DIFF
+    required: false
+  SET_ENV_NAME_FILTERED_DIFF:
+    description: Env name (filtered_diff).
+    default: GIT_DIFF_FILTERED
+    required: false
+  SET_ENV_NAME_COUNT:
+    description: Env name (count).
+    required: false
+  SET_ENV_NAME_INSERTIONS:
+    description: Env name (insertions).
+    required: false
+  SET_ENV_NAME_DELETIONS:
+    description: Env name (deletions).
+    required: false
+  SET_ENV_NAME_LINES:
+    description: Env name (lines).
+    required: false
+
+outputs:
+  diff:
+    description: The results of diff file names.
+  filtered_diff:
+    description: The results of diff file names.
+  count:
+    description: The number of diff files.
+  insertions:
+    description: The number of insertions lines.
+  deletions:
+    description: The number of deletions lines.
+  lines:
+    description: The number of diff lines.
+
+branding:
+  # https://feathericons.com/
+  icon: 'file'
+  color: 'orange'
+
+runs:
+  using: node12
+  main: lib/main.js
