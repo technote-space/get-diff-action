@@ -12,6 +12,9 @@ jobs:
     name: Update npm dependencies
     runs-on: ubuntu-latest
     steps:
+      - uses: technote-space/auto-cancel-redundant-job@v1
+        with:
+          EXCLUDE_MERGED: 'true'
       - name: Update dependencies
         id: update_deps
         uses: technote-space/create-pr-action@v1
@@ -46,7 +49,6 @@ jobs:
       - name: Get version
         uses: technote-space/get-next-version-action@v1
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EXCLUDE_MESSAGES: |
             update package version
             update packages
