@@ -4,7 +4,7 @@ import path, { resolve } from 'path';
 import {
 	generateContext,
 	testEnv,
-	spyOnExec,
+	spyOnSpawn,
 	testChildProcess,
 	execCalledWith,
 	setChildProcessParams,
@@ -73,7 +73,7 @@ describe('getGitDiff', () => {
 		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
 		process.env.INPUT_GITHUB_TOKEN = 'test token';
 
-		const mockExec = spyOnExec();
+		const mockExec = spyOnSpawn();
 		setChildProcessParams({
 			stdout: (command: string): string => {
 				if (command.startsWith('git diff')) {
@@ -104,7 +104,7 @@ describe('getGitDiff', () => {
 		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
 		process.env.INPUT_GITHUB_TOKEN = 'test token';
 
-		const mockExec = spyOnExec();
+		const mockExec = spyOnSpawn();
 		setChildProcessParams({
 			stdout: (command: string): string => {
 				if (command.startsWith('git diff')) {
@@ -140,7 +140,7 @@ describe('getGitDiff', () => {
 		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
 		process.env.INPUT_GITHUB_TOKEN = 'test token';
 
-		const mockExec = spyOnExec();
+		const mockExec = spyOnSpawn();
 		setChildProcessParams({
 			stdout: (command: string): string => {
 				if (command.startsWith('git diff')) {
@@ -178,7 +178,7 @@ describe('getGitDiff', () => {
 		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
 		process.env.INPUT_GITHUB_TOKEN = 'test token';
 
-		const mockExec = spyOnExec();
+		const mockExec = spyOnSpawn();
 		setChildProcessParams({
 			stdout: (command: string): string => {
 				if (command.startsWith('git diff')) {
@@ -216,7 +216,7 @@ describe('getGitDiff', () => {
 		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
 		process.env.INPUT_GITHUB_TOKEN = 'test token';
 
-		const mockExec = spyOnExec();
+		const mockExec = spyOnSpawn();
 		setChildProcessParams({
 			stdout: (command: string): string => {
 				if (command.startsWith('git diff')) {
@@ -236,7 +236,7 @@ describe('getGitDiff', () => {
 		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
 		process.env.INPUT_GITHUB_TOKEN = 'test token';
 
-		const mockExec = spyOnExec();
+		const mockExec = spyOnSpawn();
 		setChildProcessParams({
 			stdout: (command: string): string => {
 				if (command.startsWith('git diff')) {
@@ -287,7 +287,7 @@ describe('getGitDiff', () => {
 		process.env.INPUT_SUFFIX_FILTER = '.ts\n.txt';
 		process.env.INPUT_ABSOLUTE      = 'true';
 		process.env.INPUT_SET_ENV_NAME  = '';
-		const mockExec                  = spyOnExec();
+		const mockExec                  = spyOnSpawn();
 		setChildProcessParams({
 			stdout: (command: string): string => {
 				if (command.startsWith('git diff')) {
@@ -319,7 +319,7 @@ describe('getGitDiff', () => {
 
 describe('getFileDiff', () => {
 	it('should get file diff 1', async() => {
-		const mockExec = spyOnExec();
+		const mockExec = spyOnSpawn();
 		setChildProcessParams({
 			stdout: '1 file changed, 25 insertions(+), 4 deletions(-)',
 		});
@@ -336,7 +336,7 @@ describe('getFileDiff', () => {
 	});
 
 	it('should get file diff 2', async() => {
-		const mockExec = spyOnExec();
+		const mockExec = spyOnSpawn();
 		setChildProcessParams({
 			stdout: '1 file changed, 1 insertion(+), 3 deletions(-)',
 		});
@@ -353,7 +353,7 @@ describe('getFileDiff', () => {
 	});
 
 	it('should get file diff 3', async() => {
-		const mockExec = spyOnExec();
+		const mockExec = spyOnSpawn();
 		setChildProcessParams({
 			stdout: '1 file changed, 3 insertions(+)',
 		});
@@ -370,7 +370,7 @@ describe('getFileDiff', () => {
 	});
 
 	it('should return empty', async() => {
-		const mockExec = spyOnExec();
+		const mockExec = spyOnSpawn();
 		setChildProcessParams({
 			stdout: '',
 		});
