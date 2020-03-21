@@ -4,7 +4,7 @@ import {
 	testEnv,
 	spyOnStdout,
 	stdoutCalledWith,
-	spyOnExec,
+	spyOnSpawn,
 	testChildProcess,
 	setChildProcessParams,
 	execCalledWith,
@@ -159,7 +159,7 @@ describe('execute', () => {
 		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
 		process.env.INPUT_GITHUB_TOKEN = 'test token';
 
-		const mockExec   = spyOnExec();
+		const mockExec   = spyOnSpawn();
 		const mockStdout = spyOnStdout();
 		setChildProcessParams({
 			stdout: (command: string): string => {
@@ -262,7 +262,7 @@ describe('execute', () => {
 	it('should execute empty', async() => {
 		process.env.GITHUB_WORKSPACE = '/home/runner/work/my-repo-name/my-repo-name';
 
-		const mockExec   = spyOnExec();
+		const mockExec   = spyOnSpawn();
 		const mockStdout = spyOnStdout();
 
 		await execute(logger, prContext, []);
@@ -294,7 +294,7 @@ describe('execute', () => {
 	it('should not execute if not cloned', async() => {
 		process.env.GITHUB_WORKSPACE = '/home/runner/work/my-repo-name/my-repo-name';
 
-		const mockExec   = spyOnExec();
+		const mockExec   = spyOnSpawn();
 		const mockStdout = spyOnStdout();
 		setChildProcessParams({
 			stdout: (command: string): string => {
