@@ -23,8 +23,6 @@ async function listRepos(
 }
 ```
 
-Get parameter types for a REST API endpoint
-
 Get response types from endpoint methods
 
 ```ts

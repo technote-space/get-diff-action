@@ -315,6 +315,14 @@ export interface Endpoints {
     response: OctokitResponse<any>;
   };
   /**
+   * @see https://developer.github.com/v3/actions/workflow_runs/#delete-workflow-run-logs
+   */
+  "DELETE /repos/:owner/:repo/actions/runs/:run_id/logs": {
+    parameters: ActionsDeleteWorkflowRunLogsEndpoint;
+    request: ActionsDeleteWorkflowRunLogsRequestOptions;
+    response: OctokitResponse<any>;
+  };
+  /**
    * @see https://developer.github.com/v3/actions/secrets/#delete-a-secret-from-a-repository
    */
   "DELETE /repos/:owner/:repo/actions/secrets/:name": {
@@ -16502,6 +16510,28 @@ type ActionsListWorkflowRunLogsEndpoint = {
 
 type ActionsListWorkflowRunLogsRequestOptions = {
   method: "GET";
+  url: "/repos/:owner/:repo/actions/runs/:run_id/logs";
+  headers: RequestHeaders;
+  request: RequestRequestOptions;
+};
+
+type ActionsDeleteWorkflowRunLogsEndpoint = {
+  /**
+   * owner parameter
+   */
+  owner: string;
+  /**
+   * repo parameter
+   */
+  repo: string;
+  /**
+   * run_id parameter
+   */
+  run_id: number;
+};
+
+type ActionsDeleteWorkflowRunLogsRequestOptions = {
+  method: "DELETE";
   url: "/repos/:owner/:repo/actions/runs/:run_id/logs";
   headers: RequestHeaders;
   request: RequestRequestOptions;
