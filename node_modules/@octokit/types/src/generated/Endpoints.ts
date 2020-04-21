@@ -42456,62 +42456,62 @@ type ActivityListReposWatchedByUserResponseData = Array<
   ActivityListReposWatchedByUserResponseDataItem
 >;
 
-export type AppsCreateInstallationTokenParamsPermissions = {};
-export type GistsCreateParamsFiles = {
+type AppsCreateInstallationTokenParamsPermissions = {};
+type GistsCreateParamsFiles = {
   content?: string;
 };
-export type GistsUpdateParamsFiles = {
+type GistsUpdateParamsFiles = {
   content?: string;
   filename?: string;
 };
-export type OrgsCreateHookParamsConfig = {
+type OrgsCreateHookParamsConfig = {
   url: string;
   content_type?: string;
   secret?: string;
   insecure_ssl?: string;
 };
-export type OrgsUpdateHookParamsConfig = {
+type OrgsUpdateHookParamsConfig = {
   url: string;
   content_type?: string;
   secret?: string;
   insecure_ssl?: string;
 };
-export type TeamsCreateOrUpdateIdPGroupConnectionsInOrgParamsGroups = {
+type TeamsCreateOrUpdateIdPGroupConnectionsInOrgParamsGroups = {
   group_id: string;
   group_name: string;
   group_description: string;
 };
-export type ReposUpdateBranchProtectionParamsRequiredStatusChecks = {
+type ReposUpdateBranchProtectionParamsRequiredStatusChecks = {
   strict: boolean;
   contexts: string[];
 };
-export type ReposUpdateBranchProtectionParamsRequiredPullRequestReviews = {
+type ReposUpdateBranchProtectionParamsRequiredPullRequestReviews = {
   dismissal_restrictions?: ReposUpdateBranchProtectionParamsRequiredPullRequestReviewsDismissalRestrictions;
   dismiss_stale_reviews?: boolean;
   require_code_owner_reviews?: boolean;
   required_approving_review_count?: number;
 };
-export type ReposUpdateBranchProtectionParamsRequiredPullRequestReviewsDismissalRestrictions = {
+type ReposUpdateBranchProtectionParamsRequiredPullRequestReviewsDismissalRestrictions = {
   users?: string[];
   teams?: string[];
 };
-export type ReposUpdateBranchProtectionParamsRestrictions = {
+type ReposUpdateBranchProtectionParamsRestrictions = {
   users: string[];
   teams: string[];
   apps?: string[];
 };
-export type ReposUpdateProtectedBranchPullRequestReviewEnforcementParamsDismissalRestrictions = {
+type ReposUpdateProtectedBranchPullRequestReviewEnforcementParamsDismissalRestrictions = {
   users?: string[];
   teams?: string[];
 };
-export type ChecksCreateParamsOutput = {
+type ChecksCreateParamsOutput = {
   title: string;
   summary: string;
   text?: string;
   annotations?: ChecksCreateParamsOutputAnnotations[];
   images?: ChecksCreateParamsOutputImages[];
 };
-export type ChecksCreateParamsOutputAnnotations = {
+type ChecksCreateParamsOutputAnnotations = {
   path: string;
   start_line: number;
   end_line: number;
@@ -42522,24 +42522,24 @@ export type ChecksCreateParamsOutputAnnotations = {
   title?: string;
   raw_details?: string;
 };
-export type ChecksCreateParamsOutputImages = {
+type ChecksCreateParamsOutputImages = {
   alt: string;
   image_url: string;
   caption?: string;
 };
-export type ChecksCreateParamsActions = {
+type ChecksCreateParamsActions = {
   label: string;
   description: string;
   identifier: string;
 };
-export type ChecksUpdateParamsOutput = {
+type ChecksUpdateParamsOutput = {
   title?: string;
   summary: string;
   text?: string;
   annotations?: ChecksUpdateParamsOutputAnnotations[];
   images?: ChecksUpdateParamsOutputImages[];
 };
-export type ChecksUpdateParamsOutputAnnotations = {
+type ChecksUpdateParamsOutputAnnotations = {
   path: string;
   start_line: number;
   end_line: number;
@@ -42550,81 +42550,81 @@ export type ChecksUpdateParamsOutputAnnotations = {
   title?: string;
   raw_details?: string;
 };
-export type ChecksUpdateParamsOutputImages = {
+type ChecksUpdateParamsOutputImages = {
   alt: string;
   image_url: string;
   caption?: string;
 };
-export type ChecksUpdateParamsActions = {
+type ChecksUpdateParamsActions = {
   label: string;
   description: string;
   identifier: string;
 };
-export type ChecksSetSuitesPreferencesParamsAutoTriggerChecks = {
+type ChecksSetSuitesPreferencesParamsAutoTriggerChecks = {
   app_id: number;
   setting: boolean;
 };
-export type ReposCreateOrUpdateFileParamsCommitter = {
+type ReposCreateOrUpdateFileParamsCommitter = {
   name: string;
   email: string;
 };
-export type ReposCreateOrUpdateFileParamsAuthor = {
+type ReposCreateOrUpdateFileParamsAuthor = {
   name: string;
   email: string;
 };
-export type ReposDeleteFileParamsCommitter = {
+type ReposDeleteFileParamsCommitter = {
   name?: string;
   email?: string;
 };
-export type ReposDeleteFileParamsAuthor = {
+type ReposDeleteFileParamsAuthor = {
   name?: string;
   email?: string;
 };
-export type ReposCreateDispatchEventParamsClientPayload = {};
-export type GitCreateCommitParamsAuthor = {
-  name?: string;
-  email?: string;
-  date?: string;
-};
-export type GitCreateCommitParamsCommitter = {
+type ReposCreateDispatchEventParamsClientPayload = {};
+type GitCreateCommitParamsAuthor = {
   name?: string;
   email?: string;
   date?: string;
 };
-export type GitCreateTagParamsTagger = {
+type GitCreateCommitParamsCommitter = {
   name?: string;
   email?: string;
   date?: string;
 };
-export type GitCreateTreeParamsTree = {
+type GitCreateTagParamsTagger = {
+  name?: string;
+  email?: string;
+  date?: string;
+};
+type GitCreateTreeParamsTree = {
   path?: string;
   mode?: "100644" | "100755" | "040000" | "160000" | "120000";
   type?: "blob" | "tree" | "commit";
   sha?: string | null;
   content?: string;
 };
-export type ReposCreateHookParamsConfig = {
+type ReposCreateHookParamsConfig = {
   url: string;
   content_type?: string;
   secret?: string;
   insecure_ssl?: string;
 };
-export type ReposUpdateHookParamsConfig = {
+type ReposUpdateHookParamsConfig = {
   url: string;
   content_type?: string;
   secret?: string;
   insecure_ssl?: string;
 };
-export type ReposEnablePagesSiteParamsSource = {
+type ReposEnablePagesSiteParamsSource = {
   branch?: "master" | "gh-pages";
   path?: string;
 };
-export type PullsCreateReviewParamsComments = {
+type PullsCreateReviewParamsComments = {
   path: string;
   position: number;
   body: string;
 };
-export type TeamsCreateOrUpdateIdPGroupConnectionsLegacyParamsGroups = {
+type TeamsCreateOrUpdateIdPGroupConnectionsLegacyParamsGroups = {
   group_id: string;
   group_name: string;
   group_description: string;
