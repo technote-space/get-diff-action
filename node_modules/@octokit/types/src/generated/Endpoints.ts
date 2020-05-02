@@ -21005,7 +21005,7 @@ type ReposListBranchesForHeadCommitResponseDataItemCommit = {
 type ReposListBranchesForHeadCommitResponseDataItem = {
   name: string;
   commit: ReposListBranchesForHeadCommitResponseDataItemCommit;
-  protected: string;
+  protected: boolean;
 };
 type ReposListBranchesForHeadCommitResponseData = Array<
   ReposListBranchesForHeadCommitResponseDataItem
