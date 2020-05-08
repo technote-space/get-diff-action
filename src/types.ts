@@ -4,6 +4,10 @@ export type DiffResult = FileDiffResult & FileResult;
 export type PullRequestParams = Readonly<{
 	base: {
 		ref: string;
+		sha: string;
+	};
+	head: {
+		ref: string;
 	};
 }>;
 export type DiffInfo = Readonly<{

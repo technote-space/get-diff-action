@@ -30,6 +30,7 @@ const prContext         = generateContext({
 	repo: 'world',
 	event: 'pull_request',
 	ref: 'refs/pull/55/merge',
+	action: 'synchronize',
 }, {
 	payload: {
 		number: 11,
@@ -38,9 +39,11 @@ const prContext         = generateContext({
 			id: 21031067,
 			head: {
 				ref: 'feature/new-feature',
+				sha: 'head-sha',
 			},
 			base: {
 				ref: 'master',
+				sha: 'base-sha',
 			},
 			title: 'title',
 			'html_url': 'test url',
@@ -97,6 +100,62 @@ describe('getGitDiff', () => {
 			'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'abc/composer.json\'',
 			'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'README.md\'',
 			'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'src/main.ts\'',
+		]);
+	});
+
+	it('should get git diff (pull request closed)', async() => {
+		process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
+		process.env.INPUT_GITHUB_TOKEN = 'test token';
+
+		const mockExec = spyOnSpawn();
+		setChildProcessParams({
+			stdout: (command: string): string => {
+				if (command.startsWith('git diff')) {
+					return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
+				}
+				return '';
+			},
+		});
+
+		expect(await getGitDiff(logger, generateContext({
+			owner: 'hello',
+			repo: 'world',
+			event: 'pull_request',
+			ref: 'master',
+			sha: 'sha',
+			action: 'closed',
+		}, {
+			payload: {
+				number: 11,
+				'pull_request': {
+					number: 11,
+					id: 21031067,
+					head: {
+						ref: 'feature/new-feature',
+						sha: 'head-sha',
+					},
+					base: {
+						ref: 'master',
+						sha: 'base-sha',
+					},
+					title: 'title',
+					'html_url': 'test url',
+				},
+			},
+		}))).toEqual([
+			{file: 'package.json', ...emptyDiff},
+			{file: 'abc/composer.json', ...emptyDiff},
+			{file: 'README.md', ...emptyDiff},
+			{file: 'src/main.ts', ...emptyDiff},
+		]);
+		execCalledWith(mockExec, [
+			'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' > /dev/null 2>&1 || :',
+			'git fetch --no-tags --no-recurse-submodules \'--depth=3\' get-diff-action \'refs/heads/master:refs/remotes/get-diff-action/master\' || :',
+			'git diff \'base-sha...sha\' \'--diff-filter=AM\' --name-only || :',
+			'git diff \'base-sha...sha\' --shortstat -w \'package.json\'',
+			'git diff \'base-sha...sha\' --shortstat -w \'abc/composer.json\'',
+			'git diff \'base-sha...sha\' --shortstat -w \'README.md\'',
+			'git diff \'base-sha...sha\' --shortstat -w \'src/main.ts\'',
 		]);
 	});
 
