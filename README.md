@@ -155,7 +155,7 @@ If there is no difference in the source code below, this workflow will skip the 
 ### Target events
 | eventName | action |
 |:---:|:---:|
-|pull_request|opened, reopened, synchronize|
+|pull_request|opened, reopened, synchronize, closed|
 |push|*|
 
 If called on any other event, the result will be empty.
