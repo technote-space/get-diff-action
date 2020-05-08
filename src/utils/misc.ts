@@ -14,8 +14,8 @@ export const escape = (items: string[]): string[] => items.map(item => {
 });
 
 export const getDiffInfoForPR = (pull: PullRequestParams, context: Context): DiffInfo => ({
-	base: Utils.normalizeRef(pull.base.ref),
-	head: Utils.normalizeRef(context.ref),
+	base: context.payload.action === 'closed' ? pull.base.sha : Utils.normalizeRef(pull.base.ref),
+	head: context.payload.action === 'closed' ? context.sha : Utils.normalizeRef(context.ref),
 });
 
 export const isDefaultBranch = async(octokit: Octokit, context: Context): Promise<boolean> => await (new ApiHelper(octokit, context)).getDefaultBranch() === Utils.getBranch(context);
@@ -48,4 +48,7 @@ export const getDiffInfoForPush = async(octokit: Octokit, context: Context): Pro
 	};
 };
 
-export const getDiffInfo = async(octokit: Octokit, context: Context): Promise<DiffInfo> => context.payload.pull_request ? getDiffInfoForPR({base: context.payload.pull_request.base}, context) : await getDiffInfoForPush(octokit, context);
+export const getDiffInfo = async(octokit: Octokit, context: Context): Promise<DiffInfo> => context.payload.pull_request ? getDiffInfoForPR({
+	base: context.payload.pull_request.base,
+	head: context.payload.pull_request.head,
+}, context) : await getDiffInfoForPush(octokit, context);
