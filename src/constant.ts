@@ -3,6 +3,7 @@ export const TARGET_EVENTS = {
 		'opened',
 		'reopened',
 		'synchronize',
+		'closed',
 	],
 	'push': '*',
 };
