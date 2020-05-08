@@ -155,7 +155,7 @@ jobs:
 ### 対象イベント
 | eventName | action |
 |:---:|:---:|
-|pull_request|opened, reopened, synchronize|
+|pull_request|opened, reopened, synchronize, closed|
 |push|*|
 
 もしこれ以外のイベントで呼ばれた場合、結果は空になります。
