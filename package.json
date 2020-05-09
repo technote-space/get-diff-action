@@ -39,7 +39,7 @@
     "@types/node": "^13.13.5",
     "@typescript-eslint/eslint-plugin": "^2.31.0",
     "@typescript-eslint/parser": "^2.31.0",
-    "eslint": "^6.8.0",
+    "eslint": "^7.0.0",
     "husky": "^4.2.5",
     "jest": "^26.0.1",
     "jest-circus": "^26.0.1",
