@@ -24,85 +24,84 @@ const toAbsolute                 = (item: string, workspace: string): string => 
 const getCompareRef = (ref: string): string => Utils.isRef(ref) ? Utils.getLocalRefspec(ref, REMOTE_NAME) : ref;
 
 export const getFileDiff = async(file: FileResult, diffInfo: DiffInfo, dot: string): Promise<FileDiffResult> => {
-	const stdout = (await command.execAsync({
-		command: 'git diff',
-		args: [
-			`${getCompareRef(diffInfo.base)}${dot}${getCompareRef(diffInfo.head)}`,
-			'--shortstat',
-			'-w',
-			file.file,
-		],
-		cwd: Utils.getWorkspace(),
-	})).stdout;
+  const stdout = (await command.execAsync({
+    command: 'git diff',
+    args: [
+      `${getCompareRef(diffInfo.base)}${dot}${getCompareRef(diffInfo.head)}`,
+      '--shortstat',
+      '-w',
+      file.file,
+    ],
+    cwd: Utils.getWorkspace(),
+  })).stdout;
 
-	if ('' === stdout) {
-		return {insertions: 0, deletions: 0, lines: 0};
-	}
+  if ('' === stdout) {
+    return {insertions: 0, deletions: 0, lines: 0};
+  }
 
-	const insertions = Number.parseInt((stdout.match(/ (\d+) insertions?\(/) ?? ['', '0'])[1]);
-	const deletions  = Number.parseInt((stdout.match(/ (\d+) deletions?\(/) ?? ['', '0'])[1]);
-	return {insertions, deletions, lines: insertions + deletions};
+  const insertions = Number.parseInt((stdout.match(/ (\d+) insertions?\(/) ?? ['', '0'])[1]);
+  const deletions  = Number.parseInt((stdout.match(/ (\d+) deletions?\(/) ?? ['', '0'])[1]);
+  return {insertions, deletions, lines: insertions + deletions};
 };
 
 export const getGitDiff = async(logger: Logger, context: Context): Promise<Array<DiffResult>> => {
-	if (!Utils.isCloned(Utils.getWorkspace())) {
-		logger.warn('Please checkout before call this action.');
-		return [];
-	}
+  if (!Utils.isCloned(Utils.getWorkspace())) {
+    logger.warn('Please checkout before call this action.');
+    return [];
+  }
 
-	const dot       = getDot();
-	const files     = getFiles();
-	const prefix    = getPrefix();
-	const suffix    = getSuffix();
-	const workspace = getWorkspace();
-	const diffInfo  = await getDiffInfo(Utils.getOctokit(), context);
+  const dot       = getDot();
+  const files     = getFiles();
+  const prefix    = getPrefix();
+  const suffix    = getSuffix();
+  const workspace = getWorkspace();
+  const diffInfo  = await getDiffInfo(Utils.getOctokit(), context);
 
-	if (diffInfo.base === diffInfo.head) {
-		return [];
-	}
+  if (diffInfo.base === diffInfo.head) {
+    return [];
+  }
 
-	const helper = new GitHelper(logger);
-	helper.useOrigin(REMOTE_NAME);
+  const helper = new GitHelper(logger);
+  helper.useOrigin(REMOTE_NAME);
 
-	const refs = [Utils.normalizeRef(context.ref)];
-	if (Utils.isRef(diffInfo.base)) {
-		refs.push(diffInfo.base);
-	}
-	if (Utils.isRef(diffInfo.head)) {
-		refs.push(diffInfo.head);
-	}
-	await helper.fetchOrigin(Utils.getWorkspace(), context, [
-		'--no-tags',
-		'--no-recurse-submodules',
-		'--depth=3',
-	], Utils.uniqueArray(refs).map(ref => Utils.getRefspec(ref, REMOTE_NAME)));
+  const refs = [Utils.normalizeRef(context.ref)];
+  if (Utils.isRef(diffInfo.base)) {
+    refs.push(diffInfo.base);
+  }
+  if (Utils.isRef(diffInfo.head)) {
+    refs.push(diffInfo.head);
+  }
+  await helper.fetchOrigin(Utils.getWorkspace(), context, [
+    '--no-tags',
+    '--no-recurse-submodules',
+  ], Utils.uniqueArray(refs).map(ref => Utils.getRefspec(ref, REMOTE_NAME)));
 
-	return (await Utils.split((await command.execAsync({
-		command: 'git diff',
-		args: [
-			`${getCompareRef(diffInfo.base)}${dot}${getCompareRef(diffInfo.head)}`,
-			'--diff-filter=' + getFilter(),
-			'--name-only',
-		],
-		cwd: Utils.getWorkspace(),
-		suppressError: true,
-	})).stdout)
-		.map(item => ({
-			file: item,
-			filterIgnored: isFilterIgnored(item, files),
-			prefixMatched: isPrefixMatched(item, prefix),
-			suffixMatched: isSuffixMatched(item, suffix),
-		}))
-		.filter(item => item.filterIgnored || (item.prefixMatched && item.suffixMatched))
-		.map(async item => ({...item, ...await getFileDiff(item, diffInfo, dot)}))
-		.reduce(async(prev, item) => {
-			const acc = await prev;
-			return acc.concat(await item);
-		}, Promise.resolve([] as Array<DiffResult>)))
-		.map(item => ({...item, file: toAbsolute(item.file, workspace)}));
+  return (await Utils.split((await command.execAsync({
+    command: 'git diff',
+    args: [
+      `${getCompareRef(diffInfo.base)}${dot}${getCompareRef(diffInfo.head)}`,
+      '--diff-filter=' + getFilter(),
+      '--name-only',
+    ],
+    cwd: Utils.getWorkspace(),
+    suppressError: true,
+  })).stdout)
+    .map(item => ({
+      file: item,
+      filterIgnored: isFilterIgnored(item, files),
+      prefixMatched: isPrefixMatched(item, prefix),
+      suffixMatched: isSuffixMatched(item, suffix),
+    }))
+    .filter(item => item.filterIgnored || (item.prefixMatched && item.suffixMatched))
+    .map(async item => ({...item, ...await getFileDiff(item, diffInfo, dot)}))
+    .reduce(async(prev, item) => {
+      const acc = await prev;
+      return acc.concat(await item);
+    }, Promise.resolve([] as Array<DiffResult>)))
+    .map(item => ({...item, file: toAbsolute(item.file, workspace)}));
 };
 
 export const getDiffFiles = (diffs: FileResult[], filter: boolean): string => escape(diffs.filter(item => !filter || item.prefixMatched && item.suffixMatched).map(item => item.file)).join(getSeparator());
 export const sumResults   = (diffs: DiffResult[], map: (item: DiffResult) => number): number => getSummaryIncludeFilesFlag() ?
-	diffs.map(map).reduce((acc, val) => acc + val, 0) : // eslint-disable-line no-magic-numbers
-	diffs.filter(item => !item.filterIgnored).map(map).reduce((acc, val) => acc + val, 0); // eslint-disable-line no-magic-numbers
+  diffs.map(map).reduce((acc, val) => acc + val, 0) : // eslint-disable-line no-magic-numbers
+  diffs.filter(item => !item.filterIgnored).map(map).reduce((acc, val) => acc + val, 0); // eslint-disable-line no-magic-numbers
