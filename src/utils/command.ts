@@ -74,7 +74,6 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
 	await helper.fetchOrigin(Utils.getWorkspace(), context, [
 		'--no-tags',
 		'--no-recurse-submodules',
-		'--depth=3',
 	], Utils.uniqueArray(refs).map(ref => Utils.getRefspec(ref, REMOTE_NAME)));
 
 	return (await Utils.split((await command.execAsync({
