@@ -92,11 +92,11 @@ jobs:
    例：(default)
    ```yaml
    DOT: '...'
-   DIFF_FILTER: 'AM'
+   DIFF_FILTER: 'AMRC'
    ```
    =>
    ```shell script
-   git diff ${FROM}...${TO} '--diff-filter=AM' --name-only
+   git diff ${FROM}...${TO} '--diff-filter=AMRC' --name-only
    ```
    =>
    ```

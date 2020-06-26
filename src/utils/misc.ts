@@ -1,5 +1,5 @@
 import { Context } from '@actions/github/lib/context';
-import { Octokit } from '@octokit/rest';
+import { Octokit } from '@technote-space/github-action-helper/dist/types';
 import { Utils, ApiHelper } from '@technote-space/github-action-helper';
 import { PullRequestParams, DiffInfo } from '../types';
 

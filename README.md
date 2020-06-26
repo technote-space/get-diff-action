@@ -92,11 +92,11 @@ If there is no difference in the source code below, this workflow will skip the 
    e.g. (default)
    ```yaml
    DOT: '...'
-   DIFF_FILTER: 'AM'
+   DIFF_FILTER: 'AMRC'
    ```
    =>
    ```shell script
-   git diff ${FROM}...${TO} '--diff-filter=AM' --name-only
+   git diff ${FROM}...${TO} '--diff-filter=AMRC' --name-only
    ```
    =>
    ```
