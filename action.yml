@@ -16,7 +16,7 @@ inputs:
     required: true
   DIFF_FILTER:
     description: Diff filter.
-    default: 'AM'
+    default: 'AMR'
     required: true
   SEPARATOR:
     description: Separator of diffs.
