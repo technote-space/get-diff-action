@@ -178,7 +178,7 @@ describe('execute', () => {
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' > /dev/null 2>&1 || :',
       'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/pull/55/merge:refs/pull/55/merge\' \'refs/heads/master:refs/remotes/get-diff-action/master\' || :',
-      'git diff \'get-diff-action/master...pull/55/merge\' \'--diff-filter=AM\' --name-only || :',
+      'git diff \'get-diff-action/master...pull/55/merge\' \'--diff-filter=AMRC\' --name-only || :',
       'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'package.json\'',
       'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'abc/composer.json\'',
       'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'README.md\'',
@@ -187,7 +187,7 @@ describe('execute', () => {
     stdoutCalledWith(mockStdout, [
       '[command]git remote add get-diff-action',
       '[command]git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/pull/55/merge:refs/pull/55/merge\' \'refs/heads/master:refs/remotes/get-diff-action/master\'',
-      '[command]git diff \'get-diff-action/master...pull/55/merge\' \'--diff-filter=AM\' --name-only',
+      '[command]git diff \'get-diff-action/master...pull/55/merge\' \'--diff-filter=AMRC\' --name-only',
       '  >> package.json',
       '  >> abc/composer.json',
       '  >> README.md',
