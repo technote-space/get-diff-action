@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: technote-space/get-diff-action@v1
+      - uses: technote-space/get-diff-action@v2
         with:
           PREFIX_FILTER: |
             src
@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: technote-space/get-diff-action@v1
+      - uses: technote-space/get-diff-action@v2
         id: git_diff
         with:
           SUFFIX_FILTER: .php
