@@ -1,6 +1,6 @@
 {
   "name": "@technote-space/get-diff-action",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "GitHub actions to get git diff.",
   "author": {
     "name": "Technote",
