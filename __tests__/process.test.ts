@@ -10,6 +10,7 @@ import {
   execCalledWith,
   testFs,
   generateContext,
+  getLogStdout,
 } from '@technote-space/github-action-test-helper';
 import {Logger} from '@technote-space/github-action-helper';
 import {dumpDiffs, setResult, execute} from '../src/process';
@@ -79,35 +80,35 @@ describe('dumpDiffs', () => {
 
     stdoutCalledWith(mockStdout, [
       '::group::Dump diffs',
-      '[\n' +
-      '\t{\n' +
-      '\t\t"file": "test1",\n' +
-      '\t\t"insertions": 1,\n' +
-      '\t\t"deletions": 100,\n' +
-      '\t\t"lines": 101,\n' +
-      '\t\t"filterIgnored": false,\n' +
-      '\t\t"prefixMatched": true,\n' +
-      '\t\t"suffixMatched": true\n' +
-      '\t},\n' +
-      '\t{\n' +
-      '\t\t"file": "test2",\n' +
-      '\t\t"insertions": 2,\n' +
-      '\t\t"deletions": 200,\n' +
-      '\t\t"lines": 202,\n' +
-      '\t\t"filterIgnored": false,\n' +
-      '\t\t"prefixMatched": true,\n' +
-      '\t\t"suffixMatched": true\n' +
-      '\t},\n' +
-      '\t{\n' +
-      '\t\t"file": "test4",\n' +
-      '\t\t"insertions": 4,\n' +
-      '\t\t"deletions": 400,\n' +
-      '\t\t"lines": 404,\n' +
-      '\t\t"filterIgnored": true,\n' +
-      '\t\t"prefixMatched": true,\n' +
-      '\t\t"suffixMatched": false\n' +
-      '\t}\n' +
-      ']',
+      getLogStdout([
+        {
+          'file': 'test1',
+          'insertions': 1,
+          'deletions': 100,
+          'lines': 101,
+          'filterIgnored': false,
+          'prefixMatched': true,
+          'suffixMatched': true,
+        },
+        {
+          'file': 'test2',
+          'insertions': 2,
+          'deletions': 200,
+          'lines': 202,
+          'filterIgnored': false,
+          'prefixMatched': true,
+          'suffixMatched': true,
+        },
+        {
+          'file': 'test4',
+          'insertions': 4,
+          'deletions': 400,
+          'lines': 404,
+          'filterIgnored': true,
+          'prefixMatched': true,
+          'suffixMatched': false,
+        },
+      ]),
       '::endgroup::',
     ]);
   });
@@ -225,44 +226,44 @@ describe('execute', () => {
       '[command]git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'src/main.ts\'',
       '  >> 1 file changed, 25 insertions(+), 4 deletions(-)',
       '::group::Dump diffs',
-      '[\n' +
-      '\t{\n' +
-      '\t\t"file": "package.json",\n' +
-      '\t\t"filterIgnored": false,\n' +
-      '\t\t"prefixMatched": true,\n' +
-      '\t\t"suffixMatched": true,\n' +
-      '\t\t"insertions": 25,\n' +
-      '\t\t"deletions": 4,\n' +
-      '\t\t"lines": 29\n' +
-      '\t},\n' +
-      '\t{\n' +
-      '\t\t"file": "abc/composer.json",\n' +
-      '\t\t"filterIgnored": false,\n' +
-      '\t\t"prefixMatched": true,\n' +
-      '\t\t"suffixMatched": true,\n' +
-      '\t\t"insertions": 25,\n' +
-      '\t\t"deletions": 4,\n' +
-      '\t\t"lines": 29\n' +
-      '\t},\n' +
-      '\t{\n' +
-      '\t\t"file": "README.md",\n' +
-      '\t\t"filterIgnored": false,\n' +
-      '\t\t"prefixMatched": true,\n' +
-      '\t\t"suffixMatched": true,\n' +
-      '\t\t"insertions": 25,\n' +
-      '\t\t"deletions": 4,\n' +
-      '\t\t"lines": 29\n' +
-      '\t},\n' +
-      '\t{\n' +
-      '\t\t"file": "src/main.ts",\n' +
-      '\t\t"filterIgnored": false,\n' +
-      '\t\t"prefixMatched": true,\n' +
-      '\t\t"suffixMatched": true,\n' +
-      '\t\t"insertions": 25,\n' +
-      '\t\t"deletions": 4,\n' +
-      '\t\t"lines": 29\n' +
-      '\t}\n' +
-      ']',
+      getLogStdout([
+        {
+          'file': 'package.json',
+          'filterIgnored': false,
+          'prefixMatched': true,
+          'suffixMatched': true,
+          'insertions': 25,
+          'deletions': 4,
+          'lines': 29,
+        },
+        {
+          'file': 'abc/composer.json',
+          'filterIgnored': false,
+          'prefixMatched': true,
+          'suffixMatched': true,
+          'insertions': 25,
+          'deletions': 4,
+          'lines': 29,
+        },
+        {
+          'file': 'README.md',
+          'filterIgnored': false,
+          'prefixMatched': true,
+          'suffixMatched': true,
+          'insertions': 25,
+          'deletions': 4,
+          'lines': 29,
+        },
+        {
+          'file': 'src/main.ts',
+          'filterIgnored': false,
+          'prefixMatched': true,
+          'suffixMatched': true,
+          'insertions': 25,
+          'deletions': 4,
+          'lines': 29,
+        },
+      ]),
       '::endgroup::',
       '::group::Dump output',
       '::set-output name=diff::\'package.json\' \'abc/composer.json\' \'README.md\' \'src/main.ts\'',
