@@ -119,7 +119,7 @@ describe('setResult', () => {
   it('should set result', () => {
     const mockStdout = spyOnStdout();
 
-    setResult(diffs, logger);
+    setResult(diffs, false, logger);
 
     stdoutCalledWith(mockStdout, [
       '::group::Dump output',
@@ -149,7 +149,7 @@ describe('setResult', () => {
     process.env.INPUT_SET_ENV_NAME_LINES      = 'LINES';
     const mockStdout                          = spyOnStdout();
 
-    setResult(diffs, logger);
+    setResult(diffs, false, logger);
 
     stdoutCalledWith(mockStdout, [
       '::group::Dump output',
@@ -289,7 +289,7 @@ describe('execute', () => {
     const mockExec   = spyOnSpawn();
     const mockStdout = spyOnStdout();
 
-    await execute(logger, prContext, []);
+    await execute(logger, prContext, true);
 
     execCalledWith(mockExec, []);
     stdoutCalledWith(mockStdout, [
@@ -311,6 +311,44 @@ describe('execute', () => {
       '"deletions: 0"',
       '::set-output name=lines::0',
       '"lines: 0"',
+      '::endgroup::',
+    ]);
+  });
+
+  it('should execute empty with default value', async() => {
+    process.env.GITHUB_WORKSPACE            = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_DIFF_DEFAULT          = '1';
+    process.env.INPUT_FILTERED_DIFF_DEFAULT = '2';
+    process.env.INPUT_COUNT_DEFAULT         = '3';
+    process.env.INPUT_INSERTIONS_DEFAULT    = '4';
+    process.env.INPUT_DELETIONS_DEFAULT     = '5';
+    process.env.INPUT_LINES_DEFAULT         = '6';
+
+    const mockExec   = spyOnSpawn();
+    const mockStdout = spyOnStdout();
+
+    await execute(logger, prContext, true);
+
+    execCalledWith(mockExec, []);
+    stdoutCalledWith(mockStdout, [
+      '::group::Dump diffs',
+      '[]',
+      '::endgroup::',
+      '::group::Dump output',
+      '::set-output name=diff::1',
+      '::set-env name=GIT_DIFF::1',
+      '"diff: 1"',
+      '::set-output name=filtered_diff::2',
+      '::set-env name=GIT_DIFF_FILTERED::2',
+      '"filtered_diff: 2"',
+      '::set-output name=count::3',
+      '"count: 3"',
+      '::set-output name=insertions::4',
+      '"insertions: 4"',
+      '::set-output name=deletions::5',
+      '"deletions: 5"',
+      '::set-output name=lines::6',
+      '"lines: 6"',
       '::endgroup::',
     ]);
   });
