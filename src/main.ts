@@ -13,7 +13,7 @@ const run = async(): Promise<void> => {
 
   if (!isTargetEvent(TARGET_EVENTS, context)) {
     logger.info('This is not target event.');
-    await execute(logger, context, []);
+    await execute(logger, context, true);
     return;
   }
 

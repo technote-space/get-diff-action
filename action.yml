@@ -66,6 +66,29 @@ inputs:
     description: Env name (lines).
     required: false
 
+  DIFF_DEFAULT:
+    description: Default value (diff).
+    required: false
+  FILTERED_DIFF_DEFAULT:
+    description: Default value (filtered_diff).
+    required: false
+  COUNT_DEFAULT:
+    description: Default value (count).
+    default: '0'
+    required: false
+  INSERTIONS_DEFAULT:
+    description: Default value (insertions).
+    default: '0'
+    required: false
+  DELETIONS_DEFAULT:
+    description: Default value (deletions).
+    default: '0'
+    required: false
+  LINES_DEFAULT:
+    description: Default value (lines).
+    default: '0'
+    required: false
+
 outputs:
   diff:
     description: The results of diff file names.
