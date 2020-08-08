@@ -25,8 +25,16 @@ inputs:
   PREFIX_FILTER:
     description: Prefix filter.
     required: false
+  PREFIX_FILTER_FLAGS:
+    description: test
+    default: ''
+    required: false
   SUFFIX_FILTER:
     description: Suffix filter.
+    required: false
+  SUFFIX_FILTER_FLAGS:
+    description: test
+    default: 'i'
     required: false
   FILES:
     description: Specific files.
