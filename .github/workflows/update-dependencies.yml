@@ -19,7 +19,7 @@ jobs:
         run: echo "::set-env name=RUNNING::"
       - name: Set running flag
         run: echo "::set-env name=RUNNING::1"
-        if: github.event.pull_request.head.user.id == github.event.pull_request.base.user.id)
+        if: github.event.pull_request.head.user.id == github.event.pull_request.base.user.id
       - uses: technote-space/load-config-action@v1
         if: env.RUNNING
         with:
