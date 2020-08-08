@@ -1,6 +1,6 @@
 /* eslint-disable no-magic-numbers */
 import nock from 'nock';
-import path, { resolve } from 'path';
+import path, {resolve} from 'path';
 import {
   generateContext,
   testEnv,
@@ -12,8 +12,8 @@ import {
   disableNetConnect,
   getApiFixture,
 } from '@technote-space/github-action-test-helper';
-import { Logger } from '@technote-space/github-action-helper';
-import { getGitDiff, getFileDiff, getDiffFiles, sumResults } from '../../src/utils/command';
+import {Logger} from '@technote-space/github-action-helper';
+import {getGitDiff, getFileDiff, getDiffFiles, sumResults} from '../../src/utils/command';
 
 const rootDir           = path.resolve(__dirname, '../..');
 const fixtureRootDir    = resolve(__dirname, '..', 'fixtures');
@@ -21,7 +21,15 @@ const defaultFileResult = {filterIgnored: false, prefixMatched: true, suffixMatc
 const diffs             = [
   {file: 'test1', insertions: 1, deletions: 100, lines: 101, ...defaultFileResult},
   {file: 'test2', insertions: 2, deletions: 200, lines: 202, ...defaultFileResult},
-  {file: 'test4', insertions: 4, deletions: 400, lines: 404, filterIgnored: true, prefixMatched: true, suffixMatched: false},
+  {
+    file: 'test4',
+    insertions: 4,
+    deletions: 400,
+    lines: 404,
+    filterIgnored: true,
+    prefixMatched: true,
+    suffixMatched: false,
+  },
 ];
 const emptyDiff         = {insertions: 0, deletions: 0, lines: 0, ...defaultFileResult};
 const logger            = new Logger();
@@ -73,14 +81,15 @@ describe('getGitDiff', () => {
   disableNetConnect(nock);
 
   it('should get git diff (pull request)', async() => {
-    process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
-    process.env.INPUT_GITHUB_TOKEN = 'test token';
+    process.env.GITHUB_WORKSPACE    = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN  = 'test token';
+    process.env.INPUT_SUFFIX_FILTER = 'json\nmd\nts';
 
     const mockExec = spyOnSpawn();
     setChildProcessParams({
       stdout: (command: string): string => {
         if (command.startsWith('git diff')) {
-          return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
+          return 'package.json\nabc/composer.JSON\nREADME.md\nsrc/main.ts';
         }
         return '';
       },
@@ -88,7 +97,7 @@ describe('getGitDiff', () => {
 
     expect(await getGitDiff(logger, prContext)).toEqual([
       {file: 'package.json', ...emptyDiff},
-      {file: 'abc/composer.json', ...emptyDiff},
+      {file: 'abc/composer.JSON', ...emptyDiff},
       {file: 'README.md', ...emptyDiff},
       {file: 'src/main.ts', ...emptyDiff},
     ]);
@@ -97,21 +106,23 @@ describe('getGitDiff', () => {
       'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/pull/55/merge:refs/pull/55/merge\' \'refs/heads/master:refs/remotes/get-diff-action/master\' || :',
       'git diff \'get-diff-action/master...pull/55/merge\' \'--diff-filter=AMRC\' --name-only || :',
       'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'package.json\'',
-      'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'abc/composer.json\'',
+      'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'abc/composer.JSON\'',
       'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'README.md\'',
       'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'src/main.ts\'',
     ]);
   });
 
   it('should get git diff (pull request closed)', async() => {
-    process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
-    process.env.INPUT_GITHUB_TOKEN = 'test token';
+    process.env.GITHUB_WORKSPACE          = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN        = 'test token';
+    process.env.INPUT_SUFFIX_FILTER       = 'json\nmd\nts';
+    process.env.INPUT_SUFFIX_FILTER_FLAGS = '';
 
     const mockExec = spyOnSpawn();
     setChildProcessParams({
       stdout: (command: string): string => {
         if (command.startsWith('git diff')) {
-          return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
+          return 'package.json\nabc/composer.JSON\nREADME.md\nsrc/main.ts';
         }
         return '';
       },
@@ -144,7 +155,6 @@ describe('getGitDiff', () => {
       },
     }))).toEqual([
       {file: 'package.json', ...emptyDiff},
-      {file: 'abc/composer.json', ...emptyDiff},
       {file: 'README.md', ...emptyDiff},
       {file: 'src/main.ts', ...emptyDiff},
     ]);
@@ -153,7 +163,6 @@ describe('getGitDiff', () => {
       'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/heads/master:refs/remotes/get-diff-action/master\' || :',
       'git diff \'base-sha...sha\' \'--diff-filter=AMRC\' --name-only || :',
       'git diff \'base-sha...sha\' --shortstat -w \'package.json\'',
-      'git diff \'base-sha...sha\' --shortstat -w \'abc/composer.json\'',
       'git diff \'base-sha...sha\' --shortstat -w \'README.md\'',
       'git diff \'base-sha...sha\' --shortstat -w \'src/main.ts\'',
     ]);
@@ -357,8 +366,18 @@ describe('getGitDiff', () => {
     });
 
     expect(await getGitDiff(logger, prContext)).toEqual([
-      {file: process.env.GITHUB_WORKSPACE + '/package.json', ...emptyDiff, filterIgnored: true, prefixMatched: false, suffixMatched: false},
-      {file: process.env.GITHUB_WORKSPACE + '/abc/composer.json', ...emptyDiff, filterIgnored: true, prefixMatched: false, suffixMatched: false},
+      {
+        file: process.env.GITHUB_WORKSPACE + '/package.json', ...emptyDiff,
+        filterIgnored: true,
+        prefixMatched: false,
+        suffixMatched: false,
+      },
+      {
+        file: process.env.GITHUB_WORKSPACE + '/abc/composer.json', ...emptyDiff,
+        filterIgnored: true,
+        prefixMatched: false,
+        suffixMatched: false,
+      },
       {file: process.env.GITHUB_WORKSPACE + '/src/main.ts', ...emptyDiff},
       {file: process.env.GITHUB_WORKSPACE + '/src/test/test2.txt', ...emptyDiff},
       {file: process.env.GITHUB_WORKSPACE + '/__tests__/main.test.ts', ...emptyDiff},
@@ -383,7 +402,10 @@ describe('getFileDiff', () => {
       stdout: '1 file changed, 25 insertions(+), 4 deletions(-)',
     });
 
-    const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'refs/heads/master', head: 'refs/pull/123/merge'}, '...');
+    const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {
+      base: 'refs/heads/master',
+      head: 'refs/pull/123/merge',
+    }, '...');
 
     expect(diff.insertions).toBe(25);
     expect(diff.deletions).toBe(4);
@@ -400,7 +422,10 @@ describe('getFileDiff', () => {
       stdout: '1 file changed, 1 insertion(+), 3 deletions(-)',
     });
 
-    const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'refs/heads/master', head: 'refs/pull/123/merge'}, '...');
+    const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {
+      base: 'refs/heads/master',
+      head: 'refs/pull/123/merge',
+    }, '...');
 
     expect(diff.insertions).toBe(1);
     expect(diff.deletions).toBe(3);
@@ -417,7 +442,10 @@ describe('getFileDiff', () => {
       stdout: '1 file changed, 3 insertions(+)',
     });
 
-    const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'refs/heads/master', head: 'refs/pull/123/merge'}, '...');
+    const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {
+      base: 'refs/heads/master',
+      head: 'refs/pull/123/merge',
+    }, '...');
 
     expect(diff.insertions).toBe(3);
     expect(diff.deletions).toBe(0);
@@ -434,7 +462,10 @@ describe('getFileDiff', () => {
       stdout: '',
     });
 
-    const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {base: 'refs/heads/master', head: 'refs/pull/123/merge'}, '...');
+    const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {
+      base: 'refs/heads/master',
+      head: 'refs/pull/123/merge',
+    }, '...');
 
     expect(diff.insertions).toBe(0);
     expect(diff.deletions).toBe(0);
@@ -477,8 +508,14 @@ describe('getDiffFiles', () => {
   it('get git diff output 4', () => {
     expect(getDiffFiles([], true)).toEqual('');
     expect(getDiffFiles([{file: 'test1', ...defaultFileResult, prefixMatched: false}], true)).toEqual('');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult, prefixMatched: false}, {file: 'test2', ...defaultFileResult}], true)).toEqual('test2');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult, prefixMatched: false}, {file: 'test2 test3', ...defaultFileResult}], true)).toEqual('\'test2 test3\'');
+    expect(getDiffFiles([{
+      file: 'test1', ...defaultFileResult,
+      prefixMatched: false,
+    }, {file: 'test2', ...defaultFileResult}], true)).toEqual('test2');
+    expect(getDiffFiles([{
+      file: 'test1', ...defaultFileResult,
+      prefixMatched: false,
+    }, {file: 'test2 test3', ...defaultFileResult}], true)).toEqual('\'test2 test3\'');
   });
 });
 
