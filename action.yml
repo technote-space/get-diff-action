@@ -26,14 +26,14 @@ inputs:
     description: Prefix filter.
     required: false
   PREFIX_FILTER_FLAGS:
-    description: test
+    description: RegExp flags of prefix filter.
     default: ''
     required: false
   SUFFIX_FILTER:
     description: Suffix filter.
     required: false
   SUFFIX_FILTER_FLAGS:
-    description: test
+    description: RegExp flags of suffix filter.
     default: 'i'
     required: false
   FILES:
