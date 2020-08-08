@@ -1,8 +1,8 @@
-import { exportVariable, getInput, setOutput } from '@actions/core' ;
-import { Context } from '@actions/github/lib/context';
-import { Logger } from '@technote-space/github-action-helper';
-import { getGitDiff, getDiffFiles, sumResults } from './utils/command';
-import { DiffResult } from './types';
+import {exportVariable, getInput, setOutput} from '@actions/core' ;
+import {Context} from '@actions/github/lib/context';
+import {Logger} from '@technote-space/github-action-helper';
+import {getGitDiff, getDiffFiles, sumResults} from './utils/command';
+import {DiffResult} from './types';
 
 export const dumpDiffs = (diffs: DiffResult[], logger: Logger): void => {
   logger.startProcess('Dump diffs');

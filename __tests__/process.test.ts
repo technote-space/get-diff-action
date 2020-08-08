@@ -11,14 +11,38 @@ import {
   testFs,
   generateContext,
 } from '@technote-space/github-action-test-helper';
-import { Logger } from '@technote-space/github-action-helper';
-import { dumpDiffs, setResult, execute } from '../src/process';
+import {Logger} from '@technote-space/github-action-helper';
+import {dumpDiffs, setResult, execute} from '../src/process';
 
 const rootDir   = path.resolve(__dirname, '..');
 const diffs     = [
-  {file: 'test1', insertions: 1, deletions: 100, lines: 101, filterIgnored: false, prefixMatched: true, suffixMatched: true},
-  {file: 'test2', insertions: 2, deletions: 200, lines: 202, filterIgnored: false, prefixMatched: true, suffixMatched: true},
-  {file: 'test4', insertions: 4, deletions: 400, lines: 404, filterIgnored: true, prefixMatched: true, suffixMatched: false},
+  {
+    file: 'test1',
+    insertions: 1,
+    deletions: 100,
+    lines: 101,
+    filterIgnored: false,
+    prefixMatched: true,
+    suffixMatched: true,
+  },
+  {
+    file: 'test2',
+    insertions: 2,
+    deletions: 200,
+    lines: 202,
+    filterIgnored: false,
+    prefixMatched: true,
+    suffixMatched: true,
+  },
+  {
+    file: 'test4',
+    insertions: 4,
+    deletions: 400,
+    lines: 404,
+    filterIgnored: true,
+    prefixMatched: true,
+    suffixMatched: false,
+  },
 ];
 const setExists = testFs(true);
 const logger    = new Logger();

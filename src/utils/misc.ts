@@ -1,7 +1,7 @@
-import { Context } from '@actions/github/lib/context';
-import { Octokit } from '@technote-space/github-action-helper/dist/types';
-import { Utils, ApiHelper } from '@technote-space/github-action-helper';
-import { PullRequestParams, DiffInfo } from '../types';
+import {Context} from '@actions/github/lib/context';
+import {Octokit} from '@technote-space/github-action-helper/dist/types';
+import {Utils, ApiHelper} from '@technote-space/github-action-helper';
+import {PullRequestParams, DiffInfo} from '../types';
 
 export const escape = (items: string[]): string[] => items.map(item => {
   // eslint-disable-next-line no-useless-escape
