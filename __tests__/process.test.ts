@@ -283,6 +283,62 @@ describe('execute', () => {
     ]);
   });
 
+  it('should execute (no diff)', async() => {
+    process.env.GITHUB_WORKSPACE    = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN  = 'test token';
+    process.env.INPUT_PREFIX_FILTER = 'test/';
+
+    const mockExec   = spyOnSpawn();
+    const mockStdout = spyOnStdout();
+    setChildProcessParams({
+      stdout: (command: string): string => {
+        if (command.startsWith('git diff')) {
+          if (command.includes('shortstat')) {
+            return '1 file changed, 25 insertions(+), 4 deletions(-)';
+          }
+          return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
+        }
+        return '';
+      },
+    });
+
+    await execute(logger, prContext);
+
+    execCalledWith(mockExec, [
+      'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' > /dev/null 2>&1 || :',
+      'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/pull/55/merge:refs/pull/55/merge\' \'refs/heads/master:refs/remotes/get-diff-action/master\' || :',
+      'git diff \'get-diff-action/master...pull/55/merge\' \'--diff-filter=AMRC\' --name-only || :',
+    ]);
+    stdoutCalledWith(mockStdout, [
+      '[command]git remote add get-diff-action',
+      '[command]git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/pull/55/merge:refs/pull/55/merge\' \'refs/heads/master:refs/remotes/get-diff-action/master\'',
+      '[command]git diff \'get-diff-action/master...pull/55/merge\' \'--diff-filter=AMRC\' --name-only',
+      '  >> package.json',
+      '  >> abc/composer.json',
+      '  >> README.md',
+      '  >> src/main.ts',
+      '::group::Dump diffs',
+      '[]',
+      '::endgroup::',
+      '::group::Dump output',
+      '::set-output name=diff::',
+      '::set-env name=GIT_DIFF::',
+      '"diff: "',
+      '::set-output name=filtered_diff::',
+      '::set-env name=GIT_DIFF_FILTERED::',
+      '"filtered_diff: "',
+      '::set-output name=count::0',
+      '"count: 0"',
+      '::set-output name=insertions::0',
+      '"insertions: 0"',
+      '::set-output name=deletions::0',
+      '"deletions: 0"',
+      '::set-output name=lines::0',
+      '"lines: 0"',
+      '::endgroup::',
+    ]);
+  });
+
   it('should execute empty', async() => {
     process.env.GITHUB_WORKSPACE = '/home/runner/work/my-repo-name/my-repo-name';
 
