@@ -65,7 +65,6 @@ inputs:
   SET_ENV_NAME_LINES:
     description: Env name (lines).
     required: false
-
   DIFF_DEFAULT:
     description: Default value (diff).
     required: false
