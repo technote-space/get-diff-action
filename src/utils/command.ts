@@ -13,12 +13,14 @@ const getFilter                  = (): string => getInput('DIFF_FILTER', {requir
 const getSeparator               = (): string => getRawInput('SEPARATOR');
 const getPrefix                  = (): string[] => Utils.getArrayInput('PREFIX_FILTER', undefined, '');
 const getSuffix                  = (): string[] => Utils.getArrayInput('SUFFIX_FILTER', undefined, '');
+const getPrefixRegExpFlags       = (): string => getInput('PREFIX_FILTER_FLAGS') || '';
+const getSuffixRegExpFlags       = (): string => getInput('SUFFIX_FILTER_FLAGS') || '';
 const getFiles                   = (): string[] => Utils.getArrayInput('FILES', undefined, '');
 const getWorkspace               = (): string => Utils.getBoolValue(getInput('ABSOLUTE')) ? (Utils.getWorkspace() + '/') : '';
 const getSummaryIncludeFilesFlag = (): boolean => Utils.getBoolValue(getInput('SUMMARY_INCLUDE_FILES'));
 const isFilterIgnored            = (item: string, files: string[]): boolean => !!(files.length && files.includes(path.basename(item)));
-const isPrefixMatched            = (item: string, prefix: string[]): boolean => !prefix.length || !prefix.every(prefix => !Utils.getPrefixRegExp(prefix).test(item));
-const isSuffixMatched            = (item: string, suffix: string[]): boolean => !suffix.length || !suffix.every(suffix => !Utils.getSuffixRegExp(suffix).test(item));
+const isPrefixMatched            = (item: string, prefix: string[]): boolean => !prefix.length || !prefix.every(prefix => !Utils.getPrefixRegExp(prefix, getPrefixRegExpFlags()).test(item));
+const isSuffixMatched            = (item: string, suffix: string[]): boolean => !suffix.length || !suffix.every(suffix => !Utils.getSuffixRegExp(suffix, getSuffixRegExpFlags()).test(item));
 const toAbsolute                 = (item: string, workspace: string): string => workspace + item;
 
 const getCompareRef = (ref: string): string => Utils.isRef(ref) ? Utils.getLocalRefspec(ref, REMOTE_NAME) : ref;

@@ -81,14 +81,15 @@ describe('getGitDiff', () => {
   disableNetConnect(nock);
 
   it('should get git diff (pull request)', async() => {
-    process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
-    process.env.INPUT_GITHUB_TOKEN = 'test token';
+    process.env.GITHUB_WORKSPACE    = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN  = 'test token';
+    process.env.INPUT_SUFFIX_FILTER = 'json\nmd\nts';
 
     const mockExec = spyOnSpawn();
     setChildProcessParams({
       stdout: (command: string): string => {
         if (command.startsWith('git diff')) {
-          return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
+          return 'package.json\nabc/composer.JSON\nREADME.md\nsrc/main.ts';
         }
         return '';
       },
@@ -96,7 +97,7 @@ describe('getGitDiff', () => {
 
     expect(await getGitDiff(logger, prContext)).toEqual([
       {file: 'package.json', ...emptyDiff},
-      {file: 'abc/composer.json', ...emptyDiff},
+      {file: 'abc/composer.JSON', ...emptyDiff},
       {file: 'README.md', ...emptyDiff},
       {file: 'src/main.ts', ...emptyDiff},
     ]);
@@ -105,21 +106,23 @@ describe('getGitDiff', () => {
       'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/pull/55/merge:refs/pull/55/merge\' \'refs/heads/master:refs/remotes/get-diff-action/master\' || :',
       'git diff \'get-diff-action/master...pull/55/merge\' \'--diff-filter=AMRC\' --name-only || :',
       'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'package.json\'',
-      'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'abc/composer.json\'',
+      'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'abc/composer.JSON\'',
       'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'README.md\'',
       'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'src/main.ts\'',
     ]);
   });
 
   it('should get git diff (pull request closed)', async() => {
-    process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
-    process.env.INPUT_GITHUB_TOKEN = 'test token';
+    process.env.GITHUB_WORKSPACE          = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN        = 'test token';
+    process.env.INPUT_SUFFIX_FILTER       = 'json\nmd\nts';
+    process.env.INPUT_SUFFIX_FILTER_FLAGS = '';
 
     const mockExec = spyOnSpawn();
     setChildProcessParams({
       stdout: (command: string): string => {
         if (command.startsWith('git diff')) {
-          return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
+          return 'package.json\nabc/composer.JSON\nREADME.md\nsrc/main.ts';
         }
         return '';
       },
@@ -152,7 +155,6 @@ describe('getGitDiff', () => {
       },
     }))).toEqual([
       {file: 'package.json', ...emptyDiff},
-      {file: 'abc/composer.json', ...emptyDiff},
       {file: 'README.md', ...emptyDiff},
       {file: 'src/main.ts', ...emptyDiff},
     ]);
@@ -161,7 +163,6 @@ describe('getGitDiff', () => {
       'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/heads/master:refs/remotes/get-diff-action/master\' || :',
       'git diff \'base-sha...sha\' \'--diff-filter=AMRC\' --name-only || :',
       'git diff \'base-sha...sha\' --shortstat -w \'package.json\'',
-      'git diff \'base-sha...sha\' --shortstat -w \'abc/composer.json\'',
       'git diff \'base-sha...sha\' --shortstat -w \'README.md\'',
       'git diff \'base-sha...sha\' --shortstat -w \'src/main.ts\'',
     ]);
