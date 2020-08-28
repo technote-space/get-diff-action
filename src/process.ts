@@ -1,7 +1,7 @@
 import {exportVariable, getInput, setOutput} from '@actions/core' ;
 import {Context} from '@actions/github/lib/context';
 import {Logger} from '@technote-space/github-action-helper';
-import {getGitDiff, getDiffFiles, sumResults} from './utils/command';
+import {getGitDiff, getDiffFiles, getMatchedFiles, sumResults} from './utils/command';
 import {DiffResult} from './types';
 
 export const dumpDiffs = (diffs: DiffResult[], logger: Logger): void => {
@@ -13,10 +13,11 @@ export const dumpDiffs = (diffs: DiffResult[], logger: Logger): void => {
 export const setResult = (diffs: DiffResult[], skipped: boolean, logger: Logger): void => {
   const insertions = sumResults(diffs, item => item.insertions);
   const deletions  = sumResults(diffs, item => item.deletions);
-  const getValue   = (setting): string => skipped ? getInput(`${setting.name.toUpperCase()}_DEFAULT`) : setting.value();
+  const getValue   = (setting: { name: string, value: () => number | string }): string => skipped ? getInput(`${setting.name.toUpperCase()}_DEFAULT`) : `${setting.value()}`;
   const settings   = [
     {name: 'diff', value: () => getDiffFiles(diffs, false), envNameSuffix: ''},
     {name: 'filtered_diff', value: () => getDiffFiles(diffs, true)},
+    {name: 'matched_files', value: () => getMatchedFiles(diffs)},
     {name: 'count', value: () => diffs.length},
     {name: 'insertions', value: () => insertions},
     {name: 'deletions', value: () => deletions},

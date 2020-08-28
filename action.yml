@@ -53,6 +53,10 @@ inputs:
     description: Env name (filtered_diff).
     default: GIT_DIFF_FILTERED
     required: false
+  SET_ENV_NAME_MATCHED_FILES:
+    description: Env name (matched_files).
+    default: MATCHED_FILES
+    required: false
   SET_ENV_NAME_COUNT:
     description: Env name (count).
     required: false
@@ -70,6 +74,9 @@ inputs:
     required: false
   FILTERED_DIFF_DEFAULT:
     description: Default value (filtered_diff).
+    required: false
+  MATCHED_FILES_DEFAULT:
+    description: Default value (matched_files).
     required: false
   COUNT_DEFAULT:
     description: Default value (count).

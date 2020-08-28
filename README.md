@@ -18,6 +18,9 @@ GitHub actions to get git diff.
 
 - [Screenshots](#screenshots)
 - [Usage](#usage)
+  - [Example of matching files](#example-of-matching-files)
+  - [Examples of non-matching files](#examples-of-non-matching-files)
+  - [Examples of env](#examples-of-env)
 - [Behavior](#behavior)
 - [Outputs](#outputs)
 - [Action event details](#action-event-details)
@@ -30,12 +33,15 @@ GitHub actions to get git diff.
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Screenshots
-1. Example workflow  
+1. Example workflow
+
    ![Example workflow](https://raw.githubusercontent.com/technote-space/get-diff-action/images/workflow.png)
-1. Skip  
+1. Skip
+
    ![Skip](https://raw.githubusercontent.com/technote-space/get-diff-action/images/skip.png)
 
 ## Usage
+Basic Usage
 ```yaml
 on: pull_request
 name: CI
@@ -51,31 +57,66 @@ jobs:
             src
             __tests__
           SUFFIX_FILTER: .ts
+          FILES: |
+            yarn.lock
+            .eslintrc
       - name: Install Package dependencies
         run: yarn install
         if: env.GIT_DIFF
       - name: Check code style
-        # Check only the source codes that have differences
-        run: yarn eslint ${{ env.GIT_DIFF }}
+        # Check only if there are differences in the source code
+        run: yarn lint
         if: env.GIT_DIFF
+```
+### Example of matching files
+- src/main.ts
+- src/utils/abc.ts
+- __tests__/test.ts
+- yarn.lock
+- .eslintrc
+- anywhere/yarn.lock
 
-  phpmd:
-    name: PHPMD
+### Examples of non-matching files
+- main.ts
+- src/xyz.txt
+
+### Examples of env
+| name | value |
+|:---:|:---|
+| `GIT_DIFF` |`'src/main.ts' 'src/utils/abc.ts' '__tests__/test.ts' 'yarn.lock' '.eslintrc' 'anywhere/yarn.lock'` |
+| `GIT_DIFF_FILTERED` | `'src/main.ts' 'src/utils/abc.ts' '__tests__/test.ts'` |
+| `MATCHED_FILES` | `'yarn.lock' '.eslintrc' 'anywhere/yarn.lock'` |
+
+Specify a little more detail
+```yaml
+on: pull_request
+name: CI
+jobs:
+  eslint:
+    name: ESLint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v3
-        id: git_diff
         with:
-          SUFFIX_FILTER: .php
-          SEPARATOR: ','
-      - name: Install composer
-        run: composer install
-        if: steps.git_diff.outputs.diff
+          PREFIX_FILTER: |
+            src
+            __tests__
+          SUFFIX_FILTER: .ts
+          FILES: |
+            yarn.lock
+            .eslintrc
+      - name: Install Package dependencies
+        run: yarn install
+        if: env.GIT_DIFF
       - name: Check code style
-        # Check only the source codes that have differences
-        run: vendor/bin/phpmd ${{ steps.git_diff.outputs.diff }} ansi phpmd.xml
-        if: steps.git_diff.outputs.diff
+        # Check only source files with differences
+        run: yarn eslint ${{ env.GIT_DIFF_FILTERED }}  # e.g. yarn eslint 'src/main.ts' '__tests__/test.ts'
+        if: env.GIT_DIFF && !env.MATCHED_FILES
+      - name: Check code style
+        # Check only if there are differences in the source code (Run a lint on all files if there are changes to yarn.lock or .eslintrc)
+        run: yarn lint
+        if: env.GIT_DIFF && env.MATCHED_FILES
 ```
 
 If there is no difference in the source code below, this workflow will skip the code style check
@@ -107,7 +148,7 @@ If there is no difference in the source code below, this workflow will skip the 
    src/utils/command.ts
    yarn.lock
    ```
-   
+
    [${FROM}, ${TO}](#from-to)
 
 1. Filtered by `PREFIX_FILTER` or `SUFFIX_FILTER` option
@@ -123,9 +164,21 @@ If there is no difference in the source code below, this workflow will skip the 
    src/utils/command.ts
    ```
 
+1. Filtered by `FILES` option
+
+   e.g.
+   ```yaml
+   FILES: package.json
+   ```
+   =>
+   ```
+   package.json
+   anywhere/package.json
+   ```
+
 1. Mapped to absolute if `ABSOLUTE` option is true (default: false)
 
-   e.g. 
+   e.g.
    ```
    /home/runner/work/my-repo-name/my-repo-name/src/main.ts
    /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
@@ -171,5 +224,6 @@ If called on any other event, the result will be empty.
 | else | context.payload.before | context.payload.after |
 
 ## Author
-[GitHub (Technote)](https://github.com/technote-space)  
+[GitHub (Technote)](https://github.com/technote-space)
+
 [Blog](https://technote.space)
