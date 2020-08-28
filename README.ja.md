@@ -18,6 +18,9 @@
 
 - [スクリーンショット](#%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88)
 - [使用方法](#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95)
+  - [マッチするファイルの例](#%E3%83%9E%E3%83%83%E3%83%81%E3%81%99%E3%82%8B%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E4%BE%8B)
+  - [マッチしないファイルの例](#%E3%83%9E%E3%83%83%E3%83%81%E3%81%97%E3%81%AA%E3%81%84%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E4%BE%8B)
+  - [envの例](#env%E3%81%AE%E4%BE%8B)
 - [動作](#%E5%8B%95%E4%BD%9C)
 - [出力](#%E5%87%BA%E5%8A%9B)
 - [Action イベント詳細](#action-%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E8%A9%B3%E7%B4%B0)
@@ -38,6 +41,7 @@
    ![Skip](https://raw.githubusercontent.com/technote-space/get-diff-action/images/skip.png)
 
 ## 使用方法
+基本的な使い方
 ```yaml
 on: pull_request
 name: CI
@@ -55,7 +59,7 @@ jobs:
           SUFFIX_FILTER: .ts
           FILES: |
             yarn.lock
-            package.json
+            .eslintrc
       - name: Install Package dependencies
         run: yarn install
         if: env.GIT_DIFF
@@ -63,24 +67,56 @@ jobs:
         # 差分がある場合だけチェック
         run: yarn eslint ${{ env.GIT_DIFF }}
         if: env.GIT_DIFF
+```
+### マッチするファイルの例
+- src/main.ts
+- src/utils/abc.ts
+- __tests__/test.ts
+- yarn.lock
+- .eslintrc
+- anywhere/yarn.lock
 
-  phpmd:
-    name: PHPMD
+### マッチしないファイルの例
+- main.ts
+- src/xyz.txt
+
+### envの例
+| name | value |
+|:---:|:---|
+| `GIT_DIFF` |`'src/main.ts' 'src/utils/abc.ts' '__tests__/test.ts' 'yarn.lock' '.eslintrc' 'anywhere/yarn.lock'` |
+| `GIT_DIFF_FILTERED` | `'src/main.ts' 'src/utils/abc.ts' '__tests__/test.ts'` |
+| `MATCHED_FILES` | `'yarn.lock' '.eslintrc' 'anywhere/yarn.lock'` |
+
+もう少し細かく動作を指定
+```yaml
+on: pull_request
+name: CI
+jobs:
+  eslint:
+    name: ESLint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v3
-        id: git_diff
         with:
-          SUFFIX_FILTER: .php
-          SEPARATOR: ','
-      - name: Install composer
-        run: composer install
-        if: steps.git_diff.outputs.diff
+          PREFIX_FILTER: |
+            src
+            __tests__
+          SUFFIX_FILTER: .ts
+          FILES: |
+            yarn.lock
+            .eslintrc
+      - name: Install Package dependencies
+        run: yarn install
+        if: env.GIT_DIFF
       - name: Check code style
-        # 差分があるソースコードだけチェック
-        run: vendor/bin/phpmd ${{ steps.git_diff.outputs.diff }} ansi phpmd.xml
-        if: steps.git_diff.outputs.diff
+        # 差分があるソースファイルだけチェック
+        run: yarn eslint ${{ env.GIT_DIFF_FILTERED }}  # e.g. yarn eslint 'src/main.ts' '__tests__/test.ts'
+        if: env.GIT_DIFF && !env.MATCHED_FILES
+      - name: Check code style
+        # 差分がある場合だけチェック (yarn.lock か .eslintrc に変更があった場合はすべてでlintを実行)
+        run: yarn lint
+        if: env.GIT_DIFF && env.MATCHED_FILES
 ```
 
 以下のソースコードに差分がない場合、この Workflow はコードのスタイルチェックをスキップします。
