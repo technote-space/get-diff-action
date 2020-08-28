@@ -30,9 +30,11 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## スクリーンショット
-1. Workflow の例  
+1. Workflow の例
+
    ![Example workflow](https://raw.githubusercontent.com/technote-space/get-diff-action/images/workflow.png)
-1. スキップ  
+1. スキップ
+
    ![Skip](https://raw.githubusercontent.com/technote-space/get-diff-action/images/skip.png)
 
 ## 使用方法
@@ -51,11 +53,14 @@ jobs:
             src
             __tests__
           SUFFIX_FILTER: .ts
+          FILES: |
+            yarn.lock
+            package.json
       - name: Install Package dependencies
         run: yarn install
         if: env.GIT_DIFF
       - name: Check code style
-        # 差分があるソースコードだけチェック
+        # 差分がある場合だけチェック
         run: yarn eslint ${{ env.GIT_DIFF }}
         if: env.GIT_DIFF
 
@@ -123,6 +128,18 @@ jobs:
    src/utils/command.ts
    ```
 
+1. `FILES` オプションによるフィルタ
+
+   e.g.
+   ```yaml
+   FILES: package.json
+   ```
+   =>
+   ```
+   package.json
+   anywhere/package.json
+   ```
+
 1. `ABSOLUTE` オプションがtrue場合に絶対パスに変換 (default: false)
 
    例：
@@ -171,5 +188,6 @@ jobs:
 | else | context.payload.before | context.payload.after |
 
 ## Author
-[GitHub (Technote)](https://github.com/technote-space)  
+[GitHub (Technote)](https://github.com/technote-space)
+
 [Blog](https://technote.space)

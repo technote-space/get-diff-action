@@ -30,9 +30,11 @@ GitHub actions to get git diff.
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Screenshots
-1. Example workflow  
+1. Example workflow
+
    ![Example workflow](https://raw.githubusercontent.com/technote-space/get-diff-action/images/workflow.png)
-1. Skip  
+1. Skip
+
    ![Skip](https://raw.githubusercontent.com/technote-space/get-diff-action/images/skip.png)
 
 ## Usage
@@ -51,12 +53,15 @@ jobs:
             src
             __tests__
           SUFFIX_FILTER: .ts
+          FILES: |
+            yarn.lock
+            package.json
       - name: Install Package dependencies
         run: yarn install
         if: env.GIT_DIFF
       - name: Check code style
-        # Check only the source codes that have differences
-        run: yarn eslint ${{ env.GIT_DIFF }}
+        # Check only if there are differences in the source code
+        run: yarn lint
         if: env.GIT_DIFF
 
   phpmd:
@@ -73,7 +78,7 @@ jobs:
         run: composer install
         if: steps.git_diff.outputs.diff
       - name: Check code style
-        # Check only the source codes that have differences
+        # Check only the source code where there is a difference
         run: vendor/bin/phpmd ${{ steps.git_diff.outputs.diff }} ansi phpmd.xml
         if: steps.git_diff.outputs.diff
 ```
@@ -107,7 +112,7 @@ If there is no difference in the source code below, this workflow will skip the 
    src/utils/command.ts
    yarn.lock
    ```
-   
+
    [${FROM}, ${TO}](#from-to)
 
 1. Filtered by `PREFIX_FILTER` or `SUFFIX_FILTER` option
@@ -123,9 +128,21 @@ If there is no difference in the source code below, this workflow will skip the 
    src/utils/command.ts
    ```
 
+1. Filtered by `FILES` option
+
+   e.g.
+   ```yaml
+   FILES: package.json
+   ```
+   =>
+   ```
+   package.json
+   anywhere/package.json
+   ```
+
 1. Mapped to absolute if `ABSOLUTE` option is true (default: false)
 
-   e.g. 
+   e.g.
    ```
    /home/runner/work/my-repo-name/my-repo-name/src/main.ts
    /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
@@ -171,5 +188,6 @@ If called on any other event, the result will be empty.
 | else | context.payload.before | context.payload.after |
 
 ## Author
-[GitHub (Technote)](https://github.com/technote-space)  
+[GitHub (Technote)](https://github.com/technote-space)
+
 [Blog](https://technote.space)
