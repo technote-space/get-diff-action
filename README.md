@@ -18,6 +18,9 @@ GitHub actions to get git diff.
 
 - [Screenshots](#screenshots)
 - [Usage](#usage)
+  - [Example of matching files](#example-of-matching-files)
+  - [Examples of non-matching files](#examples-of-non-matching-files)
+  - [Examples of env](#examples-of-env)
 - [Behavior](#behavior)
 - [Outputs](#outputs)
 - [Action event details](#action-event-details)
