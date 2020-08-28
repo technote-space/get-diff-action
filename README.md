@@ -31,8 +31,10 @@ GitHub actions to get git diff.
 
 ## Screenshots
 1. Example workflow
+
    ![Example workflow](https://raw.githubusercontent.com/technote-space/get-diff-action/images/workflow.png)
 1. Skip
+
    ![Skip](https://raw.githubusercontent.com/technote-space/get-diff-action/images/skip.png)
 
 ## Usage
@@ -130,11 +132,12 @@ If there is no difference in the source code below, this workflow will skip the 
 
    e.g.
    ```yaml
-   FILES: package-lock.json
+   FILES: package.json
    ```
    =>
    ```
    package.json
+   anywhere/package.json
    ```
 
 1. Mapped to absolute if `ABSOLUTE` option is true (default: false)
@@ -186,4 +189,5 @@ If called on any other event, the result will be empty.
 
 ## Author
 [GitHub (Technote)](https://github.com/technote-space)
+
 [Blog](https://technote.space)
