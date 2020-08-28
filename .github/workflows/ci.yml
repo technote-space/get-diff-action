@@ -25,7 +25,9 @@ jobs:
           SUFFIX_FILTER: |
             .js
             .ts
-          FILES: .eslintrc
+          FILES: |
+            yarn.lock
+            .eslintrc
         if: "! contains(env.COMMIT_MESSAGE, '[skip ci]') && ! contains(env.COMMIT_MESSAGE, '[ci skip]')"
       - name: Set running flag
         run: echo "::set-env name=RUNNING::"
