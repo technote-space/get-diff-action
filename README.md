@@ -38,6 +38,7 @@ GitHub actions to get git diff.
    ![Skip](https://raw.githubusercontent.com/technote-space/get-diff-action/images/skip.png)
 
 ## Usage
+Basic Usage
 ```yaml
 on: pull_request
 name: CI
@@ -55,7 +56,7 @@ jobs:
           SUFFIX_FILTER: .ts
           FILES: |
             yarn.lock
-            package.json
+            .eslintrc
       - name: Install Package dependencies
         run: yarn install
         if: env.GIT_DIFF
@@ -63,24 +64,56 @@ jobs:
         # Check only if there are differences in the source code
         run: yarn lint
         if: env.GIT_DIFF
+```
+### Example of matching files
+- src/main.ts
+- src/utils/abc.ts
+- __tests__/test.ts
+- yarn.lock
+- .eslintrc
+- anywhere/yarn.lock
 
-  phpmd:
-    name: PHPMD
+### Examples of non-matching files
+- main.ts
+- src/xyz.txt
+
+### Examples of env
+| name | value |
+|:---:|:---|
+| `GIT_DIFF` |`'src/main.ts' 'src/utils/abc.ts' '__tests__/test.ts' 'yarn.lock' '.eslintrc' 'anywhere/yarn.lock'` |
+| `GIT_DIFF_FILTERED` | `'src/main.ts' 'src/utils/abc.ts' '__tests__/test.ts'` |
+| `MATCHED_FILES` | `'yarn.lock' '.eslintrc' 'anywhere/yarn.lock'` |
+
+Specify a little more detail
+```yaml
+on: pull_request
+name: CI
+jobs:
+  eslint:
+    name: ESLint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v3
-        id: git_diff
         with:
-          SUFFIX_FILTER: .php
-          SEPARATOR: ','
-      - name: Install composer
-        run: composer install
-        if: steps.git_diff.outputs.diff
+          PREFIX_FILTER: |
+            src
+            __tests__
+          SUFFIX_FILTER: .ts
+          FILES: |
+            yarn.lock
+            .eslintrc
+      - name: Install Package dependencies
+        run: yarn install
+        if: env.GIT_DIFF
       - name: Check code style
-        # Check only the source code where there is a difference
-        run: vendor/bin/phpmd ${{ steps.git_diff.outputs.diff }} ansi phpmd.xml
-        if: steps.git_diff.outputs.diff
+        # Check only source files with differences
+        run: yarn eslint ${{ env.GIT_DIFF_FILTERED }}  # e.g. yarn eslint 'src/main.ts' '__tests__/test.ts'
+        if: env.GIT_DIFF && !env.MATCHED_FILES
+      - name: Check code style
+        # Check only if there are differences in the source code (Run a lint on all files if there are changes to yarn.lock or .eslintrc)
+        run: yarn lint
+        if: env.GIT_DIFF && env.MATCHED_FILES
 ```
 
 If there is no difference in the source code below, this workflow will skip the code style check
