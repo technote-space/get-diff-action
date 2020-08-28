@@ -53,11 +53,14 @@ jobs:
             src
             __tests__
           SUFFIX_FILTER: .ts
+          FILES: |
+            yarn.lock
+            package.json
       - name: Install Package dependencies
         run: yarn install
         if: env.GIT_DIFF
       - name: Check code style
-        # 差分があるソースコードだけチェック
+        # 差分がある場合だけチェック
         run: yarn eslint ${{ env.GIT_DIFF }}
         if: env.GIT_DIFF
 

@@ -60,8 +60,8 @@ jobs:
         run: yarn install
         if: env.GIT_DIFF
       - name: Check code style
-        # Check only the source codes that have differences
-        run: yarn eslint ${{ env.GIT_DIFF }}
+        # Check only if there are differences in the source code
+        run: yarn lint
         if: env.GIT_DIFF
 
   phpmd:
@@ -78,7 +78,7 @@ jobs:
         run: composer install
         if: steps.git_diff.outputs.diff
       - name: Check code style
-        # Check only the source codes that have differences
+        # Check only the source code where there is a difference
         run: vendor/bin/phpmd ${{ steps.git_diff.outputs.diff }} ansi phpmd.xml
         if: steps.git_diff.outputs.diff
 ```
