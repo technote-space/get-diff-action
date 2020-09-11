@@ -27,6 +27,7 @@ GitHub actions to get git diff.
   - [Target events](#target-events)
 - [Addition](#addition)
   - [FROM, TO](#from-to)
+  - [Check only the latest commit differences in a draft Pull Request](#check-only-the-latest-commit-differences-in-a-draft-pull-request)
 - [Author](#author)
 
 </details>
