@@ -223,6 +223,13 @@ jobs:
 | context.payload.before = '000...000' | default branch (e.g. master) | context.payload.after |
 | else | context.payload.before | context.payload.after |
 
+### 下書きのプルリクエストで最新コミット差分のみをチェックする場合
+```yaml
+      - uses: technote-space/get-diff-action@v3
+        with:
+          CHECK_ONLY_COMMIT_WHEN_DRAFT: true
+```
+
 ## Author
 [GitHub (Technote)](https://github.com/technote-space)
 

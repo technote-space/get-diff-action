@@ -58,6 +58,34 @@ const prContext         = generateContext({
     },
   },
 });
+const draftPrContext    = generateContext({
+  owner: 'hello',
+  repo: 'world',
+  event: 'pull_request',
+  ref: 'refs/pull/55/merge',
+  action: 'synchronize',
+}, {
+  payload: {
+    number: 11,
+    before: 'before-sha',
+    after: 'after-sha',
+    'pull_request': {
+      number: 11,
+      id: 21031067,
+      head: {
+        ref: 'feature/new-feature',
+        sha: 'head-sha',
+      },
+      base: {
+        ref: 'master',
+        sha: 'base-sha',
+      },
+      title: 'title',
+      'html_url': 'test url',
+      draft: true,
+    },
+  },
+});
 const pushContext       = generateContext({
   owner: 'hello',
   repo: 'world',
@@ -165,6 +193,71 @@ describe('getGitDiff', () => {
       'git diff \'base-sha...sha\' --shortstat -w \'package.json\'',
       'git diff \'base-sha...sha\' --shortstat -w \'README.md\'',
       'git diff \'base-sha...sha\' --shortstat -w \'src/main.ts\'',
+    ]);
+  });
+
+  it('should get git diff (pull request draft1)', async() => {
+    process.env.GITHUB_WORKSPACE    = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN  = 'test token';
+    process.env.INPUT_SUFFIX_FILTER = 'json\nmd\nts';
+
+    const mockExec = spyOnSpawn();
+    setChildProcessParams({
+      stdout: (command: string): string => {
+        if (command.startsWith('git diff')) {
+          return 'package.json\nabc/composer.JSON\nREADME.md\nsrc/main.ts';
+        }
+        return '';
+      },
+    });
+
+    expect(await getGitDiff(logger, draftPrContext)).toEqual([
+      {file: 'package.json', ...emptyDiff},
+      {file: 'abc/composer.JSON', ...emptyDiff},
+      {file: 'README.md', ...emptyDiff},
+      {file: 'src/main.ts', ...emptyDiff},
+    ]);
+    execCalledWith(mockExec, [
+      'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' > /dev/null 2>&1 || :',
+      'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/pull/55/merge:refs/pull/55/merge\' \'refs/heads/master:refs/remotes/get-diff-action/master\' || :',
+      'git diff \'get-diff-action/master...pull/55/merge\' \'--diff-filter=AMRC\' --name-only || :',
+      'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'package.json\'',
+      'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'abc/composer.JSON\'',
+      'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'README.md\'',
+      'git diff \'get-diff-action/master...pull/55/merge\' --shortstat -w \'src/main.ts\'',
+    ]);
+  });
+
+  it('should get git diff (pull request draft2)', async() => {
+    process.env.GITHUB_WORKSPACE                   = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN                 = 'test token';
+    process.env.INPUT_SUFFIX_FILTER                = 'json\nmd\nts';
+    process.env.INPUT_CHECK_ONLY_COMMIT_WHEN_DRAFT = 'true';
+
+    const mockExec = spyOnSpawn();
+    setChildProcessParams({
+      stdout: (command: string): string => {
+        if (command.startsWith('git diff')) {
+          return 'package.json\nabc/composer.JSON\nREADME.md\nsrc/main.ts';
+        }
+        return '';
+      },
+    });
+
+    expect(await getGitDiff(logger, draftPrContext)).toEqual([
+      {file: 'package.json', ...emptyDiff},
+      {file: 'abc/composer.JSON', ...emptyDiff},
+      {file: 'README.md', ...emptyDiff},
+      {file: 'src/main.ts', ...emptyDiff},
+    ]);
+    execCalledWith(mockExec, [
+      'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' > /dev/null 2>&1 || :',
+      'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/pull/55/merge:refs/pull/55/merge\' || :',
+      'git diff \'before-sha...after-sha\' \'--diff-filter=AMRC\' --name-only || :',
+      'git diff \'before-sha...after-sha\' --shortstat -w \'package.json\'',
+      'git diff \'before-sha...after-sha\' --shortstat -w \'abc/composer.JSON\'',
+      'git diff \'before-sha...after-sha\' --shortstat -w \'README.md\'',
+      'git diff \'before-sha...after-sha\' --shortstat -w \'src/main.ts\'',
     ]);
   });
 

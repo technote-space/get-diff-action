@@ -94,6 +94,9 @@ inputs:
     description: Default value (lines).
     default: '0'
     required: false
+  CHECK_ONLY_COMMIT_WHEN_DRAFT:
+    description: Whether to check only commits when drafting.
+    required: false
 
 outputs:
   diff:
