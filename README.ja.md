@@ -27,6 +27,7 @@
   - [対象イベント](#%E5%AF%BE%E8%B1%A1%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88)
 - [補足](#%E8%A3%9C%E8%B6%B3)
   - [FROM, TO](#from-to)
+  - [下書きのプルリクエストで最新コミット差分のみをチェックする場合](#%E4%B8%8B%E6%9B%B8%E3%81%8D%E3%81%AE%E3%83%97%E3%83%AB%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%81%A7%E6%9C%80%E6%96%B0%E3%82%B3%E3%83%9F%E3%83%83%E3%83%88%E5%B7%AE%E5%88%86%E3%81%AE%E3%81%BF%E3%82%92%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88)
 - [Author](#author)
 
 </details>
@@ -208,7 +209,7 @@ jobs:
 ### 対象イベント
 | eventName | action |
 |:---:|:---:|
-|pull_request|opened, reopened, synchronize, closed|
+|pull_request|opened, reopened, synchronize, closed, ready_for_review|
 |push|*|
 
 もしこれ以外のイベントで呼ばれた場合、結果は空になります。
@@ -222,6 +223,24 @@ jobs:
 | push (has related pull request) | pull.base.ref (e.g. master) | `refs/pull/${pull.number}/merge` (e.g. refs/pull/123/merge) |
 | context.payload.before = '000...000' | default branch (e.g. master) | context.payload.after |
 | else | context.payload.before | context.payload.after |
+
+### 下書きのプルリクエストで最新コミット差分のみをチェックする場合
+```yaml
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed, ready_for_review]
+
+jobs:
+  eslint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: technote-space/get-diff-action@v3
+        with:
+          CHECK_ONLY_COMMIT_WHEN_DRAFT: true
+      # ...
+```
 
 ## Author
 [GitHub (Technote)](https://github.com/technote-space)
