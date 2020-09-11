@@ -27,6 +27,7 @@ GitHub actions to get git diff.
   - [Target events](#target-events)
 - [Addition](#addition)
   - [FROM, TO](#from-to)
+  - [Check only the latest commit differences in a draft Pull Request](#check-only-the-latest-commit-differences-in-a-draft-pull-request)
 - [Author](#author)
 
 </details>
@@ -225,9 +226,20 @@ If called on any other event, the result will be empty.
 
 ### Check only the latest commit differences in a draft Pull Request
 ```yaml
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed, ready_for_review]
+
+jobs:
+  eslint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v3
         with:
           CHECK_ONLY_COMMIT_WHEN_DRAFT: true
+      # ...
 ```
 
 ## Author
