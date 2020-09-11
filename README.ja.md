@@ -225,9 +225,20 @@ jobs:
 
 ### 下書きのプルリクエストで最新コミット差分のみをチェックする場合
 ```yaml
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed, ready_for_review]
+
+jobs:
+  eslint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v3
         with:
           CHECK_ONLY_COMMIT_WHEN_DRAFT: true
+      # ...
 ```
 
 ## Author
