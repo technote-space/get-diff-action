@@ -223,6 +223,13 @@ If called on any other event, the result will be empty.
 | context.payload.before = '000...000' | default branch (e.g. master) | context.payload.after |
 | else | context.payload.before | context.payload.after |
 
+### Check only the latest commit differences in a draft Pull Request
+```yaml
+      - uses: technote-space/get-diff-action@v3
+        with:
+          CHECK_ONLY_COMMIT_WHEN_DRAFT: true
+```
+
 ## Author
 [GitHub (Technote)](https://github.com/technote-space)
 
