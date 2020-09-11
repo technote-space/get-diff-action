@@ -2,6 +2,7 @@ import {Context} from '@actions/github/lib/context';
 import {Octokit} from '@technote-space/github-action-helper/dist/types';
 import {Utils, ApiHelper} from '@technote-space/github-action-helper';
 import {PullRequestParams, DiffInfo} from '../types';
+import {getInput} from '@actions/core';
 
 export const escape = (items: string[]): string[] => items.map(item => {
   // eslint-disable-next-line no-useless-escape
@@ -28,6 +29,13 @@ export const getDiffInfoForPush = async(octokit: Octokit, context: Context): Pro
   if (!await isDefaultBranch(octokit, context)) {
     const pull = await (new ApiHelper(octokit, context)).findPullRequest(context.ref);
     if (pull) {
+      if (checkOnlyCommit(pull.draft)) {
+        return {
+          base: context.payload.before,
+          head: context.payload.after,
+        };
+      }
+
       return {
         base: Utils.normalizeRef(pull.base.ref),
         head: `refs/pull/${pull.number}/merge`,
@@ -48,7 +56,21 @@ export const getDiffInfoForPush = async(octokit: Octokit, context: Context): Pro
   };
 };
 
-export const getDiffInfo = async(octokit: Octokit, context: Context): Promise<DiffInfo> => context.payload.pull_request ? getDiffInfoForPR({
-  base: context.payload.pull_request.base,
-  head: context.payload.pull_request.head,
-}, context) : await getDiffInfoForPush(octokit, context);
+const checkOnlyCommit    = (isDraft: boolean): boolean => isDraft && Utils.getBoolValue(getInput('CHECK_ONLY_COMMIT_WHEN_DRAFT'));
+export const getDiffInfo = async(octokit: Octokit, context: Context): Promise<DiffInfo> => {
+  if (context.payload.pull_request) {
+    if (checkOnlyCommit(context.payload.pull_request.draft)) {
+      return {
+        base: context.payload.before,
+        head: context.payload.after,
+      };
+    }
+
+    return getDiffInfoForPR({
+      base: context.payload.pull_request.base,
+      head: context.payload.pull_request.head,
+    }, context);
+  }
+
+  return getDiffInfoForPush(octokit, context);
+};
