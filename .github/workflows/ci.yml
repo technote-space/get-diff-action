@@ -28,6 +28,7 @@ jobs:
           FILES: |
             yarn.lock
             .eslintrc
+          CHECK_ONLY_COMMIT_WHEN_DRAFT: true
         if: "! contains(env.COMMIT_MESSAGE, '[skip ci]') && ! contains(env.COMMIT_MESSAGE, '[ci skip]')"
       - name: Set running flag
         run: echo "::set-env name=RUNNING::"
