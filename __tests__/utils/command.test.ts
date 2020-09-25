@@ -12,7 +12,7 @@ import {
   disableNetConnect,
   getApiFixture,
 } from '@technote-space/github-action-test-helper';
-import {Logger} from '@technote-space/github-action-helper';
+import {Logger} from '@technote-space/github-action-log-helper';
 import {getGitDiff, getFileDiff, getDiffFiles, sumResults} from '../../src/utils/command';
 
 const rootDir           = path.resolve(__dirname, '../..');

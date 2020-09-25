@@ -1,6 +1,6 @@
 import {exportVariable, getInput, setOutput} from '@actions/core' ;
 import {Context} from '@actions/github/lib/context';
-import {Logger} from '@technote-space/github-action-helper';
+import {Logger} from '@technote-space/github-action-log-helper';
 import {getGitDiff, getDiffFiles, getMatchedFiles, sumResults} from './utils/command';
 import {DiffResult} from './types';
 

@@ -5,14 +5,16 @@ import {
   spyOnStdout,
   stdoutCalledWith,
   spyOnSpawn,
+  execCalledWith,
+  spyOnExportVariable,
+  exportVariableCalledWith,
   testChildProcess,
   setChildProcessParams,
-  execCalledWith,
   testFs,
   generateContext,
   getLogStdout,
 } from '@technote-space/github-action-test-helper';
-import {Logger} from '@technote-space/github-action-helper';
+import {Logger} from '@technote-space/github-action-log-helper';
 import {dumpDiffs, setResult, execute} from '../src/process';
 
 const rootDir   = path.resolve(__dirname, '..');
@@ -119,19 +121,17 @@ describe('setResult', () => {
 
   it('should set result', () => {
     const mockStdout = spyOnStdout();
+    const mockEnv    = spyOnExportVariable();
 
     setResult(diffs, false, logger);
 
     stdoutCalledWith(mockStdout, [
       '::group::Dump output',
       '::set-output name=diff::test1 test2 test4',
-      '::set-env name=GIT_DIFF::test1 test2 test4',
       '"diff: test1 test2 test4"',
       '::set-output name=filtered_diff::test1 test2',
-      '::set-env name=GIT_DIFF_FILTERED::test1 test2',
       '"filtered_diff: test1 test2"',
       '::set-output name=matched_files::test4',
-      '::set-env name=MATCHED_FILES::test4',
       '"matched_files: test4"',
       '::set-output name=count::3',
       '"count: 3"',
@@ -143,6 +143,11 @@ describe('setResult', () => {
       '"lines: 303"',
       '::endgroup::',
     ]);
+    exportVariableCalledWith(mockEnv, [
+      {name: 'GIT_DIFF', val: 'test1 test2 test4'},
+      {name: 'GIT_DIFF_FILTERED', val: 'test1 test2'},
+      {name: 'MATCHED_FILES', val: 'test4'},
+    ]);
   });
 
   it('should set result without env', () => {
@@ -152,6 +157,7 @@ describe('setResult', () => {
     process.env.INPUT_SET_ENV_NAME_DELETIONS  = 'DELETIONS';
     process.env.INPUT_SET_ENV_NAME_LINES      = 'LINES';
     const mockStdout                          = spyOnStdout();
+    const mockEnv                             = spyOnExportVariable();
 
     setResult(diffs, false, logger);
 
@@ -160,24 +166,26 @@ describe('setResult', () => {
       '::set-output name=diff::test1 test2 test4',
       '"diff: test1 test2 test4"',
       '::set-output name=filtered_diff::test1 test2',
-      '::set-env name=GIT_DIFF_FILTERED::test1 test2',
       '"filtered_diff: test1 test2"',
       '::set-output name=matched_files::test4',
-      '::set-env name=MATCHED_FILES::test4',
       '"matched_files: test4"',
       '::set-output name=count::3',
-      '::set-env name=FILE_COUNT::3',
       '"count: 3"',
       '::set-output name=insertions::3',
-      '::set-env name=INSERTIONS::3',
       '"insertions: 3"',
       '::set-output name=deletions::300',
-      '::set-env name=DELETIONS::300',
       '"deletions: 300"',
       '::set-output name=lines::303',
-      '::set-env name=LINES::303',
       '"lines: 303"',
       '::endgroup::',
+    ]);
+    exportVariableCalledWith(mockEnv, [
+      {name: 'GIT_DIFF_FILTERED', val: 'test1 test2'},
+      {name: 'MATCHED_FILES', val: 'test4'},
+      {name: 'FILE_COUNT', val: '3'},
+      {name: 'INSERTIONS', val: '3'},
+      {name: 'DELETIONS', val: '300'},
+      {name: 'LINES', val: '303'},
     ]);
   });
 });
@@ -195,6 +203,7 @@ describe('execute', () => {
 
     const mockExec   = spyOnSpawn();
     const mockStdout = spyOnStdout();
+    const mockEnv    = spyOnExportVariable();
     setChildProcessParams({
       stdout: (command: string): string => {
         if (command.startsWith('git diff')) {
@@ -264,13 +273,10 @@ describe('execute', () => {
       '::endgroup::',
       '::group::Dump output',
       '::set-output name=diff::\'package.json\' \'abc/package.json\' \'src/main.ts\'',
-      '::set-env name=GIT_DIFF::\'package.json\' \'abc/package.json\' \'src/main.ts\'',
       '"diff: \'package.json\' \'abc/package.json\' \'src/main.ts\'"',
       '::set-output name=filtered_diff::\'src/main.ts\'',
-      '::set-env name=GIT_DIFF_FILTERED::\'src/main.ts\'',
       '"filtered_diff: \'src/main.ts\'"',
       '::set-output name=matched_files::\'package.json\' \'abc/package.json\'',
-      '::set-env name=MATCHED_FILES::\'package.json\' \'abc/package.json\'',
       '"matched_files: \'package.json\' \'abc/package.json\'"',
       '::set-output name=count::3',
       '"count: 3"',
@@ -282,6 +288,11 @@ describe('execute', () => {
       '"lines: 29"',
       '::endgroup::',
     ]);
+    exportVariableCalledWith(mockEnv, [
+      {name: 'GIT_DIFF', val: '\'package.json\' \'abc/package.json\' \'src/main.ts\''},
+      {name: 'GIT_DIFF_FILTERED', val: '\'src/main.ts\''},
+      {name: 'MATCHED_FILES', val: '\'package.json\' \'abc/package.json\''},
+    ]);
   });
 
   it('should execute (no diff)', async() => {
@@ -291,6 +302,7 @@ describe('execute', () => {
 
     const mockExec   = spyOnSpawn();
     const mockStdout = spyOnStdout();
+    const mockEnv    = spyOnExportVariable();
     setChildProcessParams({
       stdout: (command: string): string => {
         if (command.startsWith('git diff')) {
@@ -323,13 +335,10 @@ describe('execute', () => {
       '::endgroup::',
       '::group::Dump output',
       '::set-output name=diff::',
-      '::set-env name=GIT_DIFF::',
       '"diff: "',
       '::set-output name=filtered_diff::',
-      '::set-env name=GIT_DIFF_FILTERED::',
       '"filtered_diff: "',
       '::set-output name=matched_files::',
-      '::set-env name=MATCHED_FILES::',
       '"matched_files: "',
       '::set-output name=count::0',
       '"count: 0"',
@@ -341,6 +350,11 @@ describe('execute', () => {
       '"lines: 0"',
       '::endgroup::',
     ]);
+    exportVariableCalledWith(mockEnv, [
+      {name: 'GIT_DIFF', val: ''},
+      {name: 'GIT_DIFF_FILTERED', val: ''},
+      {name: 'MATCHED_FILES', val: ''},
+    ]);
   });
 
   it('should execute empty', async() => {
@@ -348,6 +362,7 @@ describe('execute', () => {
 
     const mockExec   = spyOnSpawn();
     const mockStdout = spyOnStdout();
+    const mockEnv    = spyOnExportVariable();
 
     await execute(logger, prContext, true);
 
@@ -358,13 +373,10 @@ describe('execute', () => {
       '::endgroup::',
       '::group::Dump output',
       '::set-output name=diff::',
-      '::set-env name=GIT_DIFF::',
       '"diff: "',
       '::set-output name=filtered_diff::',
-      '::set-env name=GIT_DIFF_FILTERED::',
       '"filtered_diff: "',
       '::set-output name=matched_files::',
-      '::set-env name=MATCHED_FILES::',
       '"matched_files: "',
       '::set-output name=count::0',
       '"count: 0"',
@@ -375,6 +387,11 @@ describe('execute', () => {
       '::set-output name=lines::0',
       '"lines: 0"',
       '::endgroup::',
+    ]);
+    exportVariableCalledWith(mockEnv, [
+      {name: 'GIT_DIFF', val: ''},
+      {name: 'GIT_DIFF_FILTERED', val: ''},
+      {name: 'MATCHED_FILES', val: ''},
     ]);
   });
 
@@ -390,6 +407,7 @@ describe('execute', () => {
 
     const mockExec   = spyOnSpawn();
     const mockStdout = spyOnStdout();
+    const mockEnv    = spyOnExportVariable();
 
     await execute(logger, prContext, true);
 
@@ -400,13 +418,10 @@ describe('execute', () => {
       '::endgroup::',
       '::group::Dump output',
       '::set-output name=diff::1',
-      '::set-env name=GIT_DIFF::1',
       '"diff: 1"',
       '::set-output name=filtered_diff::2',
-      '::set-env name=GIT_DIFF_FILTERED::2',
       '"filtered_diff: 2"',
       '::set-output name=matched_files::3',
-      '::set-env name=MATCHED_FILES::3',
       '"matched_files: 3"',
       '::set-output name=count::4',
       '"count: 4"',
@@ -418,6 +433,11 @@ describe('execute', () => {
       '"lines: 7"',
       '::endgroup::',
     ]);
+    exportVariableCalledWith(mockEnv, [
+      {name: 'GIT_DIFF', val: '1'},
+      {name: 'GIT_DIFF_FILTERED', val: '2'},
+      {name: 'MATCHED_FILES', val: '3'},
+    ]);
   });
 
   it('should not execute if not cloned', async() => {
@@ -425,6 +445,7 @@ describe('execute', () => {
 
     const mockExec   = spyOnSpawn();
     const mockStdout = spyOnStdout();
+    const mockEnv    = spyOnExportVariable();
     setChildProcessParams({
       stdout: (command: string): string => {
         if (command.startsWith('git diff')) {
@@ -448,13 +469,10 @@ describe('execute', () => {
       '::endgroup::',
       '::group::Dump output',
       '::set-output name=diff::',
-      '::set-env name=GIT_DIFF::',
       '"diff: "',
       '::set-output name=filtered_diff::',
-      '::set-env name=GIT_DIFF_FILTERED::',
       '"filtered_diff: "',
       '::set-output name=matched_files::',
-      '::set-env name=MATCHED_FILES::',
       '"matched_files: "',
       '::set-output name=count::0',
       '"count: 0"',
@@ -465,6 +483,11 @@ describe('execute', () => {
       '::set-output name=lines::0',
       '"lines: 0"',
       '::endgroup::',
+    ]);
+    exportVariableCalledWith(mockEnv, [
+      {name: 'GIT_DIFF', val: ''},
+      {name: 'GIT_DIFF_FILTERED', val: ''},
+      {name: 'MATCHED_FILES', val: ''},
     ]);
   });
 });
