@@ -54,10 +54,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v3
         with:
-          PREFIX_FILTER: |
-            src
-            __tests__
-          SUFFIX_FILTER: .ts
+          PATTERNS: |
+            +(src|__tests__)/**/*.ts
+            !src/exclude.ts
           FILES: |
             yarn.lock
             .eslintrc
@@ -69,6 +68,9 @@ jobs:
         run: yarn lint
         if: env.GIT_DIFF
 ```
+
+[Details of the patterns that can be specified](https://github.com/isaacs/minimatch#minimatch)
+
 ### Example of matching files
 - src/main.ts
 - src/utils/abc.ts
@@ -80,10 +82,11 @@ jobs:
 ### Examples of non-matching files
 - main.ts
 - src/xyz.txt
+- src/exclude.ts
 
 ### Examples of env
 | name | value |
-|:---:|:---|
+|:---|:---|
 | `GIT_DIFF` |`'src/main.ts' 'src/utils/abc.ts' '__tests__/test.ts' 'yarn.lock' '.eslintrc' 'anywhere/yarn.lock'` |
 | `GIT_DIFF_FILTERED` | `'src/main.ts' 'src/utils/abc.ts' '__tests__/test.ts'` |
 | `MATCHED_FILES` | `'yarn.lock' '.eslintrc' 'anywhere/yarn.lock'` |
@@ -98,12 +101,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: technote-space/get-diff-action@v3
+      - uses: technote-space/get-diff-action@v4
         with:
-          PREFIX_FILTER: |
-            src
-            __tests__
-          SUFFIX_FILTER: .ts
+          PATTERNS: |
+            +(src|__tests__)/**/*.ts
           FILES: |
             yarn.lock
             .eslintrc
@@ -147,22 +148,24 @@ If there is no difference in the source code below, this workflow will skip the 
    package.json
    src/main.ts
    src/utils/command.ts
+   src/docs.md
    yarn.lock
    ```
 
    [${FROM}, ${TO}](#from-to)
 
-1. Filtered by `PREFIX_FILTER` or `SUFFIX_FILTER` option
+1. Filtered by `PATTERNS` option
 
    e.g.
    ```yaml
-   SUFFIX_FILTER: .ts
-   PREFIX_FILTER: src/
+   PATTERNS: |
+     src/**/*.+(ts|md)
+     !src/utils/*
    ```
    =>
    ```
    src/main.ts
-   src/utils/command.ts
+   src/docs.md
    ```
 
 1. Filtered by `FILES` option
@@ -182,7 +185,7 @@ If there is no difference in the source code below, this workflow will skip the 
    e.g.
    ```
    /home/runner/work/my-repo-name/my-repo-name/src/main.ts
-   /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
+   /home/runner/work/my-repo-name/my-repo-name/src/docs.md
    ```
 
 1. Combined by `SEPARATOR` option
@@ -193,32 +196,32 @@ If there is no difference in the source code below, this workflow will skip the 
    ```
    =>
    ```
-   /home/runner/work/my-repo-name/my-repo-name/src/main.ts /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
+   /home/runner/work/my-repo-name/my-repo-name/src/main.ts /home/runner/work/my-repo-name/my-repo-name/src/docs.md
    ```
 
 ## Outputs
 | name | description | e.g. |
-|:---:|:---|:---:|
-|diff|The results of diff file names.<br>If inputs `SET_ENV_NAME`(default: `GIT_DIFF`) is set, an environment variable is set with that name.|`src/main.ts src/utils/command.ts`|
-|count|The number of diff files.<br>If inputs `SET_ENV_NAME_COUNT`(default: `''`) is set, an environment variable is set with that name.|`100`|
-|insertions|The number of insertions lines.<br>If inputs `SET_ENV_NAME_INSERTIONS`(default: `''`) is set, an environment variable is set with that name.|`100`|
-|deletions|The number of deletions lines.<br>If inputs `SET_ENV_NAME_DELETIONS`(default: `''`) is set, an environment variable is set with that name.|`100`|
-|lines|The number of diff lines.<br>If inputs `SET_ENV_NAME_LINES`(default: `''`) is set, an environment variable is set with that name.|`200`|
+|:---|:---|:---|
+| diff | The results of diff file names.<br>If inputs `SET_ENV_NAME`(default: `GIT_DIFF`) is set, an environment variable is set with that name. | `src/main.ts src/docs.md` |
+| count | The number of diff files.<br>If inputs `SET_ENV_NAME_COUNT`(default: `''`) is set, an environment variable is set with that name. | `100` |
+| insertions | The number of insertions lines.<br>If inputs `SET_ENV_NAME_INSERTIONS`(default: `''`) is set, an environment variable is set with that name. | `100` |
+| deletions | The number of deletions lines.<br>If inputs `SET_ENV_NAME_DELETIONS`(default: `''`) is set, an environment variable is set with that name. | `100` |
+| lines | The number of diff lines.<br>If inputs `SET_ENV_NAME_LINES`(default: `''`) is set, an environment variable is set with that name. | `200` |
 
 ## Action event details
 ### Target events
 | eventName | action |
-|:---:|:---:|
-|pull_request|opened, reopened, synchronize, closed, ready_for_review|
-|push|*|
+|:---|:---|
+| pull_request | opened, reopened, synchronize, closed, ready_for_review |
+| push | * |
 
 If called on any other event, the result will be empty.
 
 ## Addition
 ### FROM, TO
 | condition | FROM | TO |
-|:---:|:---:|:---:|
-| tag push |---|---|
+|:---|:---|:---|
+| tag push | --- | --- |
 | pull request | pull.base.ref (e.g. master) | context.ref (e.g. refs/pull/123/merge) |
 | push (has related pull request) | pull.base.ref (e.g. master) | `refs/pull/${pull.number}/merge` (e.g. refs/pull/123/merge) |
 | context.payload.before = '000...000' | default branch (e.g. master) | context.payload.after |
@@ -236,7 +239,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: technote-space/get-diff-action@v3
+      - uses: technote-space/get-diff-action@v4
         with:
           CHECK_ONLY_COMMIT_WHEN_DRAFT: true
       # ...

@@ -25,8 +25,7 @@ const diffs     = [
     deletions: 100,
     lines: 101,
     filterIgnored: false,
-    prefixMatched: true,
-    suffixMatched: true,
+    isMatched: true,
   },
   {
     file: 'test2',
@@ -34,8 +33,7 @@ const diffs     = [
     deletions: 200,
     lines: 202,
     filterIgnored: false,
-    prefixMatched: true,
-    suffixMatched: true,
+    isMatched: true,
   },
   {
     file: 'test4',
@@ -43,8 +41,7 @@ const diffs     = [
     deletions: 400,
     lines: 404,
     filterIgnored: true,
-    prefixMatched: true,
-    suffixMatched: false,
+    isMatched: false,
   },
 ];
 const setExists = testFs(true);
@@ -89,8 +86,7 @@ describe('dumpDiffs', () => {
           'deletions': 100,
           'lines': 101,
           'filterIgnored': false,
-          'prefixMatched': true,
-          'suffixMatched': true,
+          'isMatched': true,
         },
         {
           'file': 'test2',
@@ -98,8 +94,7 @@ describe('dumpDiffs', () => {
           'deletions': 200,
           'lines': 202,
           'filterIgnored': false,
-          'prefixMatched': true,
-          'suffixMatched': true,
+          'isMatched': true,
         },
         {
           'file': 'test4',
@@ -107,8 +102,7 @@ describe('dumpDiffs', () => {
           'deletions': 400,
           'lines': 404,
           'filterIgnored': true,
-          'prefixMatched': true,
-          'suffixMatched': false,
+          'isMatched': false,
         },
       ]),
       '::endgroup::',
@@ -195,11 +189,10 @@ describe('execute', () => {
   testChildProcess();
 
   it('should execute', async() => {
-    process.env.GITHUB_WORKSPACE    = '/home/runner/work/my-repo-name/my-repo-name';
-    process.env.INPUT_GITHUB_TOKEN  = 'test token';
-    process.env.INPUT_FILES         = 'package.json\ncomposer.json';
-    process.env.INPUT_PREFIX_FILTER = 'src/\n__tests__';
-    process.env.INPUT_SUFFIX_FILTER = '.ts\n.txt';
+    process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN = 'test token';
+    process.env.INPUT_FILES        = 'package.json\ncomposer.json';
+    process.env.INPUT_PATTERNS     = 'src/**/*.+(ts|txt)\n__tests__/**/*.+(ts|txt)';
 
     const mockExec   = spyOnSpawn();
     const mockStdout = spyOnStdout();
@@ -245,8 +238,7 @@ describe('execute', () => {
         {
           'file': 'package.json',
           'filterIgnored': true,
-          'prefixMatched': false,
-          'suffixMatched': false,
+          'isMatched': false,
           'insertions': 25,
           'deletions': 4,
           'lines': 29,
@@ -254,8 +246,7 @@ describe('execute', () => {
         {
           'file': 'abc/package.json',
           'filterIgnored': true,
-          'prefixMatched': false,
-          'suffixMatched': false,
+          'isMatched': false,
           'insertions': 25,
           'deletions': 4,
           'lines': 29,
@@ -263,8 +254,7 @@ describe('execute', () => {
         {
           'file': 'src/main.ts',
           'filterIgnored': false,
-          'prefixMatched': true,
-          'suffixMatched': true,
+          'isMatched': true,
           'insertions': 25,
           'deletions': 4,
           'lines': 29,
@@ -296,9 +286,9 @@ describe('execute', () => {
   });
 
   it('should execute (no diff)', async() => {
-    process.env.GITHUB_WORKSPACE    = '/home/runner/work/my-repo-name/my-repo-name';
-    process.env.INPUT_GITHUB_TOKEN  = 'test token';
-    process.env.INPUT_PREFIX_FILTER = 'test/';
+    process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN = 'test token';
+    process.env.INPUT_PATTERNS     = 'test/**';
 
     const mockExec   = spyOnSpawn();
     const mockStdout = spyOnStdout();

@@ -54,10 +54,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v3
         with:
-          PREFIX_FILTER: |
-            src
-            __tests__
-          SUFFIX_FILTER: .ts
+          PATTERNS: |
+            +(src|__tests__)/**/*.ts
+            !src/exclude.ts
           FILES: |
             yarn.lock
             .eslintrc
@@ -69,6 +68,9 @@ jobs:
         run: yarn eslint ${{ env.GIT_DIFF }}
         if: env.GIT_DIFF
 ```
+
+[指定可能なパターンの詳細](https://github.com/isaacs/minimatch#minimatch)
+
 ### マッチするファイルの例
 - src/main.ts
 - src/utils/abc.ts
@@ -80,10 +82,11 @@ jobs:
 ### マッチしないファイルの例
 - main.ts
 - src/xyz.txt
+- src/exclude.ts
 
 ### envの例
 | name | value |
-|:---:|:---|
+|:---|:---|
 | `GIT_DIFF` |`'src/main.ts' 'src/utils/abc.ts' '__tests__/test.ts' 'yarn.lock' '.eslintrc' 'anywhere/yarn.lock'` |
 | `GIT_DIFF_FILTERED` | `'src/main.ts' 'src/utils/abc.ts' '__tests__/test.ts'` |
 | `MATCHED_FILES` | `'yarn.lock' '.eslintrc' 'anywhere/yarn.lock'` |
@@ -98,12 +101,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: technote-space/get-diff-action@v3
+      - uses: technote-space/get-diff-action@v4
         with:
-          PREFIX_FILTER: |
-            src
-            __tests__
-          SUFFIX_FILTER: .ts
+          PATTERNS: |
+            +(src|__tests__)/**/*.ts
           FILES: |
             yarn.lock
             .eslintrc
@@ -147,22 +148,24 @@ jobs:
    package.json
    src/main.ts
    src/utils/command.ts
+   src/docs.md
    yarn.lock
    ```
    
    [${FROM}, ${TO}](#from-to)
 
-1. `PREFIX_FILTER` や `SUFFIX_FILTER` オプションによるフィルタ
+1. `PATTERNS` オプションによるフィルタ
 
    例：
    ```yaml
-   SUFFIX_FILTER: .ts
-   PREFIX_FILTER: src/
+   PATTERNS: |
+     src/**/*.+(ts|md)
+     !src/utils/*
    ```
    =>
    ```
    src/main.ts
-   src/utils/command.ts
+   src/docs.md
    ```
 
 1. `FILES` オプションによるフィルタ
@@ -182,7 +185,7 @@ jobs:
    例：
    ```
    /home/runner/work/my-repo-name/my-repo-name/src/main.ts
-   /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
+   /home/runner/work/my-repo-name/my-repo-name/src/docs.md
    ```
 
 1. `SEPARATOR` オプションの値で結合
@@ -193,32 +196,32 @@ jobs:
    ```
    =>
    ```
-   /home/runner/work/my-repo-name/my-repo-name/src/main.ts /home/runner/work/my-repo-name/my-repo-name/src/utils/command.ts
+   /home/runner/work/my-repo-name/my-repo-name/src/main.ts /home/runner/work/my-repo-name/my-repo-name/src/docs.md
    ```
 
 ## 出力
 | name | description | e.g. |
-|:---:|:---|:---:|
-|diff|差分のあるファイルの結果<br>`SET_ENV_NAME`(default: `GIT_DIFF`) が設定されている場合、その名前で環境変数が設定されます|`src/main.ts src/utils/command.ts`|
-|count|差分のあるファイル数<br>`SET_ENV_NAME_COUNT`(default: `''`) が設定されている場合、その名前で環境変数が設定されます|`100`|
-|insertions|追加された行数<br>`SET_ENV_NAME_INSERTIONS`(default: `''`) が設定されている場合、その名前で環境変数が設定されます|`100`|
-|deletions|削除された行数<br>`SET_ENV_NAME_DELETIONS`(default: `''`) が設定されている場合、その名前で環境変数が設定されます|`100`|
-|lines|追加された行数と削除された行数の和<br>`SET_ENV_NAME_LINES`(default: `''`) が設定されている場合、その名前で環境変数が設定されます|`200`|
+|:---|:---|:---|
+| diff | 差分のあるファイルの結果<br>`SET_ENV_NAME`(default: `GIT_DIFF`) が設定されている場合、その名前で環境変数が設定されます | `src/main.ts src/docs.md` |
+| count | 差分のあるファイル数<br>`SET_ENV_NAME_COUNT`(default: `''`) が設定されている場合、その名前で環境変数が設定されます | `100` |
+| insertions | 追加された行数<br>`SET_ENV_NAME_INSERTIONS`(default: `''`) が設定されている場合、その名前で環境変数が設定されます | `100` |
+| deletions | 削除された行数<br>`SET_ENV_NAME_DELETIONS`(default: `''`) が設定されている場合、その名前で環境変数が設定されます | `100` |
+| lines | 追加された行数と削除された行数の和<br>`SET_ENV_NAME_LINES`(default: `''`) が設定されている場合、その名前で環境変数が設定されます | `200` |
 
 ## Action イベント詳細
 ### 対象イベント
 | eventName | action |
-|:---:|:---:|
-|pull_request|opened, reopened, synchronize, closed, ready_for_review|
-|push|*|
+|:---|:---|
+| pull_request | opened, reopened, synchronize, closed, ready_for_review |
+| push | * |
 
 もしこれ以外のイベントで呼ばれた場合、結果は空になります。
 
 ## 補足
 ### FROM, TO
 | condition | FROM | TO |
-|:---:|:---:|:---:|
-| tag push |---|---|
+|:---|:---|:---|
+| tag push | --- | --- |
 | pull request | pull.base.ref (e.g. master) | context.ref (e.g. refs/pull/123/merge) |
 | push (has related pull request) | pull.base.ref (e.g. master) | `refs/pull/${pull.number}/merge` (e.g. refs/pull/123/merge) |
 | context.payload.before = '000...000' | default branch (e.g. master) | context.payload.after |
@@ -236,7 +239,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: technote-space/get-diff-action@v3
+      - uses: technote-space/get-diff-action@v4
         with:
           CHECK_ONLY_COMMIT_WHEN_DRAFT: true
       # ...
