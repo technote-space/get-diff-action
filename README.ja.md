@@ -72,17 +72,17 @@ jobs:
 [指定可能なパターンの詳細](https://github.com/isaacs/minimatch#minimatch)
 
 ### マッチするファイルの例
-- src/main.ts
-- src/utils/abc.ts
-- __tests__/test.ts
-- yarn.lock
-- .eslintrc
-- anywhere/yarn.lock
+- `src/main.ts`
+- `src/utils/abc.ts`
+- `__tests__/test.ts`
+- `yarn.lock`
+- `.eslintrc`
+- `anywhere/yarn.lock`
 
 ### マッチしないファイルの例
-- main.ts
-- src/xyz.txt
-- src/exclude.ts
+- `main.ts`
+- `src/xyz.txt`
+- `src/exclude.ts`
 
 ### envの例
 | name | value |
