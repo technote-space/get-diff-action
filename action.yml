@@ -22,19 +22,29 @@ inputs:
     description: Separator of diffs.
     default: ' '
     required: true
-  PREFIX_FILTER:
-    description: Prefix filter.
+  PATTERNS:
+    description: Target file pattern.
     required: false
-  PREFIX_FILTER_FLAGS:
-    description: RegExp flags of prefix filter.
-    default: ''
+  MINIMATCH_OPTION_NOBRACE:
+    description: https://github.com/isaacs/minimatch#nobrace
     required: false
-  SUFFIX_FILTER:
-    description: Suffix filter.
+  MINIMATCH_OPTION_NOGLOBSTAR:
+    description: https://github.com/isaacs/minimatch#noglobstar
     required: false
-  SUFFIX_FILTER_FLAGS:
-    description: RegExp flags of suffix filter.
-    default: 'i'
+  MINIMATCH_OPTION_DOT:
+    description: https://github.com/isaacs/minimatch#dot
+    required: false
+  MINIMATCH_OPTION_NOEXT:
+    description: https://github.com/isaacs/minimatch#noext
+    required: false
+  MINIMATCH_OPTION_NOCASE:
+    description: https://github.com/isaacs/minimatch#nocase
+    required: false
+  MINIMATCH_OPTION_MATCH_BASE:
+    description: https://github.com/isaacs/minimatch#matchbase
+    required: false
+  MINIMATCH_OPTION_NONEGATE:
+    description: https://github.com/isaacs/minimatch#nonegate
     required: false
   FILES:
     description: Specific files.

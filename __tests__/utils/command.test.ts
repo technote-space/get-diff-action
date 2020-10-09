@@ -17,7 +17,7 @@ import {getGitDiff, getFileDiff, getDiffFiles, sumResults} from '../../src/utils
 
 const rootDir           = path.resolve(__dirname, '../..');
 const fixtureRootDir    = resolve(__dirname, '..', 'fixtures');
-const defaultFileResult = {filterIgnored: false, prefixMatched: true, suffixMatched: true};
+const defaultFileResult = {filterIgnored: false, isMatched: true};
 const diffs             = [
   {file: 'test1', insertions: 1, deletions: 100, lines: 101, ...defaultFileResult},
   {file: 'test2', insertions: 2, deletions: 200, lines: 202, ...defaultFileResult},
@@ -27,8 +27,7 @@ const diffs             = [
     deletions: 400,
     lines: 404,
     filterIgnored: true,
-    prefixMatched: true,
-    suffixMatched: false,
+    isMatched: false,
   },
 ];
 const emptyDiff         = {insertions: 0, deletions: 0, lines: 0, ...defaultFileResult};
@@ -109,9 +108,10 @@ describe('getGitDiff', () => {
   disableNetConnect(nock);
 
   it('should get git diff (pull request)', async() => {
-    process.env.GITHUB_WORKSPACE    = '/home/runner/work/my-repo-name/my-repo-name';
-    process.env.INPUT_GITHUB_TOKEN  = 'test token';
-    process.env.INPUT_SUFFIX_FILTER = 'json\nmd\nts';
+    process.env.GITHUB_WORKSPACE              = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN            = 'test token';
+    process.env.INPUT_PATTERNS                = '**/*.json\n**/*.md\n**/*.ts';
+    process.env.INPUT_MINIMATCH_OPTION_NOCASE = '1';
 
     const mockExec = spyOnSpawn();
     setChildProcessParams({
@@ -141,10 +141,9 @@ describe('getGitDiff', () => {
   });
 
   it('should get git diff (pull request closed)', async() => {
-    process.env.GITHUB_WORKSPACE          = '/home/runner/work/my-repo-name/my-repo-name';
-    process.env.INPUT_GITHUB_TOKEN        = 'test token';
-    process.env.INPUT_SUFFIX_FILTER       = 'json\nmd\nts';
-    process.env.INPUT_SUFFIX_FILTER_FLAGS = '';
+    process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN = 'test token';
+    process.env.INPUT_PATTERNS     = '**/*.json\n**/*.md\n**/*.ts';
 
     const mockExec = spyOnSpawn();
     setChildProcessParams({
@@ -197,9 +196,11 @@ describe('getGitDiff', () => {
   });
 
   it('should get git diff (pull request draft1)', async() => {
-    process.env.GITHUB_WORKSPACE    = '/home/runner/work/my-repo-name/my-repo-name';
-    process.env.INPUT_GITHUB_TOKEN  = 'test token';
-    process.env.INPUT_SUFFIX_FILTER = 'json\nmd\nts';
+    process.env.GITHUB_WORKSPACE                  = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN                = 'test token';
+    process.env.INPUT_PATTERNS                    = '*.json\n*.md\n*.ts';
+    process.env.INPUT_MINIMATCH_OPTION_NOCASE     = '1';
+    process.env.INPUT_MINIMATCH_OPTION_MATCH_BASE = '1';
 
     const mockExec = spyOnSpawn();
     setChildProcessParams({
@@ -231,7 +232,9 @@ describe('getGitDiff', () => {
   it('should get git diff (pull request draft2)', async() => {
     process.env.GITHUB_WORKSPACE                   = '/home/runner/work/my-repo-name/my-repo-name';
     process.env.INPUT_GITHUB_TOKEN                 = 'test token';
-    process.env.INPUT_SUFFIX_FILTER                = 'json\nmd\nts';
+    process.env.INPUT_PATTERNS                     = '*.json\n*.md\n*.ts';
+    process.env.INPUT_MINIMATCH_OPTION_NOCASE      = '1';
+    process.env.INPUT_MINIMATCH_OPTION_MATCH_BASE  = '1';
     process.env.INPUT_CHECK_ONLY_COMMIT_WHEN_DRAFT = 'true';
 
     const mockExec = spyOnSpawn();
@@ -478,16 +481,15 @@ describe('getGitDiff', () => {
   });
 
   it('should get git diff (env)', async() => {
-    process.env.GITHUB_WORKSPACE    = '/home/runner/work/my-repo-name/my-repo-name';
-    process.env.INPUT_GITHUB_TOKEN  = 'test token';
-    process.env.INPUT_DOT           = '..';
-    process.env.INPUT_DIFF_FILTER   = 'AMD';
-    process.env.INPUT_FILES         = 'package.json\ncomposer.json\nREADME2.md';
-    process.env.INPUT_PREFIX_FILTER = 'src/\n__tests__';
-    process.env.INPUT_SUFFIX_FILTER = '.ts\n.txt';
-    process.env.INPUT_ABSOLUTE      = 'true';
-    process.env.INPUT_SET_ENV_NAME  = '';
-    const mockExec                  = spyOnSpawn();
+    process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN = 'test token';
+    process.env.INPUT_DOT          = '..';
+    process.env.INPUT_DIFF_FILTER  = 'AMD';
+    process.env.INPUT_FILES        = 'package.json\ncomposer.json\nREADME2.md';
+    process.env.INPUT_PATTERNS     = 'src/**/*.+(ts|txt)\n__tests__/**/*.+(ts|txt)';
+    process.env.INPUT_ABSOLUTE     = 'true';
+    process.env.INPUT_SET_ENV_NAME = '';
+    const mockExec                 = spyOnSpawn();
     setChildProcessParams({
       stdout: (command: string): string => {
         if (command.startsWith('git diff')) {
@@ -501,14 +503,12 @@ describe('getGitDiff', () => {
       {
         file: process.env.GITHUB_WORKSPACE + '/package.json', ...emptyDiff,
         filterIgnored: true,
-        prefixMatched: false,
-        suffixMatched: false,
+        isMatched: false,
       },
       {
         file: process.env.GITHUB_WORKSPACE + '/abc/composer.json', ...emptyDiff,
         filterIgnored: true,
-        prefixMatched: false,
-        suffixMatched: false,
+        isMatched: false,
       },
       {file: process.env.GITHUB_WORKSPACE + '/src/main.ts', ...emptyDiff},
       {file: process.env.GITHUB_WORKSPACE + '/src/test/test2.txt', ...emptyDiff},
@@ -639,14 +639,14 @@ describe('getDiffFiles', () => {
 
   it('get git diff output 4', () => {
     expect(getDiffFiles([], true)).toEqual('');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult, prefixMatched: false}], true)).toEqual('');
+    expect(getDiffFiles([{file: 'test1', ...defaultFileResult, isMatched: false}], true)).toEqual('');
     expect(getDiffFiles([{
       file: 'test1', ...defaultFileResult,
-      prefixMatched: false,
+      isMatched: false,
     }, {file: 'test2', ...defaultFileResult}], true)).toEqual('test2');
     expect(getDiffFiles([{
       file: 'test1', ...defaultFileResult,
-      prefixMatched: false,
+      isMatched: false,
     }, {file: 'test2 test3', ...defaultFileResult}], true)).toEqual('\'test2 test3\'');
   });
 });

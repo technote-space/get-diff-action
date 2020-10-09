@@ -1,6 +1,7 @@
 import path from 'path';
 import {getInput} from '@actions/core' ;
 import {Context} from '@actions/github/lib/context';
+import multimatch, {Options} from 'multimatch';
 import {Command, Utils, GitHelper} from '@technote-space/github-action-helper';
 import {Logger} from '@technote-space/github-action-log-helper';
 import {escape, getDiffInfo} from './misc';
@@ -12,17 +13,22 @@ const getRawInput                = (name: string): string => process.env[`INPUT_
 const getDot                     = (): string => getInput('DOT', {required: true});
 const getFilter                  = (): string => getInput('DIFF_FILTER', {required: true});
 const getSeparator               = (): string => getRawInput('SEPARATOR');
-const getPrefix                  = (): string[] => Utils.getArrayInput('PREFIX_FILTER', undefined, '');
-const getSuffix                  = (): string[] => Utils.getArrayInput('SUFFIX_FILTER', undefined, '');
-const getPrefixRegExpFlags       = (): string => getInput('PREFIX_FILTER_FLAGS') || '';
-const getSuffixRegExpFlags       = (): string => getInput('SUFFIX_FILTER_FLAGS') || '';
+const getPatterns                = (): string[] => Utils.getArrayInput('PATTERNS', undefined, '');
 const getFiles                   = (): string[] => Utils.getArrayInput('FILES', undefined, '');
 const getWorkspace               = (): string => Utils.getBoolValue(getInput('ABSOLUTE')) ? (Utils.getWorkspace() + '/') : '';
 const getSummaryIncludeFilesFlag = (): boolean => Utils.getBoolValue(getInput('SUMMARY_INCLUDE_FILES'));
 const isFilterIgnored            = (item: string, files: string[]): boolean => !!(files.length && files.includes(path.basename(item)));
-const isPrefixMatched            = (item: string, prefix: string[]): boolean => !prefix.length || !prefix.every(prefix => !Utils.getPrefixRegExp(prefix, getPrefixRegExpFlags()).test(item));
-const isSuffixMatched            = (item: string, suffix: string[]): boolean => !suffix.length || !suffix.every(suffix => !Utils.getSuffixRegExp(suffix, getSuffixRegExpFlags()).test(item));
+const isMatched                  = (item: string, patterns: string[], options: Options): boolean => !patterns.length || !!multimatch(item, patterns, options).length;
 const toAbsolute                 = (item: string, workspace: string): string => workspace + item;
+const getMatchOptions            = (): Options => ({
+  nobrace: Utils.getBoolValue(getInput('MINIMATCH_OPTION_NOBRACE')),
+  noglobstar: Utils.getBoolValue(getInput('MINIMATCH_OPTION_NOGLOBSTAR')),
+  dot: Utils.getBoolValue(getInput('MINIMATCH_OPTION_DOT')),
+  noext: Utils.getBoolValue(getInput('MINIMATCH_OPTION_NOEXT')),
+  nocase: Utils.getBoolValue(getInput('MINIMATCH_OPTION_NOCASE')),
+  matchBase: Utils.getBoolValue(getInput('MINIMATCH_OPTION_MATCH_BASE')),
+  nonegate: Utils.getBoolValue(getInput('MINIMATCH_OPTION_NONEGATE')),
+});
 
 const getCompareRef = (ref: string): string => Utils.isRef(ref) ? Utils.getLocalRefspec(ref, REMOTE_NAME) : ref;
 
@@ -53,13 +59,7 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
     return [];
   }
 
-  const dot       = getDot();
-  const files     = getFiles();
-  const prefix    = getPrefix();
-  const suffix    = getSuffix();
-  const workspace = getWorkspace();
-  const diffInfo  = await getDiffInfo(Utils.getOctokit(), context);
-
+  const diffInfo = await getDiffInfo(Utils.getOctokit(), context);
   if (diffInfo.base === diffInfo.head) {
     return [];
   }
@@ -80,6 +80,12 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
     '--depth=10000',
   ], Utils.uniqueArray(refs).map(ref => Utils.getRefspec(ref, REMOTE_NAME)));
 
+  const dot       = getDot();
+  const files     = getFiles();
+  const workspace = getWorkspace();
+  const patterns  = getPatterns();
+  const options   = getMatchOptions();
+
   return (await Utils.split((await command.execAsync({
     command: 'git diff',
     args: [
@@ -93,10 +99,9 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
     .map(item => ({
       file: item,
       filterIgnored: isFilterIgnored(item, files),
-      prefixMatched: isPrefixMatched(item, prefix),
-      suffixMatched: isSuffixMatched(item, suffix),
+      isMatched: isMatched(item, patterns, options),
     }))
-    .filter(item => item.filterIgnored || (item.prefixMatched && item.suffixMatched))
+    .filter(item => item.filterIgnored || item.isMatched)
     .map(async item => ({...item, ...await getFileDiff(item, diffInfo, dot)}))
     .reduce(async(prev, item) => {
       const acc = await prev;
@@ -105,7 +110,7 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
     .map(item => ({...item, file: toAbsolute(item.file, workspace)}));
 };
 
-export const getDiffFiles    = (diffs: FileResult[], filter: boolean): string => escape(diffs.filter(item => !filter || item.prefixMatched && item.suffixMatched).map(item => item.file)).join(getSeparator());
+export const getDiffFiles    = (diffs: FileResult[], filter: boolean): string => escape(diffs.filter(item => !filter || item.isMatched).map(item => item.file)).join(getSeparator());
 export const getMatchedFiles = (diffs: FileResult[]): string => escape(diffs.filter(item => item.filterIgnored).map(item => item.file)).join(getSeparator());
 export const sumResults      = (diffs: DiffResult[], map: (item: DiffResult) => number): number => getSummaryIncludeFilesFlag() ?
   diffs.map(map).reduce((acc, val) => acc + val, 0) : // eslint-disable-line no-magic-numbers
