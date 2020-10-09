@@ -19,12 +19,7 @@ jobs:
       - uses: technote-space/get-git-comment-action@v1
       - uses: technote-space/get-diff-action@gh-actions
         with:
-          PREFIX_FILTER: |
-            src/
-            __tests__/
-          SUFFIX_FILTER: |
-            .js
-            .ts
+          PATTERNS: +(src|__tests__)/**/*.+(js|ts)
           FILES: |
             yarn.lock
             .eslintrc
@@ -70,13 +65,7 @@ jobs:
       - uses: technote-space/get-git-comment-action@v1
       - uses: technote-space/get-diff-action@gh-actions
         with:
-          PREFIX_FILTER: |
-            src/
-            __tests__/
-          SUFFIX_FILTER: |
-            .js
-            .ts
-            .snap
+          PATTERNS: +(src|__tests__)/**/*.+(js|ts|snap)
           FILES: |
             yarn.lock
             jest.config.js
