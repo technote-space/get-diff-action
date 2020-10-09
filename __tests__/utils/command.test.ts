@@ -110,14 +110,14 @@ describe('getGitDiff', () => {
   it('should get git diff (pull request)', async() => {
     process.env.GITHUB_WORKSPACE              = '/home/runner/work/my-repo-name/my-repo-name';
     process.env.INPUT_GITHUB_TOKEN            = 'test token';
-    process.env.INPUT_PATTERNS                = '**/*.json\n**/*.md\n**/*.ts';
+    process.env.INPUT_PATTERNS                = '**/*.json\n**/*.md\n**/*.ts\n!src/index.ts';
     process.env.INPUT_MINIMATCH_OPTION_NOCASE = '1';
 
     const mockExec = spyOnSpawn();
     setChildProcessParams({
       stdout: (command: string): string => {
         if (command.startsWith('git diff')) {
-          return 'package.json\nabc/composer.JSON\nREADME.md\nsrc/main.ts';
+          return 'package.json\nabc/composer.JSON\nREADME.md\nsrc/main.ts\nsrc/index.ts';
         }
         return '';
       },
@@ -143,13 +143,13 @@ describe('getGitDiff', () => {
   it('should get git diff (pull request closed)', async() => {
     process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
     process.env.INPUT_GITHUB_TOKEN = 'test token';
-    process.env.INPUT_PATTERNS     = '**/*.json\n**/*.md\n**/*.ts';
+    process.env.INPUT_PATTERNS     = '**/*.json\n**/*.md\n**/*.ts\n!src/index.ts';
 
     const mockExec = spyOnSpawn();
     setChildProcessParams({
       stdout: (command: string): string => {
         if (command.startsWith('git diff')) {
-          return 'package.json\nabc/composer.JSON\nREADME.md\nsrc/main.ts';
+          return 'package.json\nabc/composer.JSON\nREADME.md\nsrc/main.ts\nsrc/index.ts';
         }
         return '';
       },
