@@ -29,7 +29,7 @@ export const getDiffInfoForPush = async(octokit: Octokit, context: Context): Pro
   if (!await isDefaultBranch(octokit, context)) {
     const pull = await (new ApiHelper(octokit, context)).findPullRequest(context.ref);
     if (pull) {
-      if (checkOnlyCommit(pull.draft)) {
+      if (checkOnlyCommit(Utils.ensureNotNullValue(pull.draft, false))) {
         return {
           base: context.payload.before,
           head: context.payload.after,
