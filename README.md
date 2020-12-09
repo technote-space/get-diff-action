@@ -223,7 +223,7 @@ If called on any other event, the result will be empty.
 |:---|:---|:---|
 | tag push | --- | --- |
 | pull request | pull.base.ref (e.g. master) | context.ref (e.g. refs/pull/123/merge) |
-| push (has related pull request) | pull.base.ref (e.g. master) | `refs/pull/${pull.number}/merge` (e.g. refs/pull/123/merge) |
+| push (which has related pull request) | pull.base.ref (e.g. master) | `refs/pull/${pull.number}/merge` (e.g. refs/pull/123/merge) |
 | context.payload.before = '000...000' | default branch (e.g. master) | context.payload.after |
 | else | context.payload.before | context.payload.after |
 
