@@ -14,5 +14,13 @@
   "TOC_MAX_HEADER_LEVEL": "3",
   "TOC_TITLE": "Details",
   "TOC_CREATE_PR": "true",
-  "BRANCH_PREFIX": "release/"
+  "TOC_TARGET_PATHS": "README*.md",
+  "BRANCH_PREFIX": "release/",
+  "ANNOTATION_EXCLUDE_PATTERNS": [
+    "warning jest",
+    "warning babel-jest",
+    "Cloning into",
+    "has unmet peer dependency",
+    "has incorrect peer dependency"
+  ]
 }
