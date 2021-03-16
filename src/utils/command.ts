@@ -1,17 +1,19 @@
 import path from 'path';
-import {getInput} from '@actions/core' ;
-import {Context} from '@actions/github/lib/context';
-import multimatch, {Options} from 'multimatch';
-import {Command, Utils, GitHelper} from '@technote-space/github-action-helper';
-import {Logger} from '@technote-space/github-action-log-helper';
-import {escape, getDiffInfo} from './misc';
-import {FileDiffResult, FileResult, DiffResult, DiffInfo} from '../types';
-import {REMOTE_NAME} from '../constant';
+import { getInput } from '@actions/core' ;
+import { Context } from '@actions/github/lib/context';
+import multimatch, { Options } from 'multimatch';
+import { Command, Utils, GitHelper } from '@technote-space/github-action-helper';
+import { Logger } from '@technote-space/github-action-log-helper';
+import { escape, getDiffInfo } from './misc';
+import { FileDiffResult, FileResult, DiffResult, DiffInfo } from '../types';
+import { REMOTE_NAME } from '../constant';
 
 const command                    = new Command(new Logger());
 const getRawInput                = (name: string): string => process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
 const getDot                     = (): string => getInput('DOT', {required: true});
 const getFilter                  = (): string => getInput('DIFF_FILTER', {required: true});
+const getOutputFormatType        = (): string => getRawInput('FORMAT');
+const escapeWhenJsonFormat       = (): boolean => Utils.getBoolValue(getRawInput('ESCAPE_JSON'));
 const getSeparator               = (): string => getRawInput('SEPARATOR');
 const getPatterns                = (): string[] => Utils.getArrayInput('PATTERNS', undefined, '');
 const getFiles                   = (): string[] => Utils.getArrayInput('FILES', undefined, '');
@@ -110,8 +112,9 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
     .map(item => ({...item, file: toAbsolute(item.file, workspace)}));
 };
 
-export const getDiffFiles    = (diffs: FileResult[], filter: boolean): string => escape(diffs.filter(item => !filter || item.isMatched).map(item => item.file)).join(getSeparator());
-export const getMatchedFiles = (diffs: FileResult[]): string => escape(diffs.filter(item => item.filterIgnored).map(item => item.file)).join(getSeparator());
+const format                 = (items: string[]): string => getOutputFormatType() !== 'text' ? JSON.stringify(escapeWhenJsonFormat() ? escape(items) : items) : escape(items).join(getSeparator());
+export const getDiffFiles    = (diffs: FileResult[], filter: boolean): string => format(diffs.filter(item => !filter || item.isMatched).map(item => item.file));
+export const getMatchedFiles = (diffs: FileResult[]): string => format(diffs.filter(item => item.filterIgnored).map(item => item.file));
 export const sumResults      = (diffs: DiffResult[], map: (item: DiffResult) => number): number => getSummaryIncludeFilesFlag() ?
   diffs.map(map).reduce((acc, val) => acc + val, 0) : // eslint-disable-line no-magic-numbers
   diffs.filter(item => !item.filterIgnored).map(map).reduce((acc, val) => acc + val, 0); // eslint-disable-line no-magic-numbers
