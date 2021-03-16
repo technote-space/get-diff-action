@@ -655,6 +655,27 @@ describe('getDiffFiles', () => {
       {file: 'test2 test3', ...defaultFileResult},
     ], true)).toBe('\'test2 test3\'');
   });
+
+  it('should get git diff output (json format)', () => {
+    process.env.INPUT_FORMAT = 'json';
+
+    expect(getDiffFiles([], true)).toBe('[]');
+    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}], false)).toBe('["test1"]');
+    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2', ...defaultFileResult}], false)).toBe('["test1","test2"]');
+    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2 test3', ...defaultFileResult}], false)).toBe('["test1","test2 test3"]');
+    expect(getDiffFiles([{file: 'test1/test2.txt', ...defaultFileResult}], false)).toBe('["test1/test2.txt"]');
+  });
+
+  it('should get git diff output (escaped json format)', () => {
+    process.env.INPUT_FORMAT      = 'json';
+    process.env.INPUT_ESCAPE_JSON = '1';
+
+    expect(getDiffFiles([], true)).toBe('[]');
+    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}], false)).toBe('["test1"]');
+    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2', ...defaultFileResult}], false)).toBe('["test1","test2"]');
+    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2 test3', ...defaultFileResult}], false)).toBe('["test1","\'test2 test3\'"]');
+    expect(getDiffFiles([{file: 'test1/test2.txt', ...defaultFileResult}], false)).toBe('["\'test1/test2.txt\'"]');
+  });
 });
 
 describe('sumResults', () => {
