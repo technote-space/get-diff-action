@@ -1,6 +1,6 @@
 /* eslint-disable no-magic-numbers */
 import nock from 'nock';
-import path, {resolve} from 'path';
+import path, { resolve } from 'path';
 import {
   generateContext,
   testEnv,
@@ -12,8 +12,8 @@ import {
   disableNetConnect,
   getApiFixture,
 } from '@technote-space/github-action-test-helper';
-import {Logger} from '@technote-space/github-action-log-helper';
-import {getGitDiff, getFileDiff, getDiffFiles, sumResults} from '../../src/utils/command';
+import { Logger } from '@technote-space/github-action-log-helper';
+import { getGitDiff, getFileDiff, getDiffFiles, sumResults } from '../../src/utils/command';
 
 const rootDir           = path.resolve(__dirname, '../..');
 const fixtureRootDir    = resolve(__dirname, '..', 'fixtures');
@@ -612,42 +612,48 @@ describe('getFileDiff', () => {
 describe('getDiffFiles', () => {
   testEnv(rootDir);
 
-  it('get git diff output 1', () => {
-    expect(getDiffFiles([], false)).toEqual('');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}], false)).toEqual('test1');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2', ...defaultFileResult}], false)).toEqual('test1 test2');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2 test3', ...defaultFileResult}], false)).toEqual('test1 \'test2 test3\'');
-    expect(getDiffFiles([{file: 'test1/test2.txt', ...defaultFileResult}], false)).toEqual('\'test1/test2.txt\'');
+  it('should get git diff output 1', () => {
+    expect(getDiffFiles([], false)).toBe('');
+    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}], false)).toBe('test1');
+    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2', ...defaultFileResult}], false)).toBe('test1 test2');
+    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2 test3', ...defaultFileResult}], false)).toBe('test1 \'test2 test3\'');
+    expect(getDiffFiles([{file: 'test1/test2.txt', ...defaultFileResult}], false)).toBe('\'test1/test2.txt\'');
   });
 
-  it('get git diff output 2', () => {
+  it('should get git diff output 2', () => {
     process.env.INPUT_SEPARATOR = '\n';
 
-    expect(getDiffFiles([], false)).toEqual('');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}], false)).toEqual('test1');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2', ...defaultFileResult}], false)).toEqual('test1\ntest2');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2 test3', ...defaultFileResult}], false)).toEqual('test1\n\'test2 test3\'');
-    expect(getDiffFiles([{file: 'test1/test2.txt', ...defaultFileResult}], false)).toEqual('\'test1/test2.txt\'');
+    expect(getDiffFiles([], false)).toBe('');
+    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}], false)).toBe('test1');
+    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2', ...defaultFileResult}], false)).toBe('test1\ntest2');
+    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2 test3', ...defaultFileResult}], false)).toBe('test1\n\'test2 test3\'');
+    expect(getDiffFiles([{file: 'test1/test2.txt', ...defaultFileResult}], false)).toBe('\'test1/test2.txt\'');
   });
 
-  it('get git diff output 3', () => {
+  it('should get git diff output 3', () => {
     delete process.env.INPUT_SEPARATOR;
     process.env.INPUT_TEST = '';
 
-    expect(getDiffFiles([], false)).toEqual('');
+    expect(getDiffFiles([], false)).toBe('');
   });
 
-  it('get git diff output 4', () => {
-    expect(getDiffFiles([], true)).toEqual('');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult, isMatched: false}], true)).toEqual('');
-    expect(getDiffFiles([{
-      file: 'test1', ...defaultFileResult,
-      isMatched: false,
-    }, {file: 'test2', ...defaultFileResult}], true)).toEqual('test2');
-    expect(getDiffFiles([{
-      file: 'test1', ...defaultFileResult,
-      isMatched: false,
-    }, {file: 'test2 test3', ...defaultFileResult}], true)).toEqual('\'test2 test3\'');
+  it('should get git diff output 4', () => {
+    expect(getDiffFiles([], true)).toBe('');
+    expect(getDiffFiles([{file: 'test1', ...defaultFileResult, isMatched: false}], true)).toBe('');
+    expect(getDiffFiles([
+      {
+        file: 'test1', ...defaultFileResult,
+        isMatched: false,
+      },
+      {file: 'test2', ...defaultFileResult},
+    ], true)).toBe('test2');
+    expect(getDiffFiles([
+      {
+        file: 'test1', ...defaultFileResult,
+        isMatched: false,
+      },
+      {file: 'test2 test3', ...defaultFileResult},
+    ], true)).toBe('\'test2 test3\'');
   });
 });
 
