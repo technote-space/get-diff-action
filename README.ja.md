@@ -7,7 +7,8 @@
 
 *Read this in other languages: [English](README.md), [日本語](README.ja.md).*
 
-これは `git diff` を取得するための GitHub Actions です。
+これは `git diff` を取得するための GitHub Actions です。  
+env または actionsの出力 から差分を得ることができます。
 
 ## Table of Contents
 

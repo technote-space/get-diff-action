@@ -7,7 +7,8 @@
 
 *Read this in other languages: [English](README.md), [日本語](README.ja.md).*
 
-GitHub actions to get git diff.
+GitHub actions to get git diff.  
+You can get the differences via env or action output.
 
 ## Table of Contents
 
