@@ -29,6 +29,7 @@ You can get the differences via env or action output.
 - [Addition](#addition)
   - [FROM, TO](#from-to)
   - [Check only the latest commit differences in a draft Pull Request](#check-only-the-latest-commit-differences-in-a-draft-pull-request)
+  - [To get the result in Json format](#to-get-the-result-in-json-format)
 - [Author](#author)
 
 </details>
