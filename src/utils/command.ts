@@ -41,6 +41,7 @@ export const getFileDiff = async(file: FileResult, diffInfo: DiffInfo, dot: stri
       `${getCompareRef(diffInfo.base)}${dot}${getCompareRef(diffInfo.head)}`,
       '--shortstat',
       '-w',
+      '--',
       file.file,
     ],
     cwd: Utils.getWorkspace(),

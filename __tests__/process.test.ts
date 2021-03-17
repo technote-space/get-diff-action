@@ -215,9 +215,9 @@ describe('execute', () => {
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
       'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/pull/55/merge:refs/remotes/get-diff-action/pull/55/merge\' \'refs/heads/master:refs/remotes/get-diff-action/master\' || :',
       'git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' \'--diff-filter=AMRC\' --name-only || :',
-      'git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w \'package.json\'',
-      'git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w \'abc/package.json\'',
-      'git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w \'src/main.ts\'',
+      'git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w -- \'package.json\'',
+      'git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w -- \'abc/package.json\'',
+      'git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w -- \'src/main.ts\'',
     ]);
     stdoutCalledWith(mockStdout, [
       '[command]git remote add get-diff-action',
@@ -227,11 +227,11 @@ describe('execute', () => {
       '  >> abc/package.json',
       '  >> README.md',
       '  >> src/main.ts',
-      '[command]git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w \'package.json\'',
+      '[command]git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w -- \'package.json\'',
       '  >> 1 file changed, 25 insertions(+), 4 deletions(-)',
-      '[command]git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w \'abc/package.json\'',
+      '[command]git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w -- \'abc/package.json\'',
       '  >> 1 file changed, 25 insertions(+), 4 deletions(-)',
-      '[command]git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w \'src/main.ts\'',
+      '[command]git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w -- \'src/main.ts\'',
       '  >> 1 file changed, 25 insertions(+), 4 deletions(-)',
       '::group::Dump diffs',
       getLogStdout([
