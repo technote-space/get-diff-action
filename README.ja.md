@@ -29,6 +29,7 @@ env または actionsの出力 から差分を得ることができます。
 - [補足](#%E8%A3%9C%E8%B6%B3)
   - [FROM, TO](#from-to)
   - [下書きのプルリクエストで最新コミット差分のみをチェックする場合](#%E4%B8%8B%E6%9B%B8%E3%81%8D%E3%81%AE%E3%83%97%E3%83%AB%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%81%A7%E6%9C%80%E6%96%B0%E3%82%B3%E3%83%9F%E3%83%83%E3%83%88%E5%B7%AE%E5%88%86%E3%81%AE%E3%81%BF%E3%82%92%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88)
+  - [Json形式で結果を取得する場合](#json%E5%BD%A2%E5%BC%8F%E3%81%A7%E7%B5%90%E6%9E%9C%E3%82%92%E5%8F%96%E5%BE%97%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88)
 - [Author](#author)
 
 </details>
@@ -244,6 +245,33 @@ jobs:
         with:
           CHECK_ONLY_COMMIT_WHEN_DRAFT: true
       # ...
+```
+
+### Json形式で結果を取得する場合
+```yaml
+on: pull_request
+name: CI
+jobs:
+  dump:
+    name: Dump
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: technote-space/get-diff-action@v4
+        with:
+          PATTERNS: |
+            +(src|__tests__)/**/*.ts
+            !src/exclude.ts
+          FORMAT: json
+      - run: echo '${{ env.GIT_DIFF }}' | jq .
+```
+
+Result:
+```shell
+Run echo '["yarn.lock"]' | jq .
+[
+  "yarn.lock"
+]
 ```
 
 ## Author
