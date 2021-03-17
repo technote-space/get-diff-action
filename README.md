@@ -7,7 +7,8 @@
 
 *Read this in other languages: [English](README.md), [日本語](README.ja.md).*
 
-GitHub actions to get git diff.
+GitHub actions to get git diff.  
+You can get the differences via env or action output.
 
 ## Table of Contents
 
@@ -28,6 +29,7 @@ GitHub actions to get git diff.
 - [Addition](#addition)
   - [FROM, TO](#from-to)
   - [Check only the latest commit differences in a draft Pull Request](#check-only-the-latest-commit-differences-in-a-draft-pull-request)
+  - [To get the result in Json format](#to-get-the-result-in-json-format)
 - [Author](#author)
 
 </details>
@@ -243,6 +245,33 @@ jobs:
         with:
           CHECK_ONLY_COMMIT_WHEN_DRAFT: true
       # ...
+```
+
+### To get the result in Json format
+```yaml
+on: pull_request
+name: CI
+jobs:
+  dump:
+    name: Dump
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: technote-space/get-diff-action@v4
+        with:
+          PATTERNS: |
+            +(src|__tests__)/**/*.ts
+            !src/exclude.ts
+          FORMAT: json
+      - run: echo '${{ env.GIT_DIFF }}' | jq .
+```
+
+Result:
+```shell
+Run echo '["yarn.lock"]' | jq .
+[
+  "yarn.lock"
+]
 ```
 
 ## Author

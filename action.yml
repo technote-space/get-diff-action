@@ -18,6 +18,13 @@ inputs:
     description: Diff filter.
     default: 'AMRC'
     required: true
+  FORMAT:
+    description: Output format (text or json)
+    default: text
+    required: true
+  ESCAPE_JSON:
+    description: Whether to escape when json format.
+    required: false
   SEPARATOR:
     description: Separator of diffs.
     default: ' '
