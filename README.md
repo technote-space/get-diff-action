@@ -32,6 +32,8 @@ You can get the differences via env or action output.
   - [To get the result in Json format](#to-get-the-result-in-json-format)
 - [Author](#author)
 
+*generated with [TOC Generator](https://github.com/technote-space/toc-generator)*
+
 </details>
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
