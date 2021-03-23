@@ -32,6 +32,8 @@ env または actionsの出力 から差分を得ることができます。
   - [Json形式で結果を取得する場合](#json%E5%BD%A2%E5%BC%8F%E3%81%A7%E7%B5%90%E6%9E%9C%E3%82%92%E5%8F%96%E5%BE%97%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88)
 - [Author](#author)
 
+*generated with [TOC Generator](https://github.com/technote-space/toc-generator)*
+
 </details>
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
