@@ -40,7 +40,7 @@
     "@actions/core": "^1.2.7",
     "@actions/github": "^4.0.0",
     "@technote-space/filter-github-action": "^0.5.24",
-    "@technote-space/github-action-helper": "^5.2.6",
+    "@technote-space/github-action-helper": "^5.2.7",
     "@technote-space/github-action-log-helper": "^0.1.24",
     "multimatch": "^5.0.0"
   },
