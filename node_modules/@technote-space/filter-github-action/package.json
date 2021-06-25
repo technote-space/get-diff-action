@@ -1,6 +1,6 @@
 {
   "name": "@technote-space/filter-github-action",
-  "version": "0.5.28",
+  "version": "0.5.29",
   "description": "Helper to filter GitHub Action.",
   "keywords": [
     "github",
@@ -38,12 +38,12 @@
     "@actions/github": "^5.0.0"
   },
   "devDependencies": {
-    "@technote-space/github-action-test-helper": "^0.7.12",
+    "@technote-space/github-action-test-helper": "^0.7.13",
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.12.2",
-    "@typescript-eslint/eslint-plugin": "^4.27.0",
-    "@typescript-eslint/parser": "^4.27.0",
-    "eslint": "^7.28.0",
+    "@types/node": "^15.12.4",
+    "@typescript-eslint/eslint-plugin": "^4.28.0",
+    "@typescript-eslint/parser": "^4.28.0",
+    "eslint": "^7.29.0",
     "jest": "^27.0.4",
     "jest-circus": "^27.0.4",
     "ts-jest": "^27.0.3",
