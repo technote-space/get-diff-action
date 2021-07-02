@@ -270,10 +270,39 @@ jobs:
 
 Result:
 ```shell
-Run echo '["yarn.lock"]' | jq .
+> Run echo '["yarn.lock"]' | jq .
 [
   "yarn.lock"
 ]
+```
+
+### 相対パスを指定
+
+GitHub Actions は `uses` に `working-directory` を指定できないため、モノレポ構成などで個別に実行したい場合に対応できませんが、`RELATIVE` オプションを指定すると `git diff` の `--relative=<RELATIVE>` として使用されます。
+
+https://git-scm.com/docs/git-diff#Documentation/git-diff.txt---relativeltpathgt
+
+```yaml
+on: pull_request
+name: CI
+jobs:
+  dump:
+    name: Dump
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: technote-space/get-diff-action@v4
+        with:
+          PATTERNS: '*.ts'
+          RELATIVE: 'src/abc'
+      - run: echo ${{ env.GIT_DIFF }}
+```
+
+`src/abc/test1.ts`, `src/abc/test2.ts`, `src/abc/test3.txt`, `src/test4.ts` のファイルがある場合、結果は以下のようになります。
+
+```shell
+> Run echo 'test1.ts' 'test2.ts'
+test1.ts test2.ts
 ```
 
 ## Author
