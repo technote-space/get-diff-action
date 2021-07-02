@@ -276,6 +276,33 @@ Run echo '["yarn.lock"]' | jq .
 ]
 ```
 
+### Specify a relative path
+
+GitHub Actions doesn't support `working-directory` for `uses`, so you can't run this action separately for monorepo configuration, etc. However, if you specify the `RELATIVE` option, it will be used as `--relative=<RELATIVE>` for `git diff`.
+
+```yaml
+on: pull_request
+name: CI
+jobs:
+  dump:
+    name: Dump
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: technote-space/get-diff-action@v4
+        with:
+          PATTERNS: '*.ts'
+          RELATIVE: 'src/abc'
+      - run: echo ${{ env.GIT_DIFF }}
+```
+
+If the files `src/abc/test1.ts`, `src/abc/test2.ts`, `src/abc/test3.txt`, and `src/test4.ts` exist, the result will be as follows:
+
+```shell
+> Run echo 'test1.ts' 'test2.ts'
+test1.ts test2.ts
+```
+
 ## Author
 [GitHub (Technote)](https://github.com/technote-space)
 
