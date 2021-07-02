@@ -14,6 +14,9 @@ inputs:
     description: Dot.
     default: '...'
     required: true
+  BASE:
+    description: base
+    required: false
   DIFF_FILTER:
     description: Diff filter.
     default: 'AMRC'

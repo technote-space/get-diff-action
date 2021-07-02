@@ -415,6 +415,45 @@ describe('getGitDiff', () => {
     ]);
   });
 
+  it('should get git diff (push, not found pr with base setting)', async() => {
+    process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN = 'test token';
+    process.env.INPUT_BASE         = 'main';
+
+    const mockExec = spyOnSpawn();
+    setChildProcessParams({
+      stdout: (command: string): string => {
+        if (command.startsWith('git diff')) {
+          return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
+        }
+        return '';
+      },
+    });
+
+    nock('https://api.github.com')
+      .persist()
+      .get('/repos/hello/world/pulls?head=hello%3Atest')
+      .reply(200, () => []);
+
+    expect(await getGitDiff(logger, Object.assign({}, pushContext, {
+      ref: 'refs/heads/test',
+    }))).toEqual([
+      {file: 'package.json', ...emptyDiff},
+      {file: 'abc/composer.json', ...emptyDiff},
+      {file: 'README.md', ...emptyDiff},
+      {file: 'src/main.ts', ...emptyDiff},
+    ]);
+    execCalledWith(mockExec, [
+      'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
+      'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/heads/test:refs/remotes/get-diff-action/test\' || :',
+      'git diff \'main...after-sha\' \'--diff-filter=AMRC\' --name-only || :',
+      'git diff \'main...after-sha\' --shortstat -w -- \'package.json\'',
+      'git diff \'main...after-sha\' --shortstat -w -- \'abc/composer.json\'',
+      'git diff \'main...after-sha\' --shortstat -w -- \'README.md\'',
+      'git diff \'main...after-sha\' --shortstat -w -- \'src/main.ts\'',
+    ]);
+  });
+
   it('should get git diff (push tag)', async() => {
     process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
     process.env.INPUT_GITHUB_TOKEN = 'test token';
