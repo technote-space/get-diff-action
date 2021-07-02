@@ -12,6 +12,7 @@ const command                    = new Command(new Logger());
 const getRawInput                = (name: string): string => process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
 const getDot                     = (): string => getInput('DOT', {required: true});
 const getFilter                  = (): string => getInput('DIFF_FILTER', {required: true});
+const getRelativePath            = (): string => getInput('RELATIVE');
 const getOutputFormatType        = (): string => getRawInput('FORMAT');
 const escapeWhenJsonFormat       = (): boolean => Utils.getBoolValue(getRawInput('ESCAPE_JSON'));
 const getSeparator               = (): string => getRawInput('SEPARATOR');
@@ -89,6 +90,7 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
   const patterns  = getPatterns();
   const options   = getMatchOptions();
   const filter    = getFilter();
+  const relative  = getRelativePath();
 
   return (await Utils.split((await command.execAsync({
     command: 'git diff',
@@ -96,6 +98,9 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
       `${getCompareRef(diffInfo.base)}${dot}${getCompareRef(diffInfo.head)}`,
       `--diff-filter=${filter}`,
       '--name-only',
+      ...(relative ? [
+        `--relative=${relative}`,
+      ] : []),
     ],
     cwd: Utils.getWorkspace(),
     suppressError: true,
