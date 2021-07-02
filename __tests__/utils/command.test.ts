@@ -564,6 +564,31 @@ describe('getGitDiff', () => {
       'git diff \'get-diff-action/master..get-diff-action/pull/55/merge\' --shortstat -w -- \'__tests__/main.test.ts\'',
     ]);
   });
+
+  it('should get git diff (relative)', async() => {
+    process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN = 'test token';
+    process.env.INPUT_RELATIVE     = 'src/test';
+    const mockExec                 = spyOnSpawn();
+    setChildProcessParams({
+      stdout: (command: string): string => {
+        if (command.startsWith('git diff')) {
+          return 'test.txt';
+        }
+        return '';
+      },
+    });
+
+    expect(await getGitDiff(logger, prContext)).toEqual([
+      {file: 'test.txt', ...emptyDiff},
+    ]);
+    execCalledWith(mockExec, [
+      'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
+      'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/pull/55/merge:refs/remotes/get-diff-action/pull/55/merge\' \'refs/heads/master:refs/remotes/get-diff-action/master\' || :',
+      'git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' \'--diff-filter=AMRC\' --name-only \'--relative=src/test\' || :',
+      'git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w -- \'test.txt\'',
+    ]);
+  });
 });
 
 describe('getFileDiff', () => {

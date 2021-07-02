@@ -17,6 +17,9 @@ inputs:
   BASE:
     description: base
     required: false
+  RELATIVE:
+    description: relative filter
+    required: false
   DIFF_FILTER:
     description: Diff filter.
     default: 'AMRC'
