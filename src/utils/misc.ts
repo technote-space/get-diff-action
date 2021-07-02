@@ -21,6 +21,8 @@ export const getDiffInfoForPR = (pull: PullRequestParams, context: Context): Dif
 
 export const isDefaultBranch = async(octokit: Octokit, context: Context): Promise<boolean> => await (new ApiHelper(octokit, context)).getDefaultBranch() === Utils.getBranch(context);
 
+const getBase = (context: Context): string => getInput('BASE') || context.payload.before;
+
 export const getDiffInfoForPush = async(octokit: Octokit, context: Context): Promise<DiffInfo> => {
   if (Utils.isTagRef(context)) {
     return {base: '', head: ''};
@@ -44,6 +46,7 @@ export const getDiffInfoForPush = async(octokit: Octokit, context: Context): Pro
   }
 
   if (/^0+$/.test(context.payload.before)) {
+    // new branch
     return {
       base: Utils.normalizeRef(await (new ApiHelper(octokit, context)).getDefaultBranch()),
       head: context.payload.after,
@@ -51,7 +54,7 @@ export const getDiffInfoForPush = async(octokit: Octokit, context: Context): Pro
   }
 
   return {
-    base: context.payload.before,
+    base: getBase(context),
     head: context.payload.after,
   };
 };
