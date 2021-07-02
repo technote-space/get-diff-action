@@ -13,7 +13,7 @@ export const dumpDiffs = (diffs: DiffResult[], logger: Logger): void => {
 export const setResult = (diffs: DiffResult[], skipped: boolean, logger: Logger): void => {
   const insertions = sumResults(diffs, item => item.insertions);
   const deletions  = sumResults(diffs, item => item.deletions);
-  const getValue   = (setting: { name: string, value: () => number | string }): string => skipped ? getInput(`${setting.name.toUpperCase()}_DEFAULT`) : `${setting.value()}`;
+  const getValue   = (setting: {name: string, value: () => number | string}): string => skipped ? getInput(`${setting.name.toUpperCase()}_DEFAULT`) : `${setting.value()}`;
   const settings   = [
     {name: 'diff', value: () => getDiffFiles(diffs, false), envNameSuffix: ''},
     {name: 'filtered_diff', value: () => getDiffFiles(diffs, true)},
