@@ -88,12 +88,13 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
   const workspace = getWorkspace();
   const patterns  = getPatterns();
   const options   = getMatchOptions();
+  const filter    = getFilter();
 
   return (await Utils.split((await command.execAsync({
     command: 'git diff',
     args: [
       `${getCompareRef(diffInfo.base)}${dot}${getCompareRef(diffInfo.head)}`,
-      '--diff-filter=' + getFilter(),
+      `--diff-filter=${filter}`,
       '--name-only',
     ],
     cwd: Utils.getWorkspace(),
