@@ -418,7 +418,7 @@ describe('getGitDiff', () => {
   it('should get git diff (push, not found pr with base setting)', async() => {
     process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
     process.env.INPUT_GITHUB_TOKEN = 'test token';
-    process.env.INPUT_BASE         = 'main';
+    process.env.INPUT_BASE         = 'refs/heads/main';
 
     const mockExec = spyOnSpawn();
     setChildProcessParams({
@@ -445,12 +445,12 @@ describe('getGitDiff', () => {
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
-      'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/heads/test:refs/remotes/get-diff-action/test\' || :',
-      'git diff \'main...after-sha\' \'--diff-filter=AMRC\' --name-only || :',
-      'git diff \'main...after-sha\' --shortstat -w -- \'package.json\'',
-      'git diff \'main...after-sha\' --shortstat -w -- \'abc/composer.json\'',
-      'git diff \'main...after-sha\' --shortstat -w -- \'README.md\'',
-      'git diff \'main...after-sha\' --shortstat -w -- \'src/main.ts\'',
+      'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/heads/test:refs/remotes/get-diff-action/test\' \'refs/heads/main:refs/remotes/get-diff-action/main\' || :',
+      'git diff \'get-diff-action/main...after-sha\' \'--diff-filter=AMRC\' --name-only || :',
+      'git diff \'get-diff-action/main...after-sha\' --shortstat -w -- \'package.json\'',
+      'git diff \'get-diff-action/main...after-sha\' --shortstat -w -- \'abc/composer.json\'',
+      'git diff \'get-diff-action/main...after-sha\' --shortstat -w -- \'README.md\'',
+      'git diff \'get-diff-action/main...after-sha\' --shortstat -w -- \'src/main.ts\'',
     ]);
   });
 
