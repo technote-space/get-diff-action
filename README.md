@@ -281,6 +281,8 @@ Result:
 
 GitHub Actions doesn't support `working-directory` for `uses`, so you can't run this action separately for monorepo configuration, etc. However, if you specify the `RELATIVE` option, it will be used as `--relative=<RELATIVE>` for `git diff`.
 
+https://git-scm.com/docs/git-diff#Documentation/git-diff.txt---relativeltpathgt
+
 ```yaml
 on: pull_request
 name: CI
