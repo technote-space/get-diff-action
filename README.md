@@ -30,6 +30,7 @@ You can get the differences via env or action output.
   - [FROM, TO](#from-to)
   - [Check only the latest commit differences in a draft Pull Request](#check-only-the-latest-commit-differences-in-a-draft-pull-request)
   - [To get the result in Json format](#to-get-the-result-in-json-format)
+  - [Specify a relative path](#specify-a-relative-path)
 - [Author](#author)
 
 *generated with [TOC Generator](https://github.com/technote-space/toc-generator)*
@@ -270,10 +271,39 @@ jobs:
 
 Result:
 ```shell
-Run echo '["yarn.lock"]' | jq .
+> Run echo '["yarn.lock"]' | jq .
 [
   "yarn.lock"
 ]
+```
+
+### Specify a relative path
+
+GitHub Actions doesn't support `working-directory` for `uses`, so you can't run this action separately for monorepo configuration, etc. However, if you specify the `RELATIVE` option, it will be used as `--relative=<RELATIVE>` for `git diff`.
+
+https://git-scm.com/docs/git-diff#Documentation/git-diff.txt---relativeltpathgt
+
+```yaml
+on: pull_request
+name: CI
+jobs:
+  dump:
+    name: Dump
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: technote-space/get-diff-action@v4
+        with:
+          PATTERNS: '*.ts'
+          RELATIVE: 'src/abc'
+      - run: echo ${{ env.GIT_DIFF }}
+```
+
+If the files `src/abc/test1.ts`, `src/abc/test2.ts`, `src/abc/test3.txt`, and `src/test4.ts` exist, the result will be as follows:
+
+```shell
+> Run echo 'test1.ts' 'test2.ts'
+test1.ts test2.ts
 ```
 
 ## Author

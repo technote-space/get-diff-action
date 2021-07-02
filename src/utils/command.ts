@@ -1,27 +1,28 @@
-import path from 'path';
-import { getInput } from '@actions/core' ;
-import { Context } from '@actions/github/lib/context';
-import multimatch, { Options } from 'multimatch';
-import { Command, Utils, GitHelper } from '@technote-space/github-action-helper';
-import { Logger } from '@technote-space/github-action-log-helper';
-import { escape, getDiffInfo } from './misc';
-import { FileDiffResult, FileResult, DiffResult, DiffInfo } from '../types';
-import { REMOTE_NAME } from '../constant';
+import {basename, join} from 'path';
+import {getInput} from '@actions/core' ;
+import {Context} from '@actions/github/lib/context';
+import multimatch, {Options} from 'multimatch';
+import {Command, Utils, GitHelper} from '@technote-space/github-action-helper';
+import {Logger} from '@technote-space/github-action-log-helper';
+import {escape, getDiffInfo} from './misc';
+import {FileDiffResult, FileResult, DiffResult, DiffInfo} from '../types';
+import {REMOTE_NAME} from '../constant';
 
 const command                    = new Command(new Logger());
 const getRawInput                = (name: string): string => process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
 const getDot                     = (): string => getInput('DOT', {required: true});
 const getFilter                  = (): string => getInput('DIFF_FILTER', {required: true});
+const getRelativePath            = (): string => getInput('RELATIVE');
 const getOutputFormatType        = (): string => getRawInput('FORMAT');
 const escapeWhenJsonFormat       = (): boolean => Utils.getBoolValue(getRawInput('ESCAPE_JSON'));
 const getSeparator               = (): string => getRawInput('SEPARATOR');
 const getPatterns                = (): string[] => Utils.getArrayInput('PATTERNS', undefined, '');
 const getFiles                   = (): string[] => Utils.getArrayInput('FILES', undefined, '');
-const getWorkspace               = (): string => Utils.getBoolValue(getInput('ABSOLUTE')) ? (Utils.getWorkspace() + '/') : '';
+const getWorkspace               = (relative: string): string => Utils.getBoolValue(getInput('ABSOLUTE')) ? (join(Utils.getWorkspace(), relative) + '/') : '';
 const getSummaryIncludeFilesFlag = (): boolean => Utils.getBoolValue(getInput('SUMMARY_INCLUDE_FILES'));
-const isFilterIgnored            = (item: string, files: string[]): boolean => !!(files.length && files.includes(path.basename(item)));
+const isFilterIgnored            = (item: string, files: string[]): boolean => !!(files.length && files.includes(basename(item)));
 const isMatched                  = (item: string, patterns: string[], options: Options): boolean => !patterns.length || !!multimatch(item, patterns, options).length;
-const toAbsolute                 = (item: string, workspace: string): string => workspace + item;
+const toAbsolute                 = (item: string, workspace: string): string => join(workspace, item);
 const getMatchOptions            = (): Options => ({
   nobrace: Utils.getBoolValue(getInput('MINIMATCH_OPTION_NOBRACE')),
   noglobstar: Utils.getBoolValue(getInput('MINIMATCH_OPTION_NOGLOBSTAR')),
@@ -85,16 +86,21 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
 
   const dot       = getDot();
   const files     = getFiles();
-  const workspace = getWorkspace();
+  const relative  = getRelativePath();
+  const workspace = getWorkspace(relative);
   const patterns  = getPatterns();
   const options   = getMatchOptions();
+  const filter    = getFilter();
 
   return (await Utils.split((await command.execAsync({
     command: 'git diff',
     args: [
       `${getCompareRef(diffInfo.base)}${dot}${getCompareRef(diffInfo.head)}`,
-      '--diff-filter=' + getFilter(),
+      `--diff-filter=${filter}`,
       '--name-only',
+      ...(relative ? [
+        `--relative=${relative}`,
+      ] : []),
     ],
     cwd: Utils.getWorkspace(),
     suppressError: true,

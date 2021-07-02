@@ -1,6 +1,6 @@
 /* eslint-disable no-magic-numbers */
 import nock from 'nock';
-import path, { resolve } from 'path';
+import path, {resolve, join} from 'path';
 import {
   generateContext,
   testEnv,
@@ -12,8 +12,8 @@ import {
   disableNetConnect,
   getApiFixture,
 } from '@technote-space/github-action-test-helper';
-import { Logger } from '@technote-space/github-action-log-helper';
-import { getGitDiff, getFileDiff, getDiffFiles, sumResults } from '../../src/utils/command';
+import {Logger} from '@technote-space/github-action-log-helper';
+import {getGitDiff, getFileDiff, getDiffFiles, sumResults} from '../../src/utils/command';
 
 const rootDir           = path.resolve(__dirname, '../..');
 const fixtureRootDir    = resolve(__dirname, '..', 'fixtures');
@@ -415,6 +415,45 @@ describe('getGitDiff', () => {
     ]);
   });
 
+  it('should get git diff (push, not found pr with base setting)', async() => {
+    process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN = 'test token';
+    process.env.INPUT_BASE         = 'refs/heads/main';
+
+    const mockExec = spyOnSpawn();
+    setChildProcessParams({
+      stdout: (command: string): string => {
+        if (command.startsWith('git diff')) {
+          return 'package.json\nabc/composer.json\nREADME.md\nsrc/main.ts';
+        }
+        return '';
+      },
+    });
+
+    nock('https://api.github.com')
+      .persist()
+      .get('/repos/hello/world/pulls?head=hello%3Atest')
+      .reply(200, () => []);
+
+    expect(await getGitDiff(logger, Object.assign({}, pushContext, {
+      ref: 'refs/heads/test',
+    }))).toEqual([
+      {file: 'package.json', ...emptyDiff},
+      {file: 'abc/composer.json', ...emptyDiff},
+      {file: 'README.md', ...emptyDiff},
+      {file: 'src/main.ts', ...emptyDiff},
+    ]);
+    execCalledWith(mockExec, [
+      'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
+      'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/heads/test:refs/remotes/get-diff-action/test\' \'refs/heads/main:refs/remotes/get-diff-action/main\' || :',
+      'git diff \'get-diff-action/main...after-sha\' \'--diff-filter=AMRC\' --name-only || :',
+      'git diff \'get-diff-action/main...after-sha\' --shortstat -w -- \'package.json\'',
+      'git diff \'get-diff-action/main...after-sha\' --shortstat -w -- \'abc/composer.json\'',
+      'git diff \'get-diff-action/main...after-sha\' --shortstat -w -- \'README.md\'',
+      'git diff \'get-diff-action/main...after-sha\' --shortstat -w -- \'src/main.ts\'',
+    ]);
+  });
+
   it('should get git diff (push tag)', async() => {
     process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
     process.env.INPUT_GITHUB_TOKEN = 'test token';
@@ -523,6 +562,57 @@ describe('getGitDiff', () => {
       'git diff \'get-diff-action/master..get-diff-action/pull/55/merge\' --shortstat -w -- \'src/main.ts\'',
       'git diff \'get-diff-action/master..get-diff-action/pull/55/merge\' --shortstat -w -- \'src/test/test2.txt\'',
       'git diff \'get-diff-action/master..get-diff-action/pull/55/merge\' --shortstat -w -- \'__tests__/main.test.ts\'',
+    ]);
+  });
+
+  it('should get git diff (relative)', async() => {
+    process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN = 'test token';
+    process.env.INPUT_RELATIVE     = 'src/test';
+    const mockExec                 = spyOnSpawn();
+    setChildProcessParams({
+      stdout: (command: string): string => {
+        if (command.startsWith('git diff')) {
+          return 'test.txt';
+        }
+        return '';
+      },
+    });
+
+    expect(await getGitDiff(logger, prContext)).toEqual([
+      {file: 'test.txt', ...emptyDiff},
+    ]);
+    execCalledWith(mockExec, [
+      'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
+      'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/pull/55/merge:refs/remotes/get-diff-action/pull/55/merge\' \'refs/heads/master:refs/remotes/get-diff-action/master\' || :',
+      'git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' \'--diff-filter=AMRC\' --name-only \'--relative=src/test\' || :',
+      'git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w -- \'test.txt\'',
+    ]);
+  });
+
+  it('should get git diff (relative, absolute)', async() => {
+    process.env.GITHUB_WORKSPACE   = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN = 'test token';
+    process.env.INPUT_RELATIVE     = 'src/test';
+    process.env.INPUT_ABSOLUTE     = 'true';
+    const mockExec                 = spyOnSpawn();
+    setChildProcessParams({
+      stdout: (command: string): string => {
+        if (command.startsWith('git diff')) {
+          return 'test.txt';
+        }
+        return '';
+      },
+    });
+
+    expect(await getGitDiff(logger, prContext)).toEqual([
+      {file: join(process.env.GITHUB_WORKSPACE, process.env.INPUT_RELATIVE, 'test.txt'), ...emptyDiff},
+    ]);
+    execCalledWith(mockExec, [
+      'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
+      'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/pull/55/merge:refs/remotes/get-diff-action/pull/55/merge\' \'refs/heads/master:refs/remotes/get-diff-action/master\' || :',
+      'git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' \'--diff-filter=AMRC\' --name-only \'--relative=src/test\' || :',
+      'git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' --shortstat -w -- \'test.txt\'',
     ]);
   });
 });
