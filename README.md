@@ -30,6 +30,7 @@ You can get the differences via env or action output.
   - [FROM, TO](#from-to)
   - [Check only the latest commit differences in a draft Pull Request](#check-only-the-latest-commit-differences-in-a-draft-pull-request)
   - [To get the result in Json format](#to-get-the-result-in-json-format)
+  - [Specify a relative path](#specify-a-relative-path)
 - [Author](#author)
 
 *generated with [TOC Generator](https://github.com/technote-space/toc-generator)*

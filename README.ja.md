@@ -30,6 +30,7 @@ env または actionsの出力 から差分を得ることができます。
   - [FROM, TO](#from-to)
   - [下書きのプルリクエストで最新コミット差分のみをチェックする場合](#%E4%B8%8B%E6%9B%B8%E3%81%8D%E3%81%AE%E3%83%97%E3%83%AB%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%81%A7%E6%9C%80%E6%96%B0%E3%82%B3%E3%83%9F%E3%83%83%E3%83%88%E5%B7%AE%E5%88%86%E3%81%AE%E3%81%BF%E3%82%92%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88)
   - [Json形式で結果を取得する場合](#json%E5%BD%A2%E5%BC%8F%E3%81%A7%E7%B5%90%E6%9E%9C%E3%82%92%E5%8F%96%E5%BE%97%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88)
+  - [相対パスを指定](#%E7%9B%B8%E5%AF%BE%E3%83%91%E3%82%B9%E3%82%92%E6%8C%87%E5%AE%9A)
 - [Author](#author)
 
 *generated with [TOC Generator](https://github.com/technote-space/toc-generator)*
