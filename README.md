@@ -270,7 +270,7 @@ jobs:
 
 Result:
 ```shell
-Run echo '["yarn.lock"]' | jq .
+> Run echo '["yarn.lock"]' | jq .
 [
   "yarn.lock"
 ]
