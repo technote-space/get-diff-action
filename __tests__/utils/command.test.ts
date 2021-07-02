@@ -1,6 +1,6 @@
 /* eslint-disable no-magic-numbers */
 import nock from 'nock';
-import path, { resolve } from 'path';
+import path, {resolve} from 'path';
 import {
   generateContext,
   testEnv,
@@ -12,8 +12,8 @@ import {
   disableNetConnect,
   getApiFixture,
 } from '@technote-space/github-action-test-helper';
-import { Logger } from '@technote-space/github-action-log-helper';
-import { getGitDiff, getFileDiff, getDiffFiles, sumResults } from '../../src/utils/command';
+import {Logger} from '@technote-space/github-action-log-helper';
+import {getGitDiff, getFileDiff, getDiffFiles, sumResults} from '../../src/utils/command';
 
 const rootDir           = path.resolve(__dirname, '../..');
 const fixtureRootDir    = resolve(__dirname, '..', 'fixtures');
