@@ -1,4 +1,4 @@
-import path from 'path';
+import {basename, join} from 'path';
 import {getInput} from '@actions/core' ;
 import {Context} from '@actions/github/lib/context';
 import multimatch, {Options} from 'multimatch';
@@ -18,11 +18,11 @@ const escapeWhenJsonFormat       = (): boolean => Utils.getBoolValue(getRawInput
 const getSeparator               = (): string => getRawInput('SEPARATOR');
 const getPatterns                = (): string[] => Utils.getArrayInput('PATTERNS', undefined, '');
 const getFiles                   = (): string[] => Utils.getArrayInput('FILES', undefined, '');
-const getWorkspace               = (): string => Utils.getBoolValue(getInput('ABSOLUTE')) ? (Utils.getWorkspace() + '/') : '';
+const getWorkspace               = (relative: string): string => Utils.getBoolValue(getInput('ABSOLUTE')) ? (join(Utils.getWorkspace(), relative) + '/') : '';
 const getSummaryIncludeFilesFlag = (): boolean => Utils.getBoolValue(getInput('SUMMARY_INCLUDE_FILES'));
-const isFilterIgnored            = (item: string, files: string[]): boolean => !!(files.length && files.includes(path.basename(item)));
+const isFilterIgnored            = (item: string, files: string[]): boolean => !!(files.length && files.includes(basename(item)));
 const isMatched                  = (item: string, patterns: string[], options: Options): boolean => !patterns.length || !!multimatch(item, patterns, options).length;
-const toAbsolute                 = (item: string, workspace: string): string => workspace + item;
+const toAbsolute                 = (item: string, workspace: string): string => join(workspace, item);
 const getMatchOptions            = (): Options => ({
   nobrace: Utils.getBoolValue(getInput('MINIMATCH_OPTION_NOBRACE')),
   noglobstar: Utils.getBoolValue(getInput('MINIMATCH_OPTION_NOGLOBSTAR')),
@@ -86,11 +86,11 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
 
   const dot       = getDot();
   const files     = getFiles();
-  const workspace = getWorkspace();
+  const relative  = getRelativePath();
+  const workspace = getWorkspace(relative);
   const patterns  = getPatterns();
   const options   = getMatchOptions();
   const filter    = getFilter();
-  const relative  = getRelativePath();
 
   return (await Utils.split((await command.execAsync({
     command: 'git diff',
