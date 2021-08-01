@@ -120,6 +120,9 @@ inputs:
   CHECK_ONLY_COMMIT_WHEN_DRAFT:
     description: Whether to check only commits when drafting.
     required: false
+  SUPPRESS_ERROR:
+    description: Whether to suppress git diff error.
+    required: false
 
 outputs:
   diff:

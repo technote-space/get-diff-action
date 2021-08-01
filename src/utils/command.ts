@@ -20,6 +20,7 @@ const getPatterns                = (): string[] => Utils.getArrayInput('PATTERNS
 const getFiles                   = (): string[] => Utils.getArrayInput('FILES', undefined, '');
 const getWorkspace               = (relative: string): string => Utils.getBoolValue(getInput('ABSOLUTE')) ? (join(Utils.getWorkspace(), relative) + '/') : '';
 const getSummaryIncludeFilesFlag = (): boolean => Utils.getBoolValue(getInput('SUMMARY_INCLUDE_FILES'));
+const isSuppressGitDiffError     = (): boolean => Utils.getBoolValue(getInput('SUPPRESS_ERROR'));
 const isFilterIgnored            = (item: string, files: string[]): boolean => !!(files.length && files.includes(basename(item)));
 const isMatched                  = (item: string, patterns: string[], options: Options): boolean => !patterns.length || !!multimatch(item, patterns, options).length;
 const toAbsolute                 = (item: string, workspace: string): string => join(workspace, item);
@@ -103,7 +104,7 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
       ] : []),
     ],
     cwd: Utils.getWorkspace(),
-    suppressError: true,
+    suppressError: isSuppressGitDiffError(),
   })).stdout)
     .map(item => ({
       file: item,
