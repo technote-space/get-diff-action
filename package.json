@@ -37,20 +37,20 @@
     "postpublish": "[ -n \"$CI\" ] || [ ! -f node_modules/.bin/pinst ] || pinst --enable"
   },
   "dependencies": {
-    "@actions/core": "^1.4.0",
+    "@actions/core": "^1.5.0",
     "@actions/github": "^5.0.0",
-    "@technote-space/filter-github-action": "^0.5.40",
+    "@technote-space/filter-github-action": "^0.5.42",
     "@technote-space/github-action-helper": "^5.2.17",
-    "@technote-space/github-action-log-helper": "^0.1.36",
+    "@technote-space/github-action-log-helper": "^0.1.37",
     "multimatch": "^5.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^13.1.0",
     "@commitlint/config-conventional": "^13.1.0",
-    "@technote-space/github-action-test-helper": "^0.7.22",
+    "@technote-space/github-action-test-helper": "^0.7.24",
     "@technote-space/release-github-actions-cli": "^1.8.6",
     "@types/jest": "^27.0.1",
-    "@types/node": "^16.6.1",
+    "@types/node": "^16.7.1",
     "@typescript-eslint/eslint-plugin": "^4.29.2",
     "@typescript-eslint/parser": "^4.29.2",
     "eslint": "^7.32.0",
@@ -58,9 +58,9 @@
     "jest": "^27.0.6",
     "jest-circus": "^27.0.6",
     "lint-staged": "^11.1.2",
-    "nock": "^13.1.1",
+    "nock": "^13.1.2",
     "pinst": "^2.1.6",
-    "ts-jest": "^27.0.4",
+    "ts-jest": "^27.0.5",
     "typescript": "^4.3.5"
   },
   "publishConfig": {
