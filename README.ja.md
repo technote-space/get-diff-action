@@ -1,9 +1,9 @@
 # Get Diff Action
 
 [![CI Status](https://github.com/technote-space/get-diff-action/workflows/CI/badge.svg)](https://github.com/technote-space/get-diff-action/actions)
-[![codecov](https://codecov.io/gh/technote-space/get-diff-action/branch/master/graph/badge.svg)](https://codecov.io/gh/technote-space/get-diff-action)
+[![codecov](https://codecov.io/gh/technote-space/get-diff-action/branch/main/graph/badge.svg)](https://codecov.io/gh/technote-space/get-diff-action)
 [![CodeFactor](https://www.codefactor.io/repository/github/technote-space/get-diff-action/badge)](https://www.codefactor.io/repository/github/technote-space/get-diff-action)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/technote-space/get-diff-action/blob/master/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/technote-space/get-diff-action/blob/main/LICENSE)
 
 *Read this in other languages: [English](README.md), [日本語](README.ja.md).*
 
@@ -227,9 +227,9 @@ jobs:
 | condition | FROM | TO |
 |:---|:---|:---|
 | tag push | --- | --- |
-| pull request | pull.base.ref (e.g. master) | context.ref (e.g. refs/pull/123/merge) |
-| push (has related pull request) | pull.base.ref (e.g. master) | `refs/pull/${pull.number}/merge` (e.g. refs/pull/123/merge) |
-| context.payload.before = '000...000' | default branch (e.g. master) | context.payload.after |
+| pull request | pull.base.ref (e.g. main) | context.ref (e.g. refs/pull/123/merge) |
+| push (has related pull request) | pull.base.ref (e.g. main) | `refs/pull/${pull.number}/merge` (e.g. refs/pull/123/merge) |
+| context.payload.before = '000...000' | default branch (e.g. main) | context.payload.after |
 | else | context.payload.before | context.payload.after |
 
 ### 下書きのプルリクエストで最新コミット差分のみをチェックする場合
