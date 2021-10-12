@@ -1959,6 +1959,10 @@ export interface paths {
      */
     get: operations["actions/get-workflow-run-attempt"];
   };
+  "/repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}/jobs": {
+    /** Lists jobs for a specific workflow run attempt. Anyone with read access to the repository can use this endpoint. If the repository is private you must use an access token with the `repo` scope. GitHub Apps must have the `actions:read` permission to use this endpoint. You can use parameters to narrow the list of results. For more information about using parameters, see [Parameters](https://docs.github.com/rest/overview/resources-in-the-rest-api#parameters). */
+    get: operations["actions/list-jobs-for-workflow-run-attempt"];
+  };
   "/repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}/logs": {
     /**
      * Gets a redirect URL to download an archive of log files for a specific workflow run attempt. This link expires after
@@ -19890,6 +19894,38 @@ export interface operations {
       };
     };
   };
+  /** Lists jobs for a specific workflow run attempt. Anyone with read access to the repository can use this endpoint. If the repository is private you must use an access token with the `repo` scope. GitHub Apps must have the `actions:read` permission to use this endpoint. You can use parameters to narrow the list of results. For more information about using parameters, see [Parameters](https://docs.github.com/rest/overview/resources-in-the-rest-api#parameters). */
+  "actions/list-jobs-for-workflow-run-attempt": {
+    parameters: {
+      path: {
+        owner: components["parameters"]["owner"];
+        repo: components["parameters"]["repo"];
+        /** The id of the workflow run. */
+        run_id: components["parameters"]["run-id"];
+        /** The attempt number of the workflow run. */
+        attempt_number: components["parameters"]["attempt-number"];
+      };
+      query: {
+        /** Results per page (max 100) */
+        per_page?: components["parameters"]["per-page"];
+        /** Page number of the results to fetch. */
+        page?: components["parameters"]["page"];
+      };
+    };
+    responses: {
+      /** Response */
+      200: {
+        headers: {};
+        content: {
+          "application/json": {
+            total_count: number;
+            jobs: components["schemas"]["job"][];
+          };
+        };
+      };
+      404: components["responses"]["not_found"];
+    };
+  };
   /**
    * Gets a redirect URL to download an archive of log files for a specific workflow run attempt. This link expires after
    * 1 minute. Look for `Location:` in the response header to find the URL for the download. Anyone with read access to
@@ -28430,6 +28466,8 @@ export interface operations {
           "application/json": components["schemas"]["release-asset"];
         };
       };
+      /** Response if you upload an asset with the same filename as another uploaded asset */
+      422: unknown;
     };
     requestBody: {
       content: {
