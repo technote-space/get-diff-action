@@ -7,15 +7,13 @@ Create an array with values that are present in the first array but not addition
 
 @example
 ```
-import arrayDiffer = require('array-differ');
+import arrayDiffer from 'array-differ';
 
 arrayDiffer([2, 3, 4], [3, 50]);
 //=> [2, 4]
 ```
 */
-declare function arrayDiffer<ValueType>(
+export default function arrayDiffer<ValueType>(
 	array: readonly ValueType[],
-	...values: (readonly ValueType[])[]
+	...values: Array<readonly ValueType[]>
 ): ValueType[];
-
-export = arrayDiffer;
