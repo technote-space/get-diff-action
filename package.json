@@ -57,7 +57,7 @@
     "husky": "^7.0.4",
     "jest": "^27.3.1",
     "jest-circus": "^27.3.1",
-    "lint-staged": "^11.2.4",
+    "lint-staged": "^11.2.6",
     "nock": "^13.1.4",
     "pinst": "^2.1.6",
     "ts-jest": "^27.0.7",
