@@ -1,7 +1,7 @@
-import {Context} from '@actions/github/lib/context';
-import {Octokit} from '@technote-space/github-action-helper/dist/types';
+import type {PullRequestParams, DiffInfo} from '../types';
+import type {Context} from '@actions/github/lib/context';
+import type {Octokit} from '@technote-space/github-action-helper/dist/types';
 import {Utils, ApiHelper} from '@technote-space/github-action-helper';
-import {PullRequestParams, DiffInfo} from '../types';
 import {getInput} from '@actions/core';
 
 export const escape = (items: string[]): string[] => items.map(item => {

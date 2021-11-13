@@ -3,6 +3,7 @@
 /node_modules
 /coverage
 /lib
+/dist
 /.work
 .eslintcache
 .env
