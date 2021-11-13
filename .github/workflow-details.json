@@ -1,3 +1,4 @@
 {
-  "TOC_FOOTER": "*generated with [TOC Generator](https://github.com/technote-space/toc-generator)*"
+  "TOC_FOOTER": "*generated with [TOC Generator](https://github.com/technote-space/toc-generator)*",
+  "RELEASE_GA_DELETE_NODE_MODULES": "true"
 }
