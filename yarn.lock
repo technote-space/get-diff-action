@@ -1436,15 +1436,15 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@technote-space/filter-github-action@^0.5.48", "@technote-space/filter-github-action@^0.5.53":
-  version "0.5.53"
-  resolved "https://registry.yarnpkg.com/@technote-space/filter-github-action/-/filter-github-action-0.5.53.tgz#e6b54abdfabdc68bbf4315ae21b15bef8e73b5e3"
-  integrity sha512-Q/Lk1iUcgKq8TmByuOz4VopnTeUhvP53BpWVH4dlkHRHz1+pgg0zN8tI19/SzOBHIKZSCBWZStl6UtLSG7vQHw==
+"@technote-space/filter-github-action@^0.5.54":
+  version "0.5.54"
+  resolved "https://registry.yarnpkg.com/@technote-space/filter-github-action/-/filter-github-action-0.5.54.tgz#3d4e833bb2419f8cfc2ee7ea001042b3912093df"
+  integrity sha512-kEz91EPfGhWu6gJggXWc6OMMQr+oTIHj3JSuM+gWuujIz37xsvd35PoWfa8HqAKsZ7albkDVzIhqaKNgHl/SvQ==
   dependencies:
     "@actions/core" "^1.6.0"
     "@actions/github" "^5.0.0"
 
-"@technote-space/github-action-helper@^5.2.23", "@technote-space/github-action-helper@^5.2.27":
+"@technote-space/github-action-helper@^5.2.27":
   version "5.2.27"
   resolved "https://registry.yarnpkg.com/@technote-space/github-action-helper/-/github-action-helper-5.2.27.tgz#117fede94c493fe76f74b1986df1597ed2cee02c"
   integrity sha512-P4C0rJkXG4bNXZHdbgEBP4HnO0oTd8QhurALW8L4lFyFqFoLS9gr6KSUDj+s0JobwDynb0mx7Kkw4Cs+K4FgkA==
@@ -1457,7 +1457,7 @@
     shell-escape "^0.2.0"
     sprintf-js "^1.1.2"
 
-"@technote-space/github-action-log-helper@^0.1.41", "@technote-space/github-action-log-helper@^0.1.46":
+"@technote-space/github-action-log-helper@^0.1.46":
   version "0.1.46"
   resolved "https://registry.yarnpkg.com/@technote-space/github-action-log-helper/-/github-action-log-helper-0.1.46.tgz#5abfaced0fe45d1d57b14010df31618ee4c93ba4"
   integrity sha512-DA769GXp3KKWXIz4PWARQJctXlbo0yBX6767bmtfUTri8B+4OK09wd+flbns6bjXGWpcRBwmbjSuXJEPop2wSA==
@@ -1475,29 +1475,29 @@
     "@octokit/plugin-rest-endpoint-methods" "^5.13.0"
     js-yaml "^4.1.0"
 
-"@technote-space/release-github-actions-cli@^1.8.8":
-  version "1.8.8"
-  resolved "https://registry.yarnpkg.com/@technote-space/release-github-actions-cli/-/release-github-actions-cli-1.8.8.tgz#ce8163fa1cf04875129c72331737d3abf5c664a3"
-  integrity sha512-D2CSdDc6gnpEQD5eP3F7dhF5nWmkk2FD/YK7Is4Q6nzfzd9xVf1+bh3iEhn2GuGl/MNw3YBPA7feUXbyDvWEhQ==
+"@technote-space/release-github-actions-cli@^1.8.9":
+  version "1.8.9"
+  resolved "https://registry.yarnpkg.com/@technote-space/release-github-actions-cli/-/release-github-actions-cli-1.8.9.tgz#4bce887ab24046577df689bb7f14e79cffaabe92"
+  integrity sha512-bY/MpSVMgRUWwblyWYI+2WDsup0YO5b849YZ6gRcCQkShuPxSnJKHlEdSiWLlRfW3C5Du6jbpqANOrwwJYgUqg==
   dependencies:
-    "@technote-space/github-action-helper" "^5.2.23"
-    "@technote-space/github-action-log-helper" "^0.1.41"
-    "@technote-space/release-github-actions" "^7.1.0"
+    "@technote-space/github-action-helper" "^5.2.27"
+    "@technote-space/github-action-log-helper" "^0.1.46"
+    "@technote-space/release-github-actions" "^7.1.1"
     commander "^8.3.0"
     cosmiconfig "^7.0.1"
     dotenv "^10.0.0"
     js-yaml "^4.1.0"
 
-"@technote-space/release-github-actions@^7.1.0":
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/@technote-space/release-github-actions/-/release-github-actions-7.1.0.tgz#8b79db12253e9112fae19e23d059f15f7162007b"
-  integrity sha512-j5afUiBgnf7z4+gUGt4FKqfp9uRp0letepwcfWc0bb9mG+d6Df4FMoehlcyec0eEFdqNUCYW0AwdYsgpUSMOCQ==
+"@technote-space/release-github-actions@^7.1.1":
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/@technote-space/release-github-actions/-/release-github-actions-7.1.1.tgz#5bccb67aa826faf4e4827a0a1854201f6b38dc71"
+  integrity sha512-1zhNKVkqkQZMj+zoPcZdaZmNHzR71Lij4AF6GrjNgYWN2nA1LEFuiPK90oa4pI2VrA6BpHny02aCrTnuvBzRZA==
   dependencies:
     "@actions/core" "^1.6.0"
     "@actions/github" "^5.0.0"
-    "@technote-space/filter-github-action" "^0.5.48"
-    "@technote-space/github-action-helper" "^5.2.23"
-    "@technote-space/github-action-log-helper" "^0.1.41"
+    "@technote-space/filter-github-action" "^0.5.54"
+    "@technote-space/github-action-helper" "^5.2.27"
+    "@technote-space/github-action-log-helper" "^0.1.46"
     memize "^1.1.0"
 
 "@tootallnate/once@1":
@@ -2442,9 +2442,9 @@ dotenv@^10.0.0:
   integrity sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==
 
 electron-to-chromium@^1.4.17:
-  version "1.4.32"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.32.tgz#7ad1e76692b307da454b7380cc882784962648b8"
-  integrity sha512-7QRVfMlccTFs7cZV3lB0k9Wcm6R6F+w1yBPX+xBAlAP/1oJIstxTev3A4r8REnUUAFph/cIB8y/EBU7PDbJTQw==
+  version "1.4.34"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.34.tgz#7d87dc0e95c2c65cbd0687ae23146a662506d1ef"
+  integrity sha512-B7g6Y9No9XMYk1VNrQ8KAmSEo1Iltrz/5EjOGxl1DffQAb3z/XbpHRCfYKwV8D+CPXm4Q7Xg1sceSt9osNwRIA==
 
 emittery@^0.8.1:
   version "0.8.1"
