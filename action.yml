@@ -105,6 +105,9 @@ inputs:
     description: Default value (count).
     default: '0'
     required: false
+  GET_FILE_DIFF:
+    description: Whether to get file diff.
+    required: false
   INSERTIONS_DEFAULT:
     description: Default value (insertions).
     default: '0'

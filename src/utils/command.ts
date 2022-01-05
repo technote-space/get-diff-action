@@ -16,6 +16,7 @@ const getFilter                  = (): string => getInput('DIFF_FILTER', {requir
 const getRelativePath            = (): string => getInput('RELATIVE');
 const getOutputFormatType        = (): string => getRawInput('FORMAT');
 const escapeWhenJsonFormat       = (): boolean => Utils.getBoolValue(getRawInput('ESCAPE_JSON'));
+export const getFileDiffFlag     = (): boolean => Utils.getBoolValue(getRawInput('GET_FILE_DIFF'));
 const getSeparator               = (): string => getRawInput('SEPARATOR');
 const getPatterns                = (): string[] => Utils.getArrayInput('PATTERNS', undefined, '');
 const getFiles                   = (): string[] => Utils.getArrayInput('FILES', undefined, '');
@@ -37,7 +38,11 @@ const getMatchOptions            = (): Options => ({
 
 const getCompareRef = (ref: string): string => Utils.isRef(ref) ? Utils.getLocalRefspec(ref, REMOTE_NAME) : ref;
 
-export const getFileDiff = async(file: FileResult, diffInfo: DiffInfo, dot: string): Promise<FileDiffResult> => {
+export const getFileDiff = async(file: FileResult, diffInfo: DiffInfo, dot: string, skip?: boolean): Promise<FileDiffResult | undefined> => {
+  if (skip) {
+    return undefined;
+  }
+
   const stdout = (await command.execAsync({
     command: 'git diff',
     args: [
@@ -86,13 +91,14 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
     '--depth=10000',
   ], Utils.uniqueArray(refs).map(ref => Utils.getRefspec(ref, REMOTE_NAME)));
 
-  const dot       = getDot();
-  const files     = getFiles();
-  const relative  = getRelativePath();
-  const workspace = getWorkspace(relative);
-  const patterns  = getPatterns();
-  const options   = getMatchOptions();
-  const filter    = getFilter();
+  const dot          = getDot();
+  const files        = getFiles();
+  const relative     = getRelativePath();
+  const workspace    = getWorkspace(relative);
+  const patterns     = getPatterns();
+  const options      = getMatchOptions();
+  const filter       = getFilter();
+  const skipFileDiff = !getFileDiffFlag();
 
   return (await Utils.split((await command.execAsync({
     command: 'git diff',
@@ -113,7 +119,7 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
       isMatched: isMatched(item, patterns, options),
     }))
     .filter(item => item.filterIgnored || item.isMatched)
-    .map(async item => ({...item, ...await getFileDiff(item, diffInfo, dot)}))
+    .map(async item => ({...item, ...await getFileDiff(item, diffInfo, dot, skipFileDiff)}))
     .reduce(async(prev, item) => {
       const acc = await prev;
       return acc.concat(await item);
