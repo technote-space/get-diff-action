@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: technote-space/get-diff-action@v5
+      - uses: technote-space/get-diff-action@v6
         with:
           PATTERNS: |
             +(src|__tests__)/**/*.ts
@@ -106,7 +106,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: technote-space/get-diff-action@v5
+      - uses: technote-space/get-diff-action@v6
         with:
           PATTERNS: |
             +(src|__tests__)/**/*.ts
@@ -244,7 +244,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: technote-space/get-diff-action@v5
+      - uses: technote-space/get-diff-action@v6
         with:
           CHECK_ONLY_COMMIT_WHEN_DRAFT: true
       # ...
@@ -260,7 +260,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: technote-space/get-diff-action@v5
+      - uses: technote-space/get-diff-action@v6
         with:
           PATTERNS: |
             +(src|__tests__)/**/*.ts
@@ -292,7 +292,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: technote-space/get-diff-action@v5
+      - uses: technote-space/get-diff-action@v6
         with:
           PATTERNS: '*.ts'
           RELATIVE: 'src/abc'
