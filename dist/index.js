@@ -90,18 +90,24 @@ const dumpDiffs = (diffs, logger) => {
 };
 exports.dumpDiffs = dumpDiffs;
 const setResult = (diffs, skipped, logger) => {
-    const insertions = (0, command_1.sumResults)(diffs, item => item.insertions);
-    const deletions = (0, command_1.sumResults)(diffs, item => item.deletions);
+    // eslint-disable-next-line no-magic-numbers
+    const insertions = (0, command_1.sumResults)(diffs, item => 'insertions' in item ? item.insertions : 0);
+    // eslint-disable-next-line no-magic-numbers
+    const deletions = (0, command_1.sumResults)(diffs, item => 'deletions' in item ? item.deletions : 0);
     const getValue = (setting) => skipped ? (0, core_1.getInput)(`${setting.name.toUpperCase()}_DEFAULT`) : `${setting.value()}`;
     const settings = [
         { name: 'diff', value: () => (0, command_1.getDiffFiles)(diffs, false), envNameSuffix: '' },
         { name: 'filtered_diff', value: () => (0, command_1.getDiffFiles)(diffs, true) },
         { name: 'matched_files', value: () => (0, command_1.getMatchedFiles)(diffs) },
         { name: 'count', value: () => diffs.length },
-        { name: 'insertions', value: () => insertions },
-        { name: 'deletions', value: () => deletions },
-        { name: 'lines', value: () => insertions + deletions },
     ];
+    if ((0, command_1.getFileDiffFlag)()) {
+        settings.push(...[
+            { name: 'insertions', value: () => insertions },
+            { name: 'deletions', value: () => deletions },
+            { name: 'lines', value: () => insertions + deletions },
+        ]);
+    }
     logger.startProcess('Dump output');
     settings.forEach(setting => {
         var _a;
@@ -144,7 +150,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sumResults = exports.getMatchedFiles = exports.getDiffFiles = exports.getGitDiff = exports.getFileDiff = void 0;
+exports.sumResults = exports.getMatchedFiles = exports.getDiffFiles = exports.getGitDiff = exports.getFileDiff = exports.getFileDiffFlag = void 0;
 const path_1 = __nccwpck_require__(1017);
 const core_1 = __nccwpck_require__(2186);
 const multimatch_1 = __importDefault(__nccwpck_require__(5225));
@@ -159,6 +165,8 @@ const getFilter = () => (0, core_1.getInput)('DIFF_FILTER', { required: true });
 const getRelativePath = () => (0, core_1.getInput)('RELATIVE');
 const getOutputFormatType = () => getRawInput('FORMAT');
 const escapeWhenJsonFormat = () => github_action_helper_1.Utils.getBoolValue(getRawInput('ESCAPE_JSON'));
+const getFileDiffFlag = () => github_action_helper_1.Utils.getBoolValue(getRawInput('GET_FILE_DIFF'));
+exports.getFileDiffFlag = getFileDiffFlag;
 const getSeparator = () => getRawInput('SEPARATOR');
 const getPatterns = () => github_action_helper_1.Utils.getArrayInput('PATTERNS', undefined, '');
 const getFiles = () => github_action_helper_1.Utils.getArrayInput('FILES', undefined, '');
@@ -178,8 +186,11 @@ const getMatchOptions = () => ({
     nonegate: github_action_helper_1.Utils.getBoolValue((0, core_1.getInput)('MINIMATCH_OPTION_NONEGATE')),
 });
 const getCompareRef = (ref) => github_action_helper_1.Utils.isRef(ref) ? github_action_helper_1.Utils.getLocalRefspec(ref, constant_1.REMOTE_NAME) : ref;
-const getFileDiff = (file, diffInfo, dot) => __awaiter(void 0, void 0, void 0, function* () {
+const getFileDiff = (file, diffInfo, dot, skip) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
+    if (skip) {
+        return undefined;
+    }
     const stdout = (yield command.execAsync({
         command: 'git diff',
         args: [
@@ -229,6 +240,7 @@ const getGitDiff = (logger, context) => __awaiter(void 0, void 0, void 0, functi
     const patterns = getPatterns();
     const options = getMatchOptions();
     const filter = getFilter();
+    const skipFileDiff = !(0, exports.getFileDiffFlag)();
     return (yield github_action_helper_1.Utils.split((yield command.execAsync({
         command: 'git diff',
         args: [
@@ -248,7 +260,7 @@ const getGitDiff = (logger, context) => __awaiter(void 0, void 0, void 0, functi
         isMatched: isMatched(item, patterns, options),
     }))
         .filter(item => item.filterIgnored || item.isMatched)
-        .map((item) => __awaiter(void 0, void 0, void 0, function* () { return (Object.assign(Object.assign({}, item), yield (0, exports.getFileDiff)(item, diffInfo, dot))); }))
+        .map((item) => __awaiter(void 0, void 0, void 0, function* () { return (Object.assign(Object.assign({}, item), yield (0, exports.getFileDiff)(item, diffInfo, dot, skipFileDiff))); }))
         .reduce((prev, item) => __awaiter(void 0, void 0, void 0, function* () {
         const acc = yield prev;
         return acc.concat(yield item);

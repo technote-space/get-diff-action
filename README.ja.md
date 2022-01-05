@@ -209,9 +209,9 @@ jobs:
 |:---|:---|:---|
 | diff | 差分のあるファイルの結果<br>`SET_ENV_NAME`(default: `GIT_DIFF`) が設定されている場合、その名前で環境変数が設定されます | `src/main.ts src/docs.md` |
 | count | 差分のあるファイル数<br>`SET_ENV_NAME_COUNT`(default: `''`) が設定されている場合、その名前で環境変数が設定されます | `100` |
-| insertions | 追加された行数<br>`SET_ENV_NAME_INSERTIONS`(default: `''`) が設定されている場合、その名前で環境変数が設定されます | `100` |
-| deletions | 削除された行数<br>`SET_ENV_NAME_DELETIONS`(default: `''`) が設定されている場合、その名前で環境変数が設定されます | `100` |
-| lines | 追加された行数と削除された行数の和<br>`SET_ENV_NAME_LINES`(default: `''`) が設定されている場合、その名前で環境変数が設定されます | `200` |
+| insertions | 追加された行数 (`GET_FILE_DIFF` が `true` の場合のみ利用可能)<br>`SET_ENV_NAME_INSERTIONS`(default: `''`) が設定されている場合、その名前で環境変数が設定されます | `100` |
+| deletions | 削除された行数 (`GET_FILE_DIFF` が `true` の場合のみ利用可能)<br>`SET_ENV_NAME_DELETIONS`(default: `''`) が設定されている場合、その名前で環境変数が設定されます | `100` |
+| lines | 追加された行数と削除された行数の和 (`GET_FILE_DIFF` が `true` の場合のみ利用可能)<br>`SET_ENV_NAME_LINES`(default: `''`) が設定されている場合、その名前で環境変数が設定されます | `200` |
 
 ## Action イベント詳細
 ### 対象イベント
