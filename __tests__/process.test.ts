@@ -133,6 +133,36 @@ describe('setResult', () => {
       '',
       '::set-output name=count::3',
       '"count: 3"',
+      '::endgroup::',
+    ]);
+    exportVariableCalledWith(mockEnv, [
+      {name: 'GIT_DIFF', val: 'test1 test2 test4'},
+      {name: 'GIT_DIFF_FILTERED', val: 'test1 test2'},
+      {name: 'MATCHED_FILES', val: 'test4'},
+    ]);
+  });
+
+  it('should set result with file diff', () => {
+    process.env.INPUT_GET_FILE_DIFF = '1';
+    const mockStdout                = spyOnStdout();
+    const mockEnv                   = spyOnExportVariable();
+
+    setResult(diffs, false, logger);
+
+    stdoutCalledWith(mockStdout, [
+      '::group::Dump output',
+      '',
+      '::set-output name=diff::test1 test2 test4',
+      '"diff: test1 test2 test4"',
+      '',
+      '::set-output name=filtered_diff::test1 test2',
+      '"filtered_diff: test1 test2"',
+      '',
+      '::set-output name=matched_files::test4',
+      '"matched_files: test4"',
+      '',
+      '::set-output name=count::3',
+      '"count: 3"',
       '',
       '::set-output name=insertions::3',
       '"insertions: 3"',
@@ -157,6 +187,7 @@ describe('setResult', () => {
     process.env.INPUT_SET_ENV_NAME_INSERTIONS = 'INSERTIONS';
     process.env.INPUT_SET_ENV_NAME_DELETIONS  = 'DELETIONS';
     process.env.INPUT_SET_ENV_NAME_LINES      = 'LINES';
+    process.env.INPUT_GET_FILE_DIFF           = '1';
     const mockStdout                          = spyOnStdout();
     const mockEnv                             = spyOnExportVariable();
 
@@ -207,6 +238,81 @@ describe('execute', () => {
     process.env.INPUT_GITHUB_TOKEN = 'test token';
     process.env.INPUT_FILES        = 'package.json\ncomposer.json';
     process.env.INPUT_PATTERNS     = 'src/**/*.+(ts|txt)\n__tests__/**/*.+(ts|txt)';
+
+    const mockExec   = spyOnSpawn();
+    const mockStdout = spyOnStdout();
+    const mockEnv    = spyOnExportVariable();
+    setChildProcessParams({
+      stdout: (command: string): string => {
+        if (command.startsWith('git diff')) {
+          return 'package.json\nabc/package.json\nREADME.md\nsrc/main.ts';
+        }
+        return '';
+      },
+    });
+
+    await execute(logger, prContext);
+
+    execCalledWith(mockExec, [
+      'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
+      'git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/pull/55/merge:refs/remotes/get-diff-action/pull/55/merge\' \'refs/heads/master:refs/remotes/get-diff-action/master\' || :',
+      'git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' \'--diff-filter=AMRC\' --name-only',
+    ]);
+    stdoutCalledWith(mockStdout, [
+      '[command]git remote add get-diff-action',
+      '[command]git fetch --no-tags --no-recurse-submodules \'--depth=10000\' get-diff-action \'refs/pull/55/merge:refs/remotes/get-diff-action/pull/55/merge\' \'refs/heads/master:refs/remotes/get-diff-action/master\'',
+      '[command]git diff \'get-diff-action/master...get-diff-action/pull/55/merge\' \'--diff-filter=AMRC\' --name-only',
+      '  >> package.json',
+      '  >> abc/package.json',
+      '  >> README.md',
+      '  >> src/main.ts',
+      '::group::Dump diffs',
+      getLogStdout([
+        {
+          'file': 'package.json',
+          'filterIgnored': true,
+          'isMatched': false,
+        },
+        {
+          'file': 'abc/package.json',
+          'filterIgnored': true,
+          'isMatched': false,
+        },
+        {
+          'file': 'src/main.ts',
+          'filterIgnored': false,
+          'isMatched': true,
+        },
+      ]),
+      '::endgroup::',
+      '::group::Dump output',
+      '',
+      '::set-output name=diff::\'package.json\' \'abc/package.json\' \'src/main.ts\'',
+      '"diff: \'package.json\' \'abc/package.json\' \'src/main.ts\'"',
+      '',
+      '::set-output name=filtered_diff::\'src/main.ts\'',
+      '"filtered_diff: \'src/main.ts\'"',
+      '',
+      '::set-output name=matched_files::\'package.json\' \'abc/package.json\'',
+      '"matched_files: \'package.json\' \'abc/package.json\'"',
+      '',
+      '::set-output name=count::3',
+      '"count: 3"',
+      '::endgroup::',
+    ]);
+    exportVariableCalledWith(mockEnv, [
+      {name: 'GIT_DIFF', val: '\'package.json\' \'abc/package.json\' \'src/main.ts\''},
+      {name: 'GIT_DIFF_FILTERED', val: '\'src/main.ts\''},
+      {name: 'MATCHED_FILES', val: '\'package.json\' \'abc/package.json\''},
+    ]);
+  });
+
+  it('should execute with file diff', async() => {
+    process.env.GITHUB_WORKSPACE    = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GITHUB_TOKEN  = 'test token';
+    process.env.INPUT_FILES         = 'package.json\ncomposer.json';
+    process.env.INPUT_PATTERNS      = 'src/**/*.+(ts|txt)\n__tests__/**/*.+(ts|txt)';
+    process.env.INPUT_GET_FILE_DIFF = '1';
 
     const mockExec   = spyOnSpawn();
     const mockStdout = spyOnStdout();
@@ -357,15 +463,6 @@ describe('execute', () => {
       '',
       '::set-output name=count::0',
       '"count: 0"',
-      '',
-      '::set-output name=insertions::0',
-      '"insertions: 0"',
-      '',
-      '::set-output name=deletions::0',
-      '"deletions: 0"',
-      '',
-      '::set-output name=lines::0',
-      '"lines: 0"',
       '::endgroup::',
     ]);
     exportVariableCalledWith(mockEnv, [
@@ -402,15 +499,6 @@ describe('execute', () => {
       '',
       '::set-output name=count::0',
       '"count: 0"',
-      '',
-      '::set-output name=insertions::0',
-      '"insertions: 0"',
-      '',
-      '::set-output name=deletions::0',
-      '"deletions: 0"',
-      '',
-      '::set-output name=lines::0',
-      '"lines: 0"',
       '::endgroup::',
     ]);
     exportVariableCalledWith(mockEnv, [
@@ -422,6 +510,7 @@ describe('execute', () => {
 
   it('should execute empty with default value', async() => {
     process.env.GITHUB_WORKSPACE            = '/home/runner/work/my-repo-name/my-repo-name';
+    process.env.INPUT_GET_FILE_DIFF         = '1';
     process.env.INPUT_DIFF_DEFAULT          = '1';
     process.env.INPUT_FILTERED_DIFF_DEFAULT = '2';
     process.env.INPUT_MATCHED_FILES_DEFAULT = '3';
@@ -512,15 +601,6 @@ describe('execute', () => {
       '',
       '::set-output name=count::0',
       '"count: 0"',
-      '',
-      '::set-output name=insertions::0',
-      '"insertions: 0"',
-      '',
-      '::set-output name=deletions::0',
-      '"deletions: 0"',
-      '',
-      '::set-output name=lines::0',
-      '"lines: 0"',
       '::endgroup::',
     ]);
     exportVariableCalledWith(mockEnv, [

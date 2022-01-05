@@ -209,9 +209,9 @@ If there is no difference in the source code below, this workflow will skip the 
 |:---|:---|:---|
 | diff | The results of diff file names.<br>If inputs `SET_ENV_NAME`(default: `GIT_DIFF`) is set, an environment variable is set with that name. | `src/main.ts src/docs.md` |
 | count | The number of diff files.<br>If inputs `SET_ENV_NAME_COUNT`(default: `''`) is set, an environment variable is set with that name. | `100` |
-| insertions | The number of insertions lines.<br>If inputs `SET_ENV_NAME_INSERTIONS`(default: `''`) is set, an environment variable is set with that name. | `100` |
-| deletions | The number of deletions lines.<br>If inputs `SET_ENV_NAME_DELETIONS`(default: `''`) is set, an environment variable is set with that name. | `100` |
-| lines | The number of diff lines.<br>If inputs `SET_ENV_NAME_LINES`(default: `''`) is set, an environment variable is set with that name. | `200` |
+| insertions | The number of insertions lines. (Available only if `GET_FILE_DIFF` is `true`)<br>If inputs `SET_ENV_NAME_INSERTIONS`(default: `''`) is set, an environment variable is set with that name. | `100` |
+| deletions | The number of deletions lines. (Available only if `GET_FILE_DIFF` is `true`)<br>If inputs `SET_ENV_NAME_DELETIONS`(default: `''`) is set, an environment variable is set with that name. | `100` |
+| lines | The number of diff lines. (Available only if `GET_FILE_DIFF` is `true`)<br>If inputs `SET_ENV_NAME_LINES`(default: `''`) is set, an environment variable is set with that name. | `200` |
 
 ## Action event details
 ### Target events
