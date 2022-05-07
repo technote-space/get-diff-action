@@ -37,7 +37,7 @@
     "update": "npm_config_yes=true npx npm-check-updates -u --timeout 100000 && yarn install && yarn upgrade && yarn audit"
   },
   "dependencies": {
-    "@actions/core": "^1.7.0",
+    "@actions/core": "^1.8.0",
     "@actions/github": "^5.0.1",
     "@technote-space/filter-github-action": "^0.6.1",
     "@technote-space/github-action-helper": "^5.3.5",
@@ -55,14 +55,14 @@
     "@typescript-eslint/eslint-plugin": "^5.22.0",
     "@typescript-eslint/parser": "^5.22.0",
     "@vercel/ncc": "^0.33.4",
-    "eslint": "^8.14.0",
+    "eslint": "^8.15.0",
     "husky": "^7.0.4",
-    "jest": "^28.0.3",
-    "jest-circus": "^28.0.3",
+    "jest": "^28.1.0",
+    "jest-circus": "^28.1.0",
     "lint-staged": "^12.4.1",
     "nock": "^13.2.4",
     "pinst": "^3.0.0",
-    "ts-jest": "^27.1.4",
+    "ts-jest": "^28.0.1",
     "typescript": "^4.6.4"
   },
   "publishConfig": {
