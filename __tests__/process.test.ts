@@ -1,4 +1,5 @@
 /* eslint-disable no-magic-numbers */
+import { describe, it } from 'vitest';
 import path from 'path';
 import {
   testEnv,
