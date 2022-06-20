@@ -1,18 +1,18 @@
-import type {Options} from 'multimatch';
-import type {Context} from '@actions/github/lib/context';
-import type {FileDiffResult, FileResult, DiffResult, DiffInfo} from '../types';
-import {basename, join} from 'path';
-import {getInput} from '@actions/core' ;
+import type { Options } from 'multimatch';
+import type { Context } from '@actions/github/lib/context';
+import type { FileDiffResult, FileResult, DiffResult, DiffInfo } from '../types';
+import { basename, join } from 'path';
+import { getInput } from '@actions/core' ;
 import multimatch from 'multimatch';
-import {Command, Utils, GitHelper} from '@technote-space/github-action-helper';
-import {Logger} from '@technote-space/github-action-log-helper';
-import {escape, getDiffInfo} from './misc';
-import {REMOTE_NAME} from '../constant';
+import { Command, Utils, GitHelper } from '@technote-space/github-action-helper';
+import { Logger } from '@technote-space/github-action-log-helper';
+import { escape, getDiffInfo } from './misc';
+import { REMOTE_NAME } from '../constant';
 
 const command                    = new Command(new Logger());
 const getRawInput                = (name: string): string => process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
-const getDot                     = (): string => getInput('DOT', {required: true});
-const getFilter                  = (): string => getInput('DIFF_FILTER', {required: true});
+const getDot                     = (): string => getInput('DOT', { required: true });
+const getFilter                  = (): string => getInput('DIFF_FILTER', { required: true });
 const getRelativePath            = (): string => getInput('RELATIVE');
 const getOutputFormatType        = (): string => getRawInput('FORMAT');
 const escapeWhenJsonFormat       = (): boolean => Utils.getBoolValue(getRawInput('ESCAPE_JSON'));
@@ -56,12 +56,12 @@ export const getFileDiff = async(file: FileResult, diffInfo: DiffInfo, dot: stri
   })).stdout;
 
   if ('' === stdout) {
-    return {insertions: 0, deletions: 0, lines: 0};
+    return { insertions: 0, deletions: 0, lines: 0 };
   }
 
   const insertions = Number.parseInt((stdout.match(/ (\d+) insertions?\(/) ?? ['', '0'])[1]);
   const deletions  = Number.parseInt((stdout.match(/ (\d+) deletions?\(/) ?? ['', '0'])[1]);
-  return {insertions, deletions, lines: insertions + deletions};
+  return { insertions, deletions, lines: insertions + deletions };
 };
 
 export const getGitDiff = async(logger: Logger, context: Context): Promise<Array<DiffResult>> => {
@@ -119,12 +119,12 @@ export const getGitDiff = async(logger: Logger, context: Context): Promise<Array
       isMatched: isMatched(item, patterns, options),
     }))
     .filter(item => item.filterIgnored || item.isMatched)
-    .map(async item => ({...item, ...await getFileDiff(item, diffInfo, dot, skipFileDiff)}))
+    .map(async item => ({ ...item, ...await getFileDiff(item, diffInfo, dot, skipFileDiff) }))
     .reduce(async(prev, item) => {
       const acc = await prev;
       return acc.concat(await item);
     }, Promise.resolve([] as Array<DiffResult>)))
-    .map(item => ({...item, file: toAbsolute(item.file, workspace)}));
+    .map(item => ({ ...item, file: toAbsolute(item.file, workspace) }));
 };
 
 const format                 = (items: string[]): string => getOutputFormatType() !== 'text' ? JSON.stringify(escapeWhenJsonFormat() ? escape(items) : items) : escape(items).join(getSeparator());

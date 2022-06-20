@@ -15,8 +15,8 @@ import {
   generateContext,
   getLogStdout,
 } from '@technote-space/github-action-test-helper';
-import {Logger} from '@technote-space/github-action-log-helper';
-import {dumpDiffs, setResult, execute} from '../src/process';
+import { Logger } from '@technote-space/github-action-log-helper';
+import { dumpDiffs, setResult, execute } from './process';
 
 const rootDir   = path.resolve(__dirname, '..');
 const diffs     = [
@@ -137,9 +137,9 @@ describe('setResult', () => {
       '::endgroup::',
     ]);
     exportVariableCalledWith(mockEnv, [
-      {name: 'GIT_DIFF', val: 'test1 test2 test4'},
-      {name: 'GIT_DIFF_FILTERED', val: 'test1 test2'},
-      {name: 'MATCHED_FILES', val: 'test4'},
+      { name: 'GIT_DIFF', val: 'test1 test2 test4' },
+      { name: 'GIT_DIFF_FILTERED', val: 'test1 test2' },
+      { name: 'MATCHED_FILES', val: 'test4' },
     ]);
   });
 
@@ -176,9 +176,9 @@ describe('setResult', () => {
       '::endgroup::',
     ]);
     exportVariableCalledWith(mockEnv, [
-      {name: 'GIT_DIFF', val: 'test1 test2 test4'},
-      {name: 'GIT_DIFF_FILTERED', val: 'test1 test2'},
-      {name: 'MATCHED_FILES', val: 'test4'},
+      { name: 'GIT_DIFF', val: 'test1 test2 test4' },
+      { name: 'GIT_DIFF_FILTERED', val: 'test1 test2' },
+      { name: 'MATCHED_FILES', val: 'test4' },
     ]);
   });
 
@@ -220,12 +220,12 @@ describe('setResult', () => {
       '::endgroup::',
     ]);
     exportVariableCalledWith(mockEnv, [
-      {name: 'GIT_DIFF_FILTERED', val: 'test1 test2'},
-      {name: 'MATCHED_FILES', val: 'test4'},
-      {name: 'FILE_COUNT', val: '3'},
-      {name: 'INSERTIONS', val: '3'},
-      {name: 'DELETIONS', val: '300'},
-      {name: 'LINES', val: '303'},
+      { name: 'GIT_DIFF_FILTERED', val: 'test1 test2' },
+      { name: 'MATCHED_FILES', val: 'test4' },
+      { name: 'FILE_COUNT', val: '3' },
+      { name: 'INSERTIONS', val: '3' },
+      { name: 'DELETIONS', val: '300' },
+      { name: 'LINES', val: '303' },
     ]);
   });
 });
@@ -302,9 +302,9 @@ describe('execute', () => {
       '::endgroup::',
     ]);
     exportVariableCalledWith(mockEnv, [
-      {name: 'GIT_DIFF', val: '\'package.json\' \'abc/package.json\' \'src/main.ts\''},
-      {name: 'GIT_DIFF_FILTERED', val: '\'src/main.ts\''},
-      {name: 'MATCHED_FILES', val: '\'package.json\' \'abc/package.json\''},
+      { name: 'GIT_DIFF', val: '\'package.json\' \'abc/package.json\' \'src/main.ts\'' },
+      { name: 'GIT_DIFF_FILTERED', val: '\'src/main.ts\'' },
+      { name: 'MATCHED_FILES', val: '\'package.json\' \'abc/package.json\'' },
     ]);
   });
 
@@ -407,9 +407,9 @@ describe('execute', () => {
       '::endgroup::',
     ]);
     exportVariableCalledWith(mockEnv, [
-      {name: 'GIT_DIFF', val: '\'package.json\' \'abc/package.json\' \'src/main.ts\''},
-      {name: 'GIT_DIFF_FILTERED', val: '\'src/main.ts\''},
-      {name: 'MATCHED_FILES', val: '\'package.json\' \'abc/package.json\''},
+      { name: 'GIT_DIFF', val: '\'package.json\' \'abc/package.json\' \'src/main.ts\'' },
+      { name: 'GIT_DIFF_FILTERED', val: '\'src/main.ts\'' },
+      { name: 'MATCHED_FILES', val: '\'package.json\' \'abc/package.json\'' },
     ]);
   });
 
@@ -467,9 +467,9 @@ describe('execute', () => {
       '::endgroup::',
     ]);
     exportVariableCalledWith(mockEnv, [
-      {name: 'GIT_DIFF', val: ''},
-      {name: 'GIT_DIFF_FILTERED', val: ''},
-      {name: 'MATCHED_FILES', val: ''},
+      { name: 'GIT_DIFF', val: '' },
+      { name: 'GIT_DIFF_FILTERED', val: '' },
+      { name: 'MATCHED_FILES', val: '' },
     ]);
   });
 
@@ -503,9 +503,9 @@ describe('execute', () => {
       '::endgroup::',
     ]);
     exportVariableCalledWith(mockEnv, [
-      {name: 'GIT_DIFF', val: ''},
-      {name: 'GIT_DIFF_FILTERED', val: ''},
-      {name: 'MATCHED_FILES', val: ''},
+      { name: 'GIT_DIFF', val: '' },
+      { name: 'GIT_DIFF_FILTERED', val: '' },
+      { name: 'MATCHED_FILES', val: '' },
     ]);
   });
 
@@ -556,9 +556,9 @@ describe('execute', () => {
       '::endgroup::',
     ]);
     exportVariableCalledWith(mockEnv, [
-      {name: 'GIT_DIFF', val: '1'},
-      {name: 'GIT_DIFF_FILTERED', val: '2'},
-      {name: 'MATCHED_FILES', val: '3'},
+      { name: 'GIT_DIFF', val: '1' },
+      { name: 'GIT_DIFF_FILTERED', val: '2' },
+      { name: 'MATCHED_FILES', val: '3' },
     ]);
   });
 
@@ -605,9 +605,9 @@ describe('execute', () => {
       '::endgroup::',
     ]);
     exportVariableCalledWith(mockEnv, [
-      {name: 'GIT_DIFF', val: ''},
-      {name: 'GIT_DIFF_FILTERED', val: ''},
-      {name: 'MATCHED_FILES', val: ''},
+      { name: 'GIT_DIFF', val: '' },
+      { name: 'GIT_DIFF_FILTERED', val: '' },
+      { name: 'MATCHED_FILES', val: '' },
     ]);
   });
 });
