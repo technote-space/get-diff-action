@@ -147,5 +147,5 @@ branding:
   color: 'orange'
 
 runs:
-  using: node12
-  main: dist/index.js
+  using: node16
+  main: lib/main.js
