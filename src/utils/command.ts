@@ -1,13 +1,13 @@
-import type { Options } from 'multimatch';
-import type { Context } from '@actions/github/lib/context';
 import type { FileDiffResult, FileResult, DiffResult, DiffInfo } from '../types';
+import type { Context } from '@actions/github/lib/context';
+import type { Options } from 'multimatch';
 import { basename, join } from 'path';
 import { getInput } from '@actions/core' ;
-import multimatch from 'multimatch';
 import { Command, Utils, GitHelper } from '@technote-space/github-action-helper';
 import { Logger } from '@technote-space/github-action-log-helper';
-import { escape, getDiffInfo } from './misc';
+import multimatch from 'multimatch';
 import { REMOTE_NAME } from '../constant';
+import { escape, getDiffInfo } from './misc';
 
 const command                    = new Command(new Logger());
 const getRawInput                = (name: string): string => process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';

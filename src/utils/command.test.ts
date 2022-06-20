@@ -1,7 +1,6 @@
 /* eslint-disable no-magic-numbers */
-import { describe, expect, it } from 'vitest';
-import nock from 'nock';
 import path, { resolve, join } from 'path';
+import { Logger } from '@technote-space/github-action-log-helper';
 import {
   generateContext,
   testEnv,
@@ -13,7 +12,8 @@ import {
   disableNetConnect,
   getApiFixture,
 } from '@technote-space/github-action-test-helper';
-import { Logger } from '@technote-space/github-action-log-helper';
+import nock from 'nock';
+import { describe, expect, it } from 'vitest';
 import { FileDiffResult } from '../types';
 import { getGitDiff, getFileDiff, getDiffFiles, sumResults } from './command';
 
