@@ -9,11 +9,11 @@ inputs:
   GITHUB_TOKEN:
     description: Secret GitHub API token used to make API requests.
     default: ${{ github.token }}
-    required: true
+    required: false
   DOT:
     description: Dot.
     default: '...'
-    required: true
+    required: false
   BASE:
     description: base
     required: false
@@ -23,18 +23,18 @@ inputs:
   DIFF_FILTER:
     description: Diff filter.
     default: 'AMRC'
-    required: true
+    required: false
   FORMAT:
     description: Output format (text or json)
     default: text
-    required: true
+    required: false
   ESCAPE_JSON:
     description: Whether to escape when json format.
     required: false
   SEPARATOR:
     description: Separator of diffs.
     default: ' '
-    required: true
+    required: false
   PATTERNS:
     description: Target file pattern.
     required: false
