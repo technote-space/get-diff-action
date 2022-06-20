@@ -5,7 +5,8 @@
     "plugin:@typescript-eslint/eslint-recommended"
   ],
   "plugins": [
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "import"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -30,29 +31,6 @@
         "properties": "always"
       }
     ],
-    "require-jsdoc": [
-      "error",
-      {
-        "require": {
-          "FunctionDeclaration": true,
-          "MethodDefinition": true,
-          "ClassDeclaration": true
-        }
-      }
-    ],
-    "valid-jsdoc": [
-      "error",
-      {
-        "requireReturn": false,
-        "preferType": {
-          "String": "string",
-          "Object": "object",
-          "Number": "number",
-          "Function": "function",
-          "Void": "void"
-        }
-      }
-    ],
     "quotes": [
       "error",
       "single",
@@ -71,12 +49,6 @@
         }
       }
     ],
-    "no-magic-numbers": [
-      "error",
-      {
-        "ignoreArrayIndexes": true
-      }
-    ],
     "eqeqeq": "error",
     "block-scoped-var": "error",
     "complexity": [
@@ -85,7 +57,6 @@
         "maximum": 20
       }
     ],
-    "curly": "error",
     "default-case": "error",
     "dot-location": [
       "error",
@@ -100,16 +71,6 @@
       {
         "before": false,
         "after": true
-      }
-    ],
-    "id-length": [
-      "error",
-      {
-        "min": 2,
-        "properties": "never",
-        "exceptions": [
-          "$"
-        ]
       }
     ],
     "indent": [
@@ -144,6 +105,12 @@
     ],
     "semi": [
       "error"
-    ]
+    ],
+    "sort-imports": 0,
+    "import/order": [2, {
+      "groups": ["type", "builtin", "external", "internal", "parent", "sibling", "index", "object"],
+      "alphabetize": { "order": "asc", "caseInsensitive": true }
+    }],
+    "@typescript-eslint/no-non-null-assertion": "off"
   }
 }

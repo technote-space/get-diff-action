@@ -1,6 +1,6 @@
 /* eslint-disable no-magic-numbers */
-import nock from 'nock';
-import path, {resolve, join} from 'path';
+import path, { resolve, join } from 'path';
+import { Logger } from '@technote-space/github-action-log-helper';
 import {
   generateContext,
   testEnv,
@@ -12,16 +12,17 @@ import {
   disableNetConnect,
   getApiFixture,
 } from '@technote-space/github-action-test-helper';
-import {Logger} from '@technote-space/github-action-log-helper';
-import {FileDiffResult} from '../../src/types';
-import {getGitDiff, getFileDiff, getDiffFiles, sumResults} from '../../src/utils/command';
+import nock from 'nock';
+import { describe, expect, it } from 'vitest';
+import { FileDiffResult } from '../types';
+import { getGitDiff, getFileDiff, getDiffFiles, sumResults } from './command';
 
 const rootDir           = path.resolve(__dirname, '../..');
 const fixtureRootDir    = resolve(__dirname, '..', 'fixtures');
-const defaultFileResult = {filterIgnored: false, isMatched: true};
+const defaultFileResult = { filterIgnored: false, isMatched: true };
 const diffs             = [
-  {file: 'test1', insertions: 1, deletions: 100, lines: 101, ...defaultFileResult},
-  {file: 'test2', insertions: 2, deletions: 200, lines: 202, ...defaultFileResult},
+  { file: 'test1', insertions: 1, deletions: 100, lines: 101, ...defaultFileResult },
+  { file: 'test2', insertions: 2, deletions: 200, lines: 202, ...defaultFileResult },
   {
     file: 'test4',
     insertions: 4,
@@ -124,10 +125,10 @@ describe('getGitDiff', () => {
     });
 
     expect(await getGitDiff(logger, prContext)).toEqual([
-      {file: 'package.json', ...defaultFileResult},
-      {file: 'abc/composer.JSON', ...defaultFileResult},
-      {file: 'README.md', ...defaultFileResult},
-      {file: 'src/main.ts', ...defaultFileResult},
+      { file: 'package.json', ...defaultFileResult },
+      { file: 'abc/composer.JSON', ...defaultFileResult },
+      { file: 'README.md', ...defaultFileResult },
+      { file: 'src/main.ts', ...defaultFileResult },
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
@@ -177,9 +178,9 @@ describe('getGitDiff', () => {
         },
       },
     }))).toEqual([
-      {file: 'package.json', ...defaultFileResult},
-      {file: 'README.md', ...defaultFileResult},
-      {file: 'src/main.ts', ...defaultFileResult},
+      { file: 'package.json', ...defaultFileResult },
+      { file: 'README.md', ...defaultFileResult },
+      { file: 'src/main.ts', ...defaultFileResult },
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
@@ -206,10 +207,10 @@ describe('getGitDiff', () => {
     });
 
     expect(await getGitDiff(logger, draftPrContext)).toEqual([
-      {file: 'package.json', ...defaultFileResult},
-      {file: 'abc/composer.JSON', ...defaultFileResult},
-      {file: 'README.md', ...defaultFileResult},
-      {file: 'src/main.ts', ...defaultFileResult},
+      { file: 'package.json', ...defaultFileResult },
+      { file: 'abc/composer.JSON', ...defaultFileResult },
+      { file: 'README.md', ...defaultFileResult },
+      { file: 'src/main.ts', ...defaultFileResult },
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
@@ -237,10 +238,10 @@ describe('getGitDiff', () => {
     });
 
     expect(await getGitDiff(logger, draftPrContext)).toEqual([
-      {file: 'package.json', ...defaultFileResult},
-      {file: 'abc/composer.JSON', ...defaultFileResult},
-      {file: 'README.md', ...defaultFileResult},
-      {file: 'src/main.ts', ...defaultFileResult},
+      { file: 'package.json', ...defaultFileResult },
+      { file: 'abc/composer.JSON', ...defaultFileResult },
+      { file: 'README.md', ...defaultFileResult },
+      { file: 'src/main.ts', ...defaultFileResult },
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
@@ -269,10 +270,10 @@ describe('getGitDiff', () => {
       .reply(200, () => getApiFixture(fixtureRootDir, 'pulls.list1'));
 
     expect(await getGitDiff(logger, pushContext)).toEqual([
-      {file: 'package.json', ...defaultFileResult},
-      {file: 'abc/composer.json', ...defaultFileResult},
-      {file: 'README.md', ...defaultFileResult},
-      {file: 'src/main.ts', ...defaultFileResult},
+      { file: 'package.json', ...defaultFileResult },
+      { file: 'abc/composer.json', ...defaultFileResult },
+      { file: 'README.md', ...defaultFileResult },
+      { file: 'src/main.ts', ...defaultFileResult },
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
@@ -303,10 +304,10 @@ describe('getGitDiff', () => {
     expect(await getGitDiff(logger, Object.assign({}, pushContext, {
       ref: 'refs/heads/test',
     }))).toEqual([
-      {file: 'package.json', ...defaultFileResult},
-      {file: 'abc/composer.json', ...defaultFileResult},
-      {file: 'README.md', ...defaultFileResult},
-      {file: 'src/main.ts', ...defaultFileResult},
+      { file: 'package.json', ...defaultFileResult },
+      { file: 'abc/composer.json', ...defaultFileResult },
+      { file: 'README.md', ...defaultFileResult },
+      { file: 'src/main.ts', ...defaultFileResult },
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
@@ -338,10 +339,10 @@ describe('getGitDiff', () => {
     expect(await getGitDiff(logger, Object.assign({}, pushContext, {
       ref: 'refs/heads/test',
     }))).toEqual([
-      {file: 'package.json', ...defaultFileResult},
-      {file: 'abc/composer.json', ...defaultFileResult},
-      {file: 'README.md', ...defaultFileResult},
-      {file: 'src/main.ts', ...defaultFileResult},
+      { file: 'package.json', ...defaultFileResult },
+      { file: 'abc/composer.json', ...defaultFileResult },
+      { file: 'README.md', ...defaultFileResult },
+      { file: 'src/main.ts', ...defaultFileResult },
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
@@ -372,10 +373,10 @@ describe('getGitDiff', () => {
     expect(await getGitDiff(logger, Object.assign({}, pushContext, {
       ref: 'refs/heads/test',
     }))).toEqual([
-      {file: 'package.json', ...defaultFileResult},
-      {file: 'abc/composer.json', ...defaultFileResult},
-      {file: 'README.md', ...defaultFileResult},
-      {file: 'src/main.ts', ...defaultFileResult},
+      { file: 'package.json', ...defaultFileResult },
+      { file: 'abc/composer.json', ...defaultFileResult },
+      { file: 'README.md', ...defaultFileResult },
+      { file: 'src/main.ts', ...defaultFileResult },
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
@@ -407,10 +408,10 @@ describe('getGitDiff', () => {
     expect(await getGitDiff(logger, Object.assign({}, pushContext, {
       ref: 'refs/heads/test',
     }))).toEqual([
-      {file: 'package.json', ...defaultFileResult},
-      {file: 'abc/composer.json', ...defaultFileResult},
-      {file: 'README.md', ...defaultFileResult},
-      {file: 'src/main.ts', ...defaultFileResult},
+      { file: 'package.json', ...defaultFileResult },
+      { file: 'abc/composer.json', ...defaultFileResult },
+      { file: 'README.md', ...defaultFileResult },
+      { file: 'src/main.ts', ...defaultFileResult },
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
@@ -468,10 +469,10 @@ describe('getGitDiff', () => {
         },
       },
     }))).toEqual([
-      {file: 'package.json', ...defaultFileResult},
-      {file: 'abc/composer.json', ...defaultFileResult},
-      {file: 'README.md', ...defaultFileResult},
-      {file: 'src/main.ts', ...defaultFileResult},
+      { file: 'package.json', ...defaultFileResult },
+      { file: 'abc/composer.json', ...defaultFileResult },
+      { file: 'README.md', ...defaultFileResult },
+      { file: 'src/main.ts', ...defaultFileResult },
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
@@ -510,9 +511,9 @@ describe('getGitDiff', () => {
         filterIgnored: true,
         isMatched: false,
       },
-      {file: process.env.GITHUB_WORKSPACE + '/src/main.ts', ...defaultFileResult},
-      {file: process.env.GITHUB_WORKSPACE + '/src/test/test2.txt', ...defaultFileResult},
-      {file: process.env.GITHUB_WORKSPACE + '/__tests__/main.test.ts', ...defaultFileResult},
+      { file: process.env.GITHUB_WORKSPACE + '/src/main.ts', ...defaultFileResult },
+      { file: process.env.GITHUB_WORKSPACE + '/src/test/test2.txt', ...defaultFileResult },
+      { file: process.env.GITHUB_WORKSPACE + '/__tests__/main.test.ts', ...defaultFileResult },
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
@@ -536,7 +537,7 @@ describe('getGitDiff', () => {
     });
 
     expect(await getGitDiff(logger, prContext)).toEqual([
-      {file: 'test.txt', ...defaultFileResult},
+      { file: 'test.txt', ...defaultFileResult },
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
@@ -561,7 +562,7 @@ describe('getGitDiff', () => {
     });
 
     expect(await getGitDiff(logger, prContext)).toEqual([
-      {file: join(process.env.GITHUB_WORKSPACE, process.env.INPUT_RELATIVE, 'test.txt'), ...defaultFileResult},
+      { file: join(process.env.GITHUB_WORKSPACE, process.env.INPUT_RELATIVE, 'test.txt'), ...defaultFileResult },
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
@@ -633,12 +634,12 @@ describe('getGitDiff', () => {
       },
     });
 
-    const emptyDiff = {insertions: 0, deletions: 0, lines: 0, ...defaultFileResult};
+    const emptyDiff = { insertions: 0, deletions: 0, lines: 0, ...defaultFileResult };
     expect(await getGitDiff(logger, prContext)).toEqual([
-      {file: 'package.json', ...emptyDiff},
-      {file: 'abc/composer.JSON', ...emptyDiff},
-      {file: 'README.md', ...emptyDiff},
-      {file: 'src/main.ts', ...emptyDiff},
+      { file: 'package.json', ...emptyDiff },
+      { file: 'abc/composer.JSON', ...emptyDiff },
+      { file: 'README.md', ...emptyDiff },
+      { file: 'src/main.ts', ...emptyDiff },
     ]);
     execCalledWith(mockExec, [
       'git remote add get-diff-action \'https://octocat:test token@github.com/hello/world.git\' || :',
@@ -659,7 +660,7 @@ describe('getFileDiff', () => {
       stdout: '1 file changed, 25 insertions(+), 4 deletions(-)',
     });
 
-    const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {
+    const diff = await getFileDiff({ file: 'test.js', ...defaultFileResult }, {
       base: 'refs/heads/master',
       head: 'refs/pull/123/merge',
     }, '...');
@@ -679,7 +680,7 @@ describe('getFileDiff', () => {
       stdout: '1 file changed, 1 insertion(+), 3 deletions(-)',
     });
 
-    const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {
+    const diff = await getFileDiff({ file: 'test.js', ...defaultFileResult }, {
       base: 'refs/heads/master',
       head: 'refs/pull/123/merge',
     }, '...');
@@ -699,7 +700,7 @@ describe('getFileDiff', () => {
       stdout: '1 file changed, 3 insertions(+)',
     });
 
-    const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {
+    const diff = await getFileDiff({ file: 'test.js', ...defaultFileResult }, {
       base: 'refs/heads/master',
       head: 'refs/pull/123/merge',
     }, '...');
@@ -719,7 +720,7 @@ describe('getFileDiff', () => {
       stdout: '1 file changed',
     });
 
-    const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {
+    const diff = await getFileDiff({ file: 'test.js', ...defaultFileResult }, {
       base: 'refs/heads/master',
       head: 'refs/pull/123/merge',
     }, '...');
@@ -739,7 +740,7 @@ describe('getFileDiff', () => {
       stdout: '',
     });
 
-    const diff = await getFileDiff({file: 'test.js', ...defaultFileResult}, {
+    const diff = await getFileDiff({ file: 'test.js', ...defaultFileResult }, {
       base: 'refs/heads/master',
       head: 'refs/pull/123/merge',
     }, '...');
@@ -759,7 +760,7 @@ describe('getFileDiff', () => {
       stdout: '',
     });
 
-    expect(await getFileDiff({file: 'test.js', ...defaultFileResult}, {
+    expect(await getFileDiff({ file: 'test.js', ...defaultFileResult }, {
       base: 'refs/heads/master',
       head: 'refs/pull/123/merge',
     }, '...', true)).toBeUndefined();
@@ -773,20 +774,20 @@ describe('getDiffFiles', () => {
 
   it('should get git diff output 1', () => {
     expect(getDiffFiles([], false)).toBe('');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}], false)).toBe('test1');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2', ...defaultFileResult}], false)).toBe('test1 test2');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2 test3', ...defaultFileResult}], false)).toBe('test1 \'test2 test3\'');
-    expect(getDiffFiles([{file: 'test1/test2.txt', ...defaultFileResult}], false)).toBe('\'test1/test2.txt\'');
+    expect(getDiffFiles([{ file: 'test1', ...defaultFileResult }], false)).toBe('test1');
+    expect(getDiffFiles([{ file: 'test1', ...defaultFileResult }, { file: 'test2', ...defaultFileResult }], false)).toBe('test1 test2');
+    expect(getDiffFiles([{ file: 'test1', ...defaultFileResult }, { file: 'test2 test3', ...defaultFileResult }], false)).toBe('test1 \'test2 test3\'');
+    expect(getDiffFiles([{ file: 'test1/test2.txt', ...defaultFileResult }], false)).toBe('\'test1/test2.txt\'');
   });
 
   it('should get git diff output 2', () => {
     process.env.INPUT_SEPARATOR = '\n';
 
     expect(getDiffFiles([], false)).toBe('');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}], false)).toBe('test1');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2', ...defaultFileResult}], false)).toBe('test1\ntest2');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2 test3', ...defaultFileResult}], false)).toBe('test1\n\'test2 test3\'');
-    expect(getDiffFiles([{file: 'test1/test2.txt', ...defaultFileResult}], false)).toBe('\'test1/test2.txt\'');
+    expect(getDiffFiles([{ file: 'test1', ...defaultFileResult }], false)).toBe('test1');
+    expect(getDiffFiles([{ file: 'test1', ...defaultFileResult }, { file: 'test2', ...defaultFileResult }], false)).toBe('test1\ntest2');
+    expect(getDiffFiles([{ file: 'test1', ...defaultFileResult }, { file: 'test2 test3', ...defaultFileResult }], false)).toBe('test1\n\'test2 test3\'');
+    expect(getDiffFiles([{ file: 'test1/test2.txt', ...defaultFileResult }], false)).toBe('\'test1/test2.txt\'');
   });
 
   it('should get git diff output 3', () => {
@@ -798,20 +799,20 @@ describe('getDiffFiles', () => {
 
   it('should get git diff output 4', () => {
     expect(getDiffFiles([], true)).toBe('');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult, isMatched: false}], true)).toBe('');
+    expect(getDiffFiles([{ file: 'test1', ...defaultFileResult, isMatched: false }], true)).toBe('');
     expect(getDiffFiles([
       {
         file: 'test1', ...defaultFileResult,
         isMatched: false,
       },
-      {file: 'test2', ...defaultFileResult},
+      { file: 'test2', ...defaultFileResult },
     ], true)).toBe('test2');
     expect(getDiffFiles([
       {
         file: 'test1', ...defaultFileResult,
         isMatched: false,
       },
-      {file: 'test2 test3', ...defaultFileResult},
+      { file: 'test2 test3', ...defaultFileResult },
     ], true)).toBe('\'test2 test3\'');
   });
 
@@ -819,10 +820,10 @@ describe('getDiffFiles', () => {
     process.env.INPUT_FORMAT = 'json';
 
     expect(getDiffFiles([], true)).toBe('[]');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}], false)).toBe('["test1"]');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2', ...defaultFileResult}], false)).toBe('["test1","test2"]');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2 test3', ...defaultFileResult}], false)).toBe('["test1","test2 test3"]');
-    expect(getDiffFiles([{file: 'test1/test2.txt', ...defaultFileResult}], false)).toBe('["test1/test2.txt"]');
+    expect(getDiffFiles([{ file: 'test1', ...defaultFileResult }], false)).toBe('["test1"]');
+    expect(getDiffFiles([{ file: 'test1', ...defaultFileResult }, { file: 'test2', ...defaultFileResult }], false)).toBe('["test1","test2"]');
+    expect(getDiffFiles([{ file: 'test1', ...defaultFileResult }, { file: 'test2 test3', ...defaultFileResult }], false)).toBe('["test1","test2 test3"]');
+    expect(getDiffFiles([{ file: 'test1/test2.txt', ...defaultFileResult }], false)).toBe('["test1/test2.txt"]');
   });
 
   it('should get git diff output (escaped json format)', () => {
@@ -830,10 +831,10 @@ describe('getDiffFiles', () => {
     process.env.INPUT_ESCAPE_JSON = '1';
 
     expect(getDiffFiles([], true)).toBe('[]');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}], false)).toBe('["test1"]');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2', ...defaultFileResult}], false)).toBe('["test1","test2"]');
-    expect(getDiffFiles([{file: 'test1', ...defaultFileResult}, {file: 'test2 test3', ...defaultFileResult}], false)).toBe('["test1","\'test2 test3\'"]');
-    expect(getDiffFiles([{file: 'test1/test2.txt', ...defaultFileResult}], false)).toBe('["\'test1/test2.txt\'"]');
+    expect(getDiffFiles([{ file: 'test1', ...defaultFileResult }], false)).toBe('["test1"]');
+    expect(getDiffFiles([{ file: 'test1', ...defaultFileResult }, { file: 'test2', ...defaultFileResult }], false)).toBe('["test1","test2"]');
+    expect(getDiffFiles([{ file: 'test1', ...defaultFileResult }, { file: 'test2 test3', ...defaultFileResult }], false)).toBe('["test1","\'test2 test3\'"]');
+    expect(getDiffFiles([{ file: 'test1/test2.txt', ...defaultFileResult }], false)).toBe('["\'test1/test2.txt\'"]');
   });
 });
 

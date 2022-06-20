@@ -1,8 +1,8 @@
-import type {PullRequestParams, DiffInfo} from '../types';
-import type {Context} from '@actions/github/lib/context';
-import type {Octokit} from '@technote-space/github-action-helper/dist/types';
-import {Utils, ApiHelper} from '@technote-space/github-action-helper';
-import {getInput} from '@actions/core';
+import type { PullRequestParams, DiffInfo } from '../types';
+import type { Context } from '@actions/github/lib/context';
+import type { Octokit } from '@technote-space/github-action-helper/dist/types';
+import { getInput } from '@actions/core';
+import { Utils, ApiHelper } from '@technote-space/github-action-helper';
 
 export const escape = (items: string[]): string[] => items.map(item => {
   // eslint-disable-next-line no-useless-escape
@@ -25,7 +25,7 @@ const getBase = (context: Context): string => getInput('BASE') || context.payloa
 
 export const getDiffInfoForPush = async(octokit: Octokit, context: Context): Promise<DiffInfo> => {
   if (Utils.isTagRef(context)) {
-    return {base: '', head: ''};
+    return { base: '', head: '' };
   }
 
   if (!await isDefaultBranch(octokit, context)) {
