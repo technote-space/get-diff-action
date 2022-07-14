@@ -217,7 +217,7 @@ jobs:
 ### 対象イベント
 | eventName | action |
 |:---|:---|
-| pull_request | opened, reopened, synchronize, closed, ready_for_review |
+| pull_request | opened, reopened, synchronize, closed, ready_for_review, auto_merge_enabled |
 | push | * |
 
 もしこれ以外のイベントで呼ばれた場合、結果は空になります。
@@ -236,7 +236,7 @@ jobs:
 ```yaml
 on:
   pull_request:
-    types: [opened, reopened, synchronize, closed, ready_for_review]
+    types: [opened, reopened, synchronize, closed, ready_for_review, auto_merge_enabled]
 
 jobs:
   eslint:
