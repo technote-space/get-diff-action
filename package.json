@@ -38,7 +38,7 @@
     "update": "npm_config_yes=true npx npm-check-updates -u --timeout 100000 && yarn install && yarn upgrade && yarn audit"
   },
   "devDependencies": {
-    "@actions/core": "^1.9.0",
+    "@actions/core": "^1.9.1",
     "@actions/github": "^5.0.3",
     "@babel/preset-env": "^7.18.2",
     "@commitlint/cli": "^17.0.2",
