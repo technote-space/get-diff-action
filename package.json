@@ -53,7 +53,7 @@
     "@technote-space/github-action-log-helper": "^0.2.8",
     "@technote-space/github-action-test-helper": "^0.11.0",
     "@technote-space/release-github-actions-cli": "^1.9.3",
-    "@types/node": "^18.11.5",
+    "@types/node": "^18.11.7",
     "@typescript-eslint/eslint-plugin": "^5.41.0",
     "@typescript-eslint/parser": "^5.41.0",
     "@vercel/ncc": "^0.34.0",
