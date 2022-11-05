@@ -40,7 +40,7 @@
   "devDependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1",
-    "@babel/preset-env": "^7.19.4",
+    "@babel/preset-env": "^7.20.2",
     "@commitlint/cli": "^17.2.0",
     "@commitlint/config-conventional": "^17.2.0",
     "@rollup/plugin-commonjs": "^23.0.2",
@@ -53,11 +53,11 @@
     "@technote-space/github-action-log-helper": "^0.2.8",
     "@technote-space/github-action-test-helper": "^0.11.0",
     "@technote-space/release-github-actions-cli": "^1.9.3",
-    "@types/node": "^18.11.8",
+    "@types/node": "^18.11.9",
     "@typescript-eslint/eslint-plugin": "^5.42.0",
     "@typescript-eslint/parser": "^5.42.0",
     "@vercel/ncc": "^0.34.0",
-    "@vitest/coverage-c8": "^0.24.4",
+    "@vitest/coverage-c8": "^0.24.5",
     "eslint": "^8.26.0",
     "eslint-plugin-import": "^2.26.0",
     "husky": "^8.0.1",
@@ -65,9 +65,9 @@
     "multimatch": "^6.0.0",
     "nock": "^13.2.9",
     "pinst": "^3.0.0",
-    "rollup": "^3.2.4",
+    "rollup": "^3.2.5",
     "typescript": "^4.8.4",
-    "vitest": "^0.24.4"
+    "vitest": "^0.24.5"
   },
   "publishConfig": {
     "access": "public"
