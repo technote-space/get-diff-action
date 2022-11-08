@@ -48,17 +48,17 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-typescript": "^9.0.2",
     "@sindresorhus/tsconfig": "^3.0.1",
-    "@technote-space/filter-github-action": "^0.6.4",
+    "@technote-space/filter-github-action": "^0.6.5",
     "@technote-space/github-action-helper": "^5.3.9",
     "@technote-space/github-action-log-helper": "^0.2.8",
     "@technote-space/github-action-test-helper": "^0.11.0",
     "@technote-space/release-github-actions-cli": "^1.9.3",
     "@types/node": "^18.11.9",
-    "@typescript-eslint/eslint-plugin": "^5.42.0",
-    "@typescript-eslint/parser": "^5.42.0",
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
     "@vercel/ncc": "^0.34.0",
-    "@vitest/coverage-c8": "^0.24.5",
-    "eslint": "^8.26.0",
+    "@vitest/coverage-c8": "^0.25.0",
+    "eslint": "^8.27.0",
     "eslint-plugin-import": "^2.26.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
@@ -67,7 +67,7 @@
     "pinst": "^3.0.0",
     "rollup": "^3.2.5",
     "typescript": "^4.8.4",
-    "vitest": "^0.24.5"
+    "vitest": "^0.25.0"
   },
   "publishConfig": {
     "access": "public"
