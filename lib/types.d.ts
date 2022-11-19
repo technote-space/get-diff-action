@@ -1,15 +1,15 @@
-export declare type FileDiffResult = Readonly<{
+export type FileDiffResult = Readonly<{
     insertions: number;
     deletions: number;
     lines: number;
 }>;
-export declare type FileResult = Readonly<{
+export type FileResult = Readonly<{
     file: string;
     filterIgnored: boolean;
     isMatched: boolean;
 }>;
-export declare type DiffResult = FileResult | (FileDiffResult & FileResult);
-export declare type PullRequestParams = Readonly<{
+export type DiffResult = FileResult | (FileDiffResult & FileResult);
+export type PullRequestParams = Readonly<{
     base: {
         ref: string;
         sha: string;
@@ -18,7 +18,7 @@ export declare type PullRequestParams = Readonly<{
         ref: string;
     };
 }>;
-export declare type DiffInfo = Readonly<{
+export type DiffInfo = Readonly<{
     base: string;
     head: string;
 }>;
