@@ -57,17 +57,17 @@
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
     "@vercel/ncc": "^0.34.0",
-    "@vitest/coverage-c8": "^0.25.2",
+    "@vitest/coverage-c8": "^0.25.3",
     "eslint": "^8.28.0",
     "eslint-plugin-import": "^2.26.0",
     "husky": "^8.0.2",
-    "lint-staged": "^13.0.3",
+    "lint-staged": "^13.0.4",
     "multimatch": "^6.0.0",
     "nock": "^13.2.9",
     "pinst": "^3.0.0",
-    "rollup": "^3.3.0",
+    "rollup": "^3.4.0",
     "typescript": "^4.9.3",
-    "vitest": "^0.25.2"
+    "vitest": "^0.25.3"
   },
   "publishConfig": {
     "access": "public"
