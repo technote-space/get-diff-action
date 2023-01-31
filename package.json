@@ -58,15 +58,15 @@
     "@typescript-eslint/parser": "^5.49.0",
     "@vercel/ncc": "^0.36.1",
     "@vitest/coverage-c8": "^0.28.3",
-    "eslint": "^8.32.0",
+    "eslint": "^8.33.0",
     "eslint-plugin-import": "^2.27.5",
     "husky": "^8.0.3",
     "lint-staged": "^13.1.0",
     "multimatch": "^6.0.0",
     "nock": "^13.3.0",
     "pinst": "^3.0.0",
-    "rollup": "^3.11.0",
-    "typescript": "^4.9.4",
+    "rollup": "^3.12.0",
+    "typescript": "^4.9.5",
     "vitest": "^0.28.3"
   },
   "publishConfig": {
