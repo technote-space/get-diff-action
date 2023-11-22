@@ -7,5 +7,6 @@ export const TARGET_EVENTS = {
     'ready_for_review',
   ],
   'push': '*',
+  'merge_group': '*',
 };
 export const REMOTE_NAME   = 'get-diff-action';
