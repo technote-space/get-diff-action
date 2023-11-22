@@ -218,7 +218,8 @@ If there is no difference in the source code below, this workflow will skip the 
 | eventName | action |
 |:---|:---|
 | pull_request | opened, reopened, synchronize, closed, ready_for_review |
-| push | * |
+| push         | * |
+| merge_group  | * |
 
 If called on any other event, the result will be empty.
 
