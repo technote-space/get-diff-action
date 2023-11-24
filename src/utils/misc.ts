@@ -75,5 +75,12 @@ export const getDiffInfo = async(octokit: Octokit, context: Context): Promise<Di
     }, context);
   }
 
+  if (context.payload.merge_group) {
+    return {
+      base: context.payload.merge_group.base_sha,
+      head: context.payload.merge_group.head_sha,
+    };
+  }
+
   return getDiffInfoForPush(octokit, context);
 };
